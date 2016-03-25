@@ -1,0 +1,91 @@
+COMPILER DCasm
+
+    public Generator gen;
+    public Block currentBlock;
+
+/*--------------------------------------------------------------------------*/
+CHARACTERS
+  letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
+  digit = "0123456789".
+  hexa = "ABCDEFabcdef0123456789".
+  notQuote   = ANY - '"' - "\r\n".
+  cr  = '\r'.
+  lf  = '\n'.
+  tab = '\t'.
+
+TOKENS
+  hex = "0x" hexa {hexa}.
+  reg = "$" digit {digit}.
+  ident  = letter {letter | digit}.
+  number = digit {digit}.
+  string   = '"' {notQuote} '"'.        // no check for valid escape sequences
+  semicolon = ';'.
+
+COMMENTS FROM "/*" TO "*/" NESTED
+COMMENTS FROM "//" TO lf
+
+IGNORE cr + lf + tab
+
+PRODUCTIONS
+
+//------------------------------------------------------//
+DCasm
+= block { block } 
+EOF     (.gen.generate(Instruction.Program);.).
+//------------------------------------------------------//
+
+
+//------------------------------------------------------//
+block
+=
+"{"                         (.currentBlock = new Block();.)
+( core { core } | softcfg ) 
+"}"
+[ "->"
+ident						(.Console.WriteLine(t.val); currentBlock.name = t.val;.)
+]
+							(.currentBlock.addBlock();.)
+.
+//------------------------------------------------------//
+
+
+//------------------------------------------------------//
+core
+=
+(
+("mov"          (.Instruction inst = new Instruction("mov");.)
+reg             (. inst.addArg(t.kind,t.val); .) ","
+(hex | number)  (. inst.addArg(t.kind,t.val); inst.create(); .))
+|
+(("add" | "sub" | "mul" | "div" | "mup")          (.Instruction inst = new Instruction(t.val);.)
+reg             (. inst.addArg(t.kind,t.val); .) ","
+reg             (. inst.addArg(t.kind,t.val); .) ","
+reg             (. inst.addArg(t.kind,t.val); inst.create(); .))
+|
+(("comp" | "gpo" | "gpi" | "lw" | "sw")          (.Instruction inst = new Instruction(t.val); .)
+reg             (. inst.addArg(t.kind,t.val); .) ","
+reg             (. inst.addArg(t.kind,t.val); inst.create(); .))
+|
+(("jmp" | "bra" | "jgt" | "jeq" | "jlt")        (.Instruction inst = new Instruction(t.val);.)
+reg             		(. inst.addArg(t.kind,t.val); inst.create(); .))
+|
+"call" ident (.Instruction inst = new Instruction("call"); inst.addArg(t.kind,t.val); inst.create();.)
+|
+"return" (. Instruction inst = new Instruction(t.val); inst.create(); .)
+|
+"lbl" ident (. Instruction inst = new Instruction("label"); inst.addArg(t.kind,t.val); inst.create(); .)    
+)
+.
+//------------------------------------------------------//
+
+
+//------------------------------------------------------//
+// will be used later
+softcfg
+=
+"soft" "{"		(.Console.WriteLine("softcore config");.)
+"}".
+//------------------------------------------------------//
+
+
+END DCasm.

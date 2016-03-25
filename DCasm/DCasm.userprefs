@@ -1,0 +1,17 @@
+﻿<Properties StartupItem="DCasm.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Parser.cs">
+    <Files>
+      <File FileName="Parser.cs" Line="1" Column="1" />
+      <File FileName="Program.cs" Line="18" Column="25" />
+      <File FileName="Generator.cs" Line="9" Column="19" />
+      <File FileName="DCasm.atg" Line="45" Column="2" />
+      <File FileName="Instruction.cs" Line="16" Column="4" />
+      <File FileName="Scanner.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
