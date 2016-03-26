@@ -1,12 +1,13 @@
 ﻿<Properties StartupItem="DCasm/DCasm.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="DCasm/Instruction.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="DCasm/Block.cs">
     <Files>
-      <File FileName="DCasm/Generator.cs" Line="19" Column="13" />
-      <File FileName="DCasm/Instruction.cs" Line="78" Column="13" />
-      <File FileName="DCasm/Program.cs" Line="13" Column="24" />
-      <File FileName="DCasm/Block.cs" Line="15" Column="13" />
-      <File FileName="DCasm/Utils.cs" Line="11" Column="23" />
+      <File FileName="DCasm/Generator.cs" Line="8" Column="101" />
+      <File FileName="DCasm/Program.cs" Line="31" Column="7" />
+      <File FileName="DCasm/Utils.cs" Line="10" Column="36" />
+      <File FileName="DCasm/Block.cs" Line="57" Column="9" NotebookId="1" />
+      <File FileName="DCasm/bin/Debug/test.dc" Line="6" Column="10" NotebookId="1" />
+      <File FileName="DCasm/Parser.cs" Line="1" Column="1" NotebookId="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

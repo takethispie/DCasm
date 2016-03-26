@@ -5,13 +5,9 @@ namespace DCasm
 {
 	public class Generator
 	{
+        public static Dictionary<string,List<int>> labelQueue = new Dictionary<string, List<int>>();
+
 		public Generator () { }
-
-		public void gen()
-		{
-
-		}
-
 
         public void generate(List<Instruction> program)
         {

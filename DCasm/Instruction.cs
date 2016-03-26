@@ -14,6 +14,7 @@ namespace DCasm
 		{
 			this.type = t;
 			this.value = va;
+            convert();
 		}
 
         public void convert()
@@ -23,11 +24,14 @@ namespace DCasm
                 case 1:
                     //remove 0x
                     this.value = this.value.Remove(0, 2);
+                    this.value = Utils.bin(this.value, 16);
                     break;
 
                 case 2:
                     //remove $
                     this.value = this.value.Remove(0, 1);
+                    this.value = Utils.hex(this.value, 2);
+                    this.value = Utils.bin(this.value, 5);
                     break;
             }
         }
@@ -36,9 +40,6 @@ namespace DCasm
 
 	public class Instruction
 	{
-		static public int numInstruction = 0;
-		static public List<Instruction> Program = new List<Instruction> ();
-
 		public string op;
 		public List<Part> parts;
 		public int index;
@@ -50,8 +51,8 @@ namespace DCasm
 		{
 			this.op = op;
 			parts = new List<Part> ();
-			index = Instruction.numInstruction;
-			Instruction.numInstruction += 1;
+            machineCodeSize = 1;
+            index = 0;
 		}
 
 
@@ -71,14 +72,8 @@ namespace DCasm
                 }
                 Console.Write(Environment.NewLine);
             #endif
-            Instruction.Program.Add (this);
-		}
-
-
-        public void PreGen()
-        {   
             
-        }   
+		}
 	}
 }
 

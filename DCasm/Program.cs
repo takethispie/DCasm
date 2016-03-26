@@ -7,7 +7,7 @@ namespace DCasm
 	{
 		public static void Main (string[] args)
 		{
-			string version = "0.1"; 
+			string version = "0.2"; 
 			Scanner sc;
 			Parser par;
 			string command = "";
@@ -19,17 +19,19 @@ namespace DCasm
 				command = Console.ReadLine();
 				string[] cmdSplit = command.Split(' ');
 
-				if(cmdSplit[0].ToUpper() == "DO")
-				{
-					if(File.Exists(cmdSplit[1]))
-					{
-						sc = new Scanner(cmdSplit[1]);
-						par = new Parser(sc);
-						par.gen = new Generator();
-						Console.WriteLine("Starting compilation...");
-						par.Parse();
-					}
-				}
+                if (cmdSplit[0].ToUpper() == "DO")
+                {
+                    if (File.Exists(cmdSplit[1]))
+                    {
+                        sc = new Scanner(cmdSplit[1]);
+                        par = new Parser(sc);
+                        par.gen = new Generator();
+                        Console.WriteLine("Starting compilation...");
+                        par.Parse();
+                    }
+                }
+                else
+                    Console.WriteLine("File does not exists !");
 			}
 		}
 	}

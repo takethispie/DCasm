@@ -31,7 +31,7 @@ PRODUCTIONS
 //------------------------------------------------------//
 DCasm
 = block { block } 
-EOF     (.gen.generate(Instruction.Program);.).
+EOF     (.Block.preGenerate();.).
 //------------------------------------------------------//
 
 
@@ -52,29 +52,32 @@ ident						(.Console.WriteLine(t.val); currentBlock.name = t.val;.)
 //------------------------------------------------------//
 core
 =
+(.Instruction inst = new Instruction("");.)
 (
-("mov"          (.Instruction inst = new Instruction("mov");.)
+("mov"          (.inst = new Instruction("mov");.)
 reg             (. inst.addArg(t.kind,t.val); .) ","
 (hex | number)  (. inst.addArg(t.kind,t.val); inst.create(); .))
 |
-(("add" | "sub" | "mul" | "div" | "mup")          (.Instruction inst = new Instruction(t.val);.)
+(("add" | "sub" | "mul" | "div" | "mup")          (.inst = new Instruction(t.val);.)
 reg             (. inst.addArg(t.kind,t.val); .) ","
 reg             (. inst.addArg(t.kind,t.val); .) ","
-reg             (. inst.addArg(t.kind,t.val); inst.create(); .))
+reg             (. inst.addArg(t.kind,t.val);.))
 |
-(("comp" | "gpo" | "gpi" | "lw" | "sw")          (.Instruction inst = new Instruction(t.val); .)
+(("comp" | "gpo" | "gpi" | "lw" | "sw")          (.inst = new Instruction(t.val); .)
 reg             (. inst.addArg(t.kind,t.val); .) ","
-reg             (. inst.addArg(t.kind,t.val); inst.create(); .))
+reg             (. inst.addArg(t.kind,t.val);.))
 |
-(("jmp" | "bra" | "jgt" | "jeq" | "jlt")        (.Instruction inst = new Instruction(t.val);.)
-reg             		(. inst.addArg(t.kind,t.val); inst.create(); .))
+(("jmp" | "bra" | "jgt" | "jeq" | "jlt")        (.inst = new Instruction(t.val);.)
+reg             		(. inst.addArg(t.kind,t.val);.))
 |
-"call" ident (.Instruction inst = new Instruction("call"); inst.addArg(t.kind,t.val); inst.create();.)
+"call" ident (.inst = new Instruction("mov"); inst.addArg(t.kind,t.val); inst.create(); currentBlock.addInstruction(inst);
+				inst = new Instruction("call"); inst.addArg(t.kind,t.val); .)
 |
-"return" (. Instruction inst = new Instruction(t.val); inst.create(); .)
+"return" (.inst = new Instruction(t.val);.)
 |
-"lbl" ident (. Instruction inst = new Instruction("label"); inst.addArg(t.kind,t.val); inst.create(); .)    
+"lbl" ident (.inst = new Instruction("label"); inst.addArg(t.kind,t.val); inst.machineCodeSize = 0;.)    
 )
+(.inst.create(); currentBlock.addInstruction(inst);.)
 .
 //------------------------------------------------------//
 

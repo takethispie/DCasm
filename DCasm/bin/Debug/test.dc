@@ -1,12 +1,12 @@
 {
 mov $8, 0x18AA
-sub $5, $8, $9
+sub $5, $8, $31
 add $10, $4, $3
 call print
-}
+} -> main
 
 {
-mov $1, 0x1010
-mov $2, 0x10101111
+mov $1, 0xA
+mov $2, 0xAF
 gpo $1, $2
 } -> print

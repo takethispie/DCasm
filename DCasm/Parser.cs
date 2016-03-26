@@ -95,7 +95,7 @@ public Generator gen;
 			block();
 		}
 		Expect(0);
-		gen.generate(Instruction.Program);
+		Block.preGenerate();
 	}
 
 	void block() {
@@ -119,10 +119,11 @@ public Generator gen;
 	}
 
 	void core() {
+		Instruction inst = new Instruction("");
 		switch (la.kind) {
 		case 10: {
 			Get();
-			Instruction inst = new Instruction("mov");
+			inst = new Instruction("mov");
 			Expect(2);
 			inst.addArg(t.kind,t.val); 
 			Expect(11);
@@ -146,7 +147,7 @@ public Generator gen;
 			} else {
 				Get();
 			}
-			Instruction inst = new Instruction(t.val);
+			inst = new Instruction(t.val);
 			Expect(2);
 			inst.addArg(t.kind,t.val); 
 			Expect(11);
@@ -154,7 +155,7 @@ public Generator gen;
 			inst.addArg(t.kind,t.val); 
 			Expect(11);
 			Expect(2);
-			inst.addArg(t.kind,t.val); inst.create(); 
+			inst.addArg(t.kind,t.val);
 			break;
 		}
 		case 17: case 18: case 19: case 20: case 21: {
@@ -169,12 +170,12 @@ public Generator gen;
 			} else {
 				Get();
 			}
-			Instruction inst = new Instruction(t.val); 
+			inst = new Instruction(t.val); 
 			Expect(2);
 			inst.addArg(t.kind,t.val); 
 			Expect(11);
 			Expect(2);
-			inst.addArg(t.kind,t.val); inst.create(); 
+			inst.addArg(t.kind,t.val);
 			break;
 		}
 		case 22: case 23: case 24: case 25: case 26: {
@@ -189,30 +190,32 @@ public Generator gen;
 			} else {
 				Get();
 			}
-			Instruction inst = new Instruction(t.val);
+			inst = new Instruction(t.val);
 			Expect(2);
-			inst.addArg(t.kind,t.val); inst.create(); 
+			inst.addArg(t.kind,t.val);
 			break;
 		}
 		case 27: {
 			Get();
 			Expect(3);
-			Instruction inst = new Instruction("call"); inst.addArg(t.kind,t.val); inst.create();
+			inst = new Instruction("mov"); inst.addArg(t.kind,t.val); inst.create(); currentBlock.addInstruction(inst);
+			inst = new Instruction("call"); inst.addArg(t.kind,t.val); 
 			break;
 		}
 		case 28: {
 			Get();
-			Instruction inst = new Instruction(t.val); inst.create(); 
+			inst = new Instruction(t.val);
 			break;
 		}
 		case 29: {
 			Get();
 			Expect(3);
-			Instruction inst = new Instruction("label"); inst.addArg(t.kind,t.val); inst.create(); 
+			inst = new Instruction("label"); inst.addArg(t.kind,t.val);
 			break;
 		}
 		default: SynErr(34); break;
 		}
+		inst.create(); currentBlock.addInstruction(inst);
 	}
 
 	void softcfg() {
