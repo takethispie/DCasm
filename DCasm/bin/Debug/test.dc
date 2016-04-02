@@ -1,12 +1,16 @@
 {
-mov $8, 0x18AA
-sub $5, $8, $31
-add $10, $4, $3
-call print
-} -> main
+	mov $8, 0x18AA
+	sub $5, $8, $31
+	add $10, $4, $3
+	call print
+} 
+-> main
 
 {
-mov $1, 0xA
-mov $2, 0xAF
-gpo $1, $2
-} -> print
+	mov $1, 0xA
+	goto test
+	mov $2, 0xAF
+	gpo $1, $2
+	lbl test
+} 
+-> print

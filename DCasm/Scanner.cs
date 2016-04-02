@@ -367,8 +367,8 @@ public class Scanner {
 			case "jlt": t.kind = 26; break;
 			case "call": t.kind = 27; break;
 			case "return": t.kind = 28; break;
-			case "lbl": t.kind = 29; break;
-			case "soft": t.kind = 30; break;
+			case "goto": t.kind = 29; break;
+			case "lbl": t.kind = 30; break;
 			default: break;
 		}
 	}

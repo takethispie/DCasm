@@ -28,6 +28,7 @@ public class Parser {
 
 public Generator gen;
     public Block currentBlock;
+    public int adress = 0;
 
 /*--------------------------------------------------------------------------*/
 
@@ -95,20 +96,16 @@ public Generator gen;
 			block();
 		}
 		Expect(0);
-		Block.preGenerate();
+		Block.preGenerate(); gen.generate(Block.blocks);
 	}
 
 	void block() {
 		Expect(7);
-		currentBlock = new Block();
-		if (StartOf(1)) {
+		currentBlock = new Block(); currentBlock.startAdress = adress;
+		core();
+		while (StartOf(1)) {
 			core();
-			while (StartOf(1)) {
-				core();
-			}
-		} else if (la.kind == 30) {
-			softcfg();
-		} else SynErr(32);
+		}
 		Expect(8);
 		if (la.kind == 9) {
 			Get();
@@ -119,20 +116,21 @@ public Generator gen;
 	}
 
 	void core() {
-		Instruction inst = new Instruction("");
+		Instruction inst = new Instruction(""); int instSize = 1;
 		switch (la.kind) {
 		case 10: {
 			Get();
-			inst = new Instruction("mov");
+			inst = new Instruction("mov"); 
 			Expect(2);
-			inst.addArg(t.kind,t.val); 
+			inst.param = Utils.getRegValue(t.val); 
 			Expect(11);
 			if (la.kind == 1) {
 				Get();
+				inst.param = Utils.bin(t.val, 16);
 			} else if (la.kind == 4) {
 				Get();
-			} else SynErr(33);
-			inst.addArg(t.kind,t.val); inst.create(); 
+				inst.param = Utils.getRegValue(t.val);
+			} else SynErr(32);
 			break;
 		}
 		case 12: case 13: case 14: case 15: case 16: {
@@ -149,13 +147,17 @@ public Generator gen;
 			}
 			inst = new Instruction(t.val);
 			Expect(2);
-			inst.addArg(t.kind,t.val); 
+			inst.param = Utils.getRegValue(t.val); 
 			Expect(11);
 			Expect(2);
-			inst.addArg(t.kind,t.val); 
+			inst.param = Utils.getRegValue(t.val); 
 			Expect(11);
 			Expect(2);
-			inst.addArg(t.kind,t.val);
+			inst.param = Utils.getRegValue(t.val); 
+			if (la.kind == 4) {
+				Get();
+				inst.shamt = t.val;
+			}
 			break;
 		}
 		case 17: case 18: case 19: case 20: case 21: {
@@ -172,10 +174,16 @@ public Generator gen;
 			}
 			inst = new Instruction(t.val); 
 			Expect(2);
-			inst.addArg(t.kind,t.val); 
+			inst.param = Utils.getRegValue(t.val); 
 			Expect(11);
 			Expect(2);
-			inst.addArg(t.kind,t.val);
+			inst.param = Utils.getRegValue(t.val); 
+			if(inst.op == "lw" || inst.op == "sw"){
+			if (la.kind == 4) {
+				Get();
+				inst.shamt = t.val;
+			}
+			}
 			break;
 		}
 		case 22: case 23: case 24: case 25: case 26: {
@@ -192,14 +200,14 @@ public Generator gen;
 			}
 			inst = new Instruction(t.val);
 			Expect(2);
-			inst.addArg(t.kind,t.val);
+			inst.param = Utils.getRegValue(t.val);
 			break;
 		}
 		case 27: {
 			Get();
 			Expect(3);
-			inst = new Instruction("mov"); inst.addArg(t.kind,t.val); inst.create(); currentBlock.addInstruction(inst);
-			inst = new Instruction("call"); inst.addArg(t.kind,t.val); 
+			inst = new Instruction("mov"); inst.param = "call"; inst.param = t.val; currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;  
+			  adress++; inst.create(); inst = new Instruction("call"); inst.param = "call"; inst.param = t.val; currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
 			break;
 		}
 		case 28: {
@@ -210,19 +218,18 @@ public Generator gen;
 		case 29: {
 			Get();
 			Expect(3);
-			inst = new Instruction("label"); inst.addArg(t.kind,t.val);
+			inst = new Instruction("goto"); inst.param = t.val; currentBlock.onLabelRes += inst.onLblResolution;
 			break;
 		}
-		default: SynErr(34); break;
+		case 30: {
+			Get();
+			Expect(3);
+			instSize = 0; currentBlock.addLabel(t.val,adress);
+			break;
 		}
-		inst.create(); currentBlock.addInstruction(inst);
-	}
-
-	void softcfg() {
-		Expect(30);
-		Expect(7);
-		Console.WriteLine("softcore config");
-		Expect(8);
+		default: SynErr(33); break;
+		}
+		if(instSize > 0){ inst.create(); currentBlock.addInstruction(inst); adress += instSize;} 
 	}
 
 
@@ -238,7 +245,7 @@ public Generator gen;
 	
 	static readonly bool[,] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _x}
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x}
 
 	};
 } // end Parser
@@ -281,12 +288,11 @@ public class Errors {
 			case 26: s = "\"jlt\" expected"; break;
 			case 27: s = "\"call\" expected"; break;
 			case 28: s = "\"return\" expected"; break;
-			case 29: s = "\"lbl\" expected"; break;
-			case 30: s = "\"soft\" expected"; break;
+			case 29: s = "\"goto\" expected"; break;
+			case 30: s = "\"lbl\" expected"; break;
 			case 31: s = "??? expected"; break;
-			case 32: s = "invalid block"; break;
+			case 32: s = "invalid core"; break;
 			case 33: s = "invalid core"; break;
-			case 34: s = "invalid core"; break;
 
 			default: s = "error " + n; break;
 		}

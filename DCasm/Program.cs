@@ -23,6 +23,7 @@ namespace DCasm
                 {
                     if (File.Exists(cmdSplit[1]))
                     {
+                        Block.Init();
                         sc = new Scanner(cmdSplit[1]);
                         par = new Parser(sc);
                         par.gen = new Generator();

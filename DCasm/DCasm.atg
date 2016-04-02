@@ -2,6 +2,7 @@ COMPILER DCasm
 
     public Generator gen;
     public Block currentBlock;
+    public int adress = 0;
 
 /*--------------------------------------------------------------------------*/
 CHARACTERS
@@ -31,20 +32,23 @@ PRODUCTIONS
 //------------------------------------------------------//
 DCasm
 = block { block } 
-EOF     (.Block.preGenerate();.).
+EOF     (.Block.preGenerate(); gen.generate(Block.blocks);.).
 //------------------------------------------------------//
 
 
 //------------------------------------------------------//
 block
 =
-"{"                         (.currentBlock = new Block();.)
-( core { core } | softcfg ) 
+"{"                         (.currentBlock = new Block(); currentBlock.startAdress = adress;.)
+	core 
+	{ 
+		core 
+	} 
 "}"
 [ "->"
-ident						(.Console.WriteLine(t.val); currentBlock.name = t.val;.)
+	ident						(.Console.WriteLine(t.val); currentBlock.name = t.val;.)
 ]
-							(.currentBlock.addBlock();.)
+(.currentBlock.addBlock();.)
 .
 //------------------------------------------------------//
 
@@ -52,42 +56,52 @@ ident						(.Console.WriteLine(t.val); currentBlock.name = t.val;.)
 //------------------------------------------------------//
 core
 =
-(.Instruction inst = new Instruction("");.)
+(.Instruction inst = new Instruction(""); int instSize = 1;.)
 (
-("mov"          (.inst = new Instruction("mov");.)
-reg             (. inst.addArg(t.kind,t.val); .) ","
-(hex | number)  (. inst.addArg(t.kind,t.val); inst.create(); .))
+	(
+		"mov"          (. inst = new Instruction("mov"); .)
+		reg             (. inst.param = Utils.getRegValue(t.val); .) ","
+		(
+			hex (.inst.param = Utils.bin(t.val, 16);.) 
+			|  
+			number (.inst.param = Utils.getRegValue(t.val);.) 
+		)
+	)
 |
-(("add" | "sub" | "mul" | "div" | "mup")          (.inst = new Instruction(t.val);.)
-reg             (. inst.addArg(t.kind,t.val); .) ","
-reg             (. inst.addArg(t.kind,t.val); .) ","
-reg             (. inst.addArg(t.kind,t.val);.))
+	(
+		("add" | "sub" | "mul" | "div" | "mup")          (.inst = new Instruction(t.val);.)
+		reg             (. inst.param = Utils.getRegValue(t.val); .) ","
+		reg             (. inst.param = Utils.getRegValue(t.val); .) ","
+		reg             (. inst.param = Utils.getRegValue(t.val); .)
+        //SHAMT 
+        [ number          (.inst.shamt = t.val; .) ] 
+	)
 |
-(("comp" | "gpo" | "gpi" | "lw" | "sw")          (.inst = new Instruction(t.val); .)
-reg             (. inst.addArg(t.kind,t.val); .) ","
-reg             (. inst.addArg(t.kind,t.val);.))
+	(
+		("comp" | "gpo" | "gpi" | "lw" | "sw")          (.inst = new Instruction(t.val); .)
+		reg             (. inst.param = Utils.getRegValue(t.val); .) ","
+		reg             (. inst.param = Utils.getRegValue(t.val); .) 
+        (.if(inst.op == "lw" || inst.op == "sw"){.)
+            [number       (.inst.shamt = t.val;.)]
+        (.}.)
+	)
 |
-(("jmp" | "bra" | "jgt" | "jeq" | "jlt")        (.inst = new Instruction(t.val);.)
-reg             		(. inst.addArg(t.kind,t.val);.))
+	(	
+		("jmp" | "bra" | "jgt" | "jeq" | "jlt")        (.inst = new Instruction(t.val);.)
+		reg             		(. inst.param = Utils.getRegValue(t.val);.)
+	)
 |
-"call" ident (.inst = new Instruction("mov"); inst.addArg(t.kind,t.val); inst.create(); currentBlock.addInstruction(inst);
-				inst = new Instruction("call"); inst.addArg(t.kind,t.val); .)
+	"call" ident (.inst = new Instruction("mov"); inst.param = "call"; inst.param = t.val; currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;  
+                   adress++; inst.create(); inst = new Instruction("call"); inst.param = "call"; inst.param = t.val; currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;.)
 |
-"return" (.inst = new Instruction(t.val);.)
+	"return" (.inst = new Instruction(t.val);.)
 |
-"lbl" ident (.inst = new Instruction("label"); inst.addArg(t.kind,t.val); inst.machineCodeSize = 0;.)    
+	"goto" ident (.inst = new Instruction("goto"); inst.param = t.val; currentBlock.onLabelRes += inst.onLblResolution;.)
+|
+	"lbl" ident (.instSize = 0; currentBlock.addLabel(t.val,adress);.)    
 )
-(.inst.create(); currentBlock.addInstruction(inst);.)
+(. if(instSize > 0){ inst.create(); currentBlock.addInstruction(inst); adress += instSize;} .)
 .
-//------------------------------------------------------//
-
-
-//------------------------------------------------------//
-// will be used later
-softcfg
-=
-"soft" "{"		(.Console.WriteLine("softcore config");.)
-"}".
 //------------------------------------------------------//
 
 
