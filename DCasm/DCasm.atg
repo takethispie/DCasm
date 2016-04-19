@@ -46,7 +46,7 @@ block
 	} 
 "}"
 [ "->"
-	ident						(.Console.WriteLine(t.val); currentBlock.name = t.val;.)
+	ident						(.currentBlock.name = t.val;.)
 ]
 (.currentBlock.addBlock();.)
 .
@@ -60,7 +60,7 @@ core
 (
 	(
 		"mov"          (. inst = new Instruction("mov"); .)
-		reg             (. inst.param = Utils.getRegValue(t.val); .) ","
+		reg             (. inst.param = Utils.getRegValue(t.val); inst.param = "00000"; .) ","
 		(
 			hex (.inst.param = Utils.bin(t.val, 16);.) 
 			|  
@@ -91,8 +91,10 @@ core
 		reg             		(. inst.param = Utils.getRegValue(t.val);.)
 	)
 |
-	"call" ident (.inst = new Instruction("mov"); inst.param = "call"; inst.param = t.val; currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;  
-                   adress++; inst.create(); inst = new Instruction("call"); inst.param = "call"; inst.param = t.val; currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;.)
+	"call" ident (.inst = new Instruction("mov"); inst.param = "call"; inst.param = t.val; 
+					currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;  
+                   adress++; inst.create(); inst = new Instruction("call"); inst.param = "call"; 
+                   inst.param = t.val; currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;.)
 |
 	"return" (.inst = new Instruction(t.val);.)
 |

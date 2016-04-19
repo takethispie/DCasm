@@ -1,15 +1,22 @@
 ﻿<Properties StartupItem="DCasm/DCasm.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="DCasm/Instruction.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="DCasm/Block.cs">
     <Files>
-      <File FileName="DCasm/Generator.cs" Line="1" Column="1" />
-      <File FileName="DCasm/Program.cs" Line="29" Column="51" />
-      <File FileName="DCasm/Utils.cs" Line="6" Column="6" />
-      <File FileName="DCasm/Block.cs" Line="90" Column="18" />
-      <File FileName="DCasm/DCasm.atg" Line="78" Column="3" />
-      <File FileName="DCasm/Instruction.cs" Line="56" Column="35" />
-      <File FileName="DCasm/Parser.cs" Line="1" Column="1" />
+      <File FileName="DCasm/Generator.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="DCasm/Program.cs" Line="35" Column="25" NotebookId="1" />
+      <File FileName="DCasm/Block.cs" Line="185" Column="29" NotebookId="1" />
+      <File FileName="DCasm/Instruction.cs" Line="51" Column="23" NotebookId="1" />
+      <File FileName="DCasm/Parser.cs" Line="1" Column="1" NotebookId="1" />
     </Files>
+    <FloatingWindows>
+      <FloatingWindow WindowId="1" X="0" Y="0" Width="1920" Height="1005">
+        <Files>
+          <File FileName="DCasm/bin/Debug/test.dc" Line="10" Column="13" />
+          <File FileName="DCasm/DCasm.atg" Line="49" Column="15" />
+          <File FileName="DCasm/Utils.cs" Line="17" Column="1" />
+        </Files>
+      </FloatingWindow>
+    </FloatingWindows>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

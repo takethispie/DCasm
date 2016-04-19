@@ -29,10 +29,11 @@ namespace DCasm
                         par.gen = new Generator();
                         Console.WriteLine("Starting compilation...");
                         par.Parse();
+
                     }
+                    else
+                        Console.WriteLine("File does not exists !");
                 }
-                else
-                    Console.WriteLine("File does not exists !");
 			}
 		}
 	}

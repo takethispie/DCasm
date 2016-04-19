@@ -182,7 +182,7 @@ namespace DCasm
                      if (target != null)
                      {
                         #if DEBUG
-                        Console.WriteLine("resolving block call: " + target.name + " @ " + target.startAdress);
+                            Console.WriteLine("resolving block call: " + target.name + " @ " + target.startAdress);
                         #endif
                         b.onBlockRes(target.name,target.startAdress);
                      }

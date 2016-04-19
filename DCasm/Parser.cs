@@ -110,7 +110,7 @@ public Generator gen;
 		if (la.kind == 9) {
 			Get();
 			Expect(3);
-			Console.WriteLine(t.val); currentBlock.name = t.val;
+			currentBlock.name = t.val;
 		}
 		currentBlock.addBlock();
 	}
@@ -122,7 +122,7 @@ public Generator gen;
 			Get();
 			inst = new Instruction("mov"); 
 			Expect(2);
-			inst.param = Utils.getRegValue(t.val); 
+			inst.param = Utils.getRegValue(t.val); inst.param = "00000"; 
 			Expect(11);
 			if (la.kind == 1) {
 				Get();
@@ -156,7 +156,7 @@ public Generator gen;
 			inst.param = Utils.getRegValue(t.val); 
 			if (la.kind == 4) {
 				Get();
-				inst.shamt = t.val;
+				inst.shamt = t.val; 
 			}
 			break;
 		}
@@ -206,8 +206,10 @@ public Generator gen;
 		case 27: {
 			Get();
 			Expect(3);
-			inst = new Instruction("mov"); inst.param = "call"; inst.param = t.val; currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;  
-			  adress++; inst.create(); inst = new Instruction("call"); inst.param = "call"; inst.param = t.val; currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
+			inst = new Instruction("mov"); inst.param = "call"; inst.param = t.val; 
+			currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;  
+			  adress++; inst.create(); inst = new Instruction("call"); inst.param = "call"; 
+			  inst.param = t.val; currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
 			break;
 		}
 		case 28: {

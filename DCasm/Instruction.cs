@@ -35,8 +35,21 @@ namespace DCasm
         {
             if (parameters[0] == "call" && parameters[1] == name)
             {
-                parameters.Clear();
-                param = Utils.bin(Utils.hex(adress.ToString(),4),16);
+                //if op = call
+                if (op != "111110")
+                {
+                    parameters.Clear();
+                    param = "00001";
+                    param = "00000";
+                    param = Utils.bin(Utils.hex(adress.ToString(), 4), 16);
+                }
+                else
+                {
+                    parameters.Clear();
+                    param = "00000";
+                    param = "00001";
+                    param = "0000000000000000";
+                }
             }
         }
 
@@ -58,34 +71,42 @@ namespace DCasm
 
                 case "mup":
                     op = "100010";
+                    function = "000000";
                     break;
 
                 case "lwd":
                     op = "101000";
+                    function = "000000";
                     break;
 
                 case "lw":
                     op = "101001";
+                    function = "000000";
                     break;
 
                 case "swd":
                     op = "101100";
+                    function = "000000";
                     break;
 
                 case "sw":
                     op = "101101";
+                    function = "000000";
                     break;
 
                 case "sin":
                     op = "111011";
+                    function = "000000";
                     break;
 
                 case "din":
                     op = "111101";
+                    function = "000000";
                     break;
 
                 case "ein":
                     op = "111100";
+                    function = "000000";
                     break;
 
                 case "call":
@@ -94,66 +115,96 @@ namespace DCasm
 
                 case "ret":
                     op = "111111";
+                    shamt = "00000";
+                    function = "000000";
                     break;
 
                 case "comp":
                     op = "011010";
+                    shamt = "00000";
+                    function = "000000";
                     break;
 
                 case "gpo":
                     op = "011011";
+                    function = "000000";
                     break;
 
                 case "gpi":
                     op = "011100";
+                    function = "000000";
                     break;
 
                 case "jgt":
                     op = "001001";
+                    shamt = "00000";
+                    function = "000000";
                     break;
 
                 case "jeq":
                     op = "001010";
+                    shamt = "00000";
+                    function = "000000";
                     break;
 
                 case "jlt":
                     op = "001011";
+                    shamt = "00000";
+                    function = "000000";
                     break;
 
                 case "bgt":
                     op = "010001";
+                    shamt = "00000";
+                    function = "000000";
                     break;
 
                 case "beq":
                     op = "010010";
+                    shamt = "00000";
+                    function = "000000";
                     break;
 
                 case "blt":
                     op = "010011";
+                    shamt = "00000";
+                    function = "000000";
                     break;
 
                 case "jmp":
                     op = "001111";
+                    shamt = "00000";
+                    function = "000000";
                     break;
 
                 case "bra":
                     op = "010111";
+                    shamt = "00000";
+                    function = "000000";
                     break;
 
                 case "add":
                     op = "000000";
+                    shamt = "00000";
+                    function = "000001";
                     break;
 
                 case "sub":
                     op = "000000";
+                    shamt = "00000";
+                    function = "000002";
                     break;
 
                 case "mul":
                     op = "000000";
+                    shamt = "00000";
+                    function = "000003";
                     break;
 
                 case "div":
                     op = "000000";
+                    shamt = "00000";
+                    function = "000004";
                     break;
             }
 		}
@@ -170,9 +221,10 @@ namespace DCasm
             string strParam = "";
             foreach (string para in parameters)
             {
-                strParam += para + " ";
+                strParam += para;
             }
-            return string.Format(op + " " + shamt + strParam);
+            string result = op + strParam + shamt + function;
+            return string.Format( result + " : " + result.Length);
         }
 	}
 }
