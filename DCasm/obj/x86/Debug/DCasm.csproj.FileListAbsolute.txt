@@ -1,0 +1,5 @@
+F:\Dev\C#\DustCat\DCasm\DCasm\obj\x86\Debug\DCasm.exe
+F:\Dev\C#\DustCat\DCasm\DCasm\obj\x86\Debug\DCasm.csprojResolveAssemblyReference.cache
+F:\Dev\C#\DustCat\DCasm\DCasm\bin\Debug\DCasm.exe
+F:\Dev\C#\DustCat\DCasm\DCasm\bin\Debug\DCasm.pdb
+F:\Dev\C#\DustCat\DCasm\DCasm\obj\x86\Debug\DCasm.pdb

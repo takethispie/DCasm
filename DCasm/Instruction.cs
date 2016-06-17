@@ -39,16 +39,13 @@ namespace DCasm
                 if (op != "111110")
                 {
                     parameters.Clear();
-                    param = "00001";
-                    param = "00000";
+                    param = "0000100000";
                     param = Utils.bin(Utils.hex(adress.ToString(), 4), 16);
                 }
                 else
                 {
                     parameters.Clear();
-                    param = "00000";
-                    param = "00001";
-                    param = "0000000000000000";
+                    param = "00000000010000000000000000";
                 }
             }
         }

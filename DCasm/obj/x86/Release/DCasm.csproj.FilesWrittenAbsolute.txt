@@ -1,0 +1,5 @@
+/media/takethispie/Verbatim/Dev/C#/DustCat/DCasm/DCasm/obj/x86/Release/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/media/takethispie/Verbatim/Dev/C#/DustCat/DCasm/DCasm/bin/Release/DCasm.exe.mdb
+/media/takethispie/Verbatim/Dev/C#/DustCat/DCasm/DCasm/bin/Release/DCasm.exe
+/media/takethispie/Verbatim/Dev/C#/DustCat/DCasm/DCasm/obj/x86/Release/DCasm.exe
+/media/takethispie/Verbatim/Dev/C#/DustCat/DCasm/DCasm/obj/x86/Release/DCasm.exe.mdb
