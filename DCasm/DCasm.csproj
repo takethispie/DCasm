@@ -46,5 +46,8 @@
   <ItemGroup>
     <None Include="DCasm.atg" />
     <None Include="bin\Debug\test.dc" />
+    <None Include="..\README.md">
+      <Link>README.md</Link>
+    </None>
   </ItemGroup>
 </Project>

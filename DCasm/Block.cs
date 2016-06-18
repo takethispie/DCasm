@@ -159,6 +159,7 @@ namespace DCasm
             Console.WriteLine("Main".PadRight(20) + GlobalSize.ToString().PadLeft(10,'0') + " Lines | start adress: 0");
 
             //get all non-main blocks and process them
+			//set their start adress
             foreach (Block b in blocks.FindAll(x => x.isMain == false))
             {
                 b.startAdress = GlobalSize;

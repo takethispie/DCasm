@@ -124,6 +124,8 @@ namespace DCasm
 
                 case "gpo":
                     op = "011011";
+					param = "00000";
+					shamt = "00000";
                     function = "000000";
                     break;
 
