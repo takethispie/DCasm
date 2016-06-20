@@ -28,7 +28,7 @@ to be implemented
 
 
 ## How to test
-do <sourcefile>
+do path/to/source/file
 currently there is no output file generation
 
  
