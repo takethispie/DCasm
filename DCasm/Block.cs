@@ -110,6 +110,7 @@ namespace DCasm
             }
         }
 
+
         /// <summary>
         /// add a label to the label table
         /// to be resolved later
@@ -133,7 +134,6 @@ namespace DCasm
         }
 
 
-
         /// <summary>
         /// resolve call adress, block adress
         /// befor instructions are converted to machine code
@@ -146,6 +146,7 @@ namespace DCasm
             patch();
             ResolveBlocksCall();
         }
+
 
         /// <summary>
         /// Patch adresses
@@ -171,6 +172,7 @@ namespace DCasm
                 b.resolveLabels();
             }
         }
+        
 
         /// <summary>
         /// Resolves blocks call

@@ -112,7 +112,7 @@ public Generator gen;
 			Expect(3);
 			currentBlock.name = t.val;
 		}
-		currentBlock.addBlock();
+		currentBlock.addBlock(); currentBlock.resolveLabels();
 	}
 
 	void core() {

@@ -48,7 +48,7 @@ block
 [ "->"
 	ident						(.currentBlock.name = t.val;.)
 ]
-(.currentBlock.addBlock();.)
+(.currentBlock.addBlock(); currentBlock.resolveLabels();.)
 .
 //------------------------------------------------------//
 
