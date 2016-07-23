@@ -14,7 +14,9 @@ namespace DCasm
         public delegate void ResolutionEvent(string name, int adress);
         public event ResolutionEvent onBlockRes;
         public event ResolutionEvent onLabelRes;
+
         public List<string> blockQueue;
+
         public Dictionary<string,int> labelTable;
 
 
@@ -80,7 +82,7 @@ namespace DCasm
         public void addBlock()
         {
             if (name == "main")
-            { 
+            {
                 if (!mainSet)
                 {
                     this.isMain = true;
@@ -124,13 +126,13 @@ namespace DCasm
                 throw new Exception("Error: label already exists !");
         }
 
-            
+
         public void addBlockRef(string name)
         {
             blockQueue.Add(name);
         }
 
-       
+
 
         /// <summary>
         /// resolve call adress, block adress
@@ -153,7 +155,7 @@ namespace DCasm
             GlobalSize = 0;
             Console.WriteLine(Environment.NewLine + "Pre Generation:" + Environment.NewLine);
 
-            //find main    
+            //find main
             Block main = blocks.Find(x => x.isMain == true);
             GlobalSize += main.size;
             Console.WriteLine("Main".PadRight(20) + GlobalSize.ToString().PadLeft(10,'0') + " Lines | start adress: 0");
@@ -188,9 +190,8 @@ namespace DCasm
                         b.onBlockRes(target.name,target.startAdress);
                      }
                 }
-           } 
+           }
        }
 
     }
 }
-

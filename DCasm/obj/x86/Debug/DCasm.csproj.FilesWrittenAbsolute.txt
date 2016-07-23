@@ -10,3 +10,17 @@
 /run/media/dustcat/Verbatim/Dev/C#/DustCat/DCasm/DCasm/obj/x86/Debug/DCasm.exe
 /run/media/dustcat/Verbatim/Dev/C#/DustCat/DCasm/DCasm/obj/x86/Debug/DCasm.exe.mdb
 /run/media/dustcat/Verbatim/Dev/C#/DustCat/DCasm/DCasm/obj/x86/Debug/DCasm.pdb
+/run/media/dustcat/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/run/media/dustcat/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/bin/Debug/DCasm.exe.mdb
+/run/media/dustcat/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/bin/Debug/DCasm.pdb
+/run/media/dustcat/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/bin/Debug/DCasm.exe
+/run/media/dustcat/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/obj/x86/Debug/DCasm.exe
+/run/media/dustcat/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/obj/x86/Debug/DCasm.exe.mdb
+/run/media/dustcat/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/obj/x86/Debug/DCasm.pdb
+/run/media/alex/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/run/media/alex/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/bin/Debug/DCasm.exe.mdb
+/run/media/alex/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/bin/Debug/DCasm.pdb
+/run/media/alex/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/bin/Debug/DCasm.exe
+/run/media/alex/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/obj/x86/Debug/DCasm.exe
+/run/media/alex/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/obj/x86/Debug/DCasm.exe.mdb
+/run/media/alex/Verbatim/Dev/CSharp/DustCat/DCasm/DCasm/obj/x86/Debug/DCasm.pdb

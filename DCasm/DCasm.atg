@@ -31,7 +31,7 @@ PRODUCTIONS
 
 //------------------------------------------------------//
 DCasm
-= block { block } 
+= block { block }
 EOF     (.Block.preGenerate(); gen.generate(Block.blocks);.).
 //------------------------------------------------------//
 
@@ -40,10 +40,10 @@ EOF     (.Block.preGenerate(); gen.generate(Block.blocks);.).
 block
 =
 "{"                         (.currentBlock = new Block(); currentBlock.startAdress = adress;.)
-	core 
-	{ 
-		core 
-	} 
+	core
+	{
+		core
+	}
 "}"
 [ "->"
 	ident						(.currentBlock.name = t.val;.)
@@ -62,9 +62,9 @@ core
 		"mov"          (. inst = new Instruction("mov"); .)
 		reg             (. inst.param = Utils.getRegValue(t.val); inst.param = "00000"; .) ","
 		(
-			hex (.inst.param = Utils.bin(t.val, 16);.) 
-			|  
-			number (.inst.param = Utils.getRegValue(t.val);.) 
+			hex (.inst.param = Utils.bin(t.val, 16);.)
+			|
+			number (.inst.param = Utils.getRegValue(t.val);.)
 		)
 	)
 |
@@ -73,34 +73,32 @@ core
 		reg             (. inst.param = Utils.getRegValue(t.val); .) ","
 		reg             (. inst.param = Utils.getRegValue(t.val); .) ","
 		reg             (. inst.param = Utils.getRegValue(t.val); .)
-        //SHAMT 
-        [ number          (.inst.shamt = t.val; .) ] 
+        //SHAMT
+        [ number          (.inst.shamt = t.val; .) ]
 	)
 |
 	(
 		("comp" | "gpo" | "gpi" | "lw" | "sw")          (.inst = new Instruction(t.val); .)
 		reg             (. inst.param = Utils.getRegValue(t.val); .) ","
-		reg             (. inst.param = Utils.getRegValue(t.val); .) 
+		reg             (. inst.param = Utils.getRegValue(t.val); .)
         (.if(inst.op == "lw" || inst.op == "sw"){.)
             [number       (.inst.shamt = t.val;.)]
         (.}.)
 	)
 |
-	(	
+	(
 		("jmp" | "bra" | "jgt" | "jeq" | "jlt")        (.inst = new Instruction(t.val);.)
 		reg             		(. inst.param = Utils.getRegValue(t.val);.)
 	)
 |
-	"call" ident (.inst = new Instruction("mov"); inst.param = "call"; inst.param = t.val; 
-					currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;  
-                   adress++; inst.create(); inst = new Instruction("call"); inst.param = "call"; 
+	"call" ident (.inst = new Instruction("mov"); inst.param = "call"; inst.param = t.val;
+					currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
+                   adress++; inst.create(); inst = new Instruction("call"); inst.param = "call";
                    inst.param = t.val; currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;.)
 |
 	"return" (.inst = new Instruction(t.val);.)
 |
-	"goto" ident (.inst = new Instruction("goto"); inst.param = t.val; currentBlock.onLabelRes += inst.onLblResolution;.)
-|
-	"lbl" ident (.instSize = 0; currentBlock.addLabel(t.val,adress);.)    
+	"lbl" ident (.instSize = 0; currentBlock.addLabel(t.val,adress);.)
 )
 (. if(instSize > 0){ inst.create(); currentBlock.addInstruction(inst); adress += instSize;} .)
 .

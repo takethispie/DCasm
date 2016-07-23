@@ -8,7 +8,7 @@ namespace DCasm
 		public string op,function,shamt;
         private List<string> parameters;
         public string machineCode;
-		
+
         public string param
         {
             set
@@ -16,13 +16,13 @@ namespace DCasm
         }
 
         public Instruction (string op)
-		{
-			this.op = op;
-            this.function = "";
-            this.parameters = new List<string>();
-            this.machineCode = "";
-            this.shamt = "";
-		}
+        {
+        	this.op = op;
+                this.function = "";
+                this.parameters = new List<string>();
+                this.machineCode = "";
+                this.shamt = "";
+        }
 
 
         public List<string> getParamList()
@@ -53,12 +53,13 @@ namespace DCasm
 
         public void onLblResolution(string name, int adress)
         {
+			//reformat to binary output
             parameters.Clear();
             param = Utils.bin(Utils.hex(adress.ToString(),4),16);
         }
 
 
-		public void create()
+        public void create()
         {
             switch (op)
             {
@@ -124,8 +125,8 @@ namespace DCasm
 
                 case "gpo":
                     op = "011011";
-					param = "00000";
-					shamt = "00000";
+  	                param = "00000";
+                    shamt = "00000";
                     function = "000000";
                     break;
 
@@ -227,4 +228,3 @@ namespace DCasm
         }
 	}
 }
-

@@ -13,7 +13,7 @@ public class Parser {
 	public const int _number = 4;
 	public const int _string = 5;
 	public const int _semicolon = 6;
-	public const int maxT = 31;
+	public const int maxT = 30;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -130,7 +130,7 @@ public Generator gen;
 			} else if (la.kind == 4) {
 				Get();
 				inst.param = Utils.getRegValue(t.val);
-			} else SynErr(32);
+			} else SynErr(31);
 			break;
 		}
 		case 12: case 13: case 14: case 15: case 16: {
@@ -206,9 +206,9 @@ public Generator gen;
 		case 27: {
 			Get();
 			Expect(3);
-			inst = new Instruction("mov"); inst.param = "call"; inst.param = t.val; 
-			currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;  
-			  adress++; inst.create(); inst = new Instruction("call"); inst.param = "call"; 
+			inst = new Instruction("mov"); inst.param = "call"; inst.param = t.val;
+			currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
+			  adress++; inst.create(); inst = new Instruction("call"); inst.param = "call";
 			  inst.param = t.val; currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
 			break;
 		}
@@ -220,16 +220,10 @@ public Generator gen;
 		case 29: {
 			Get();
 			Expect(3);
-			inst = new Instruction("goto"); inst.param = t.val; currentBlock.onLabelRes += inst.onLblResolution;
-			break;
-		}
-		case 30: {
-			Get();
-			Expect(3);
 			instSize = 0; currentBlock.addLabel(t.val,adress);
 			break;
 		}
-		default: SynErr(33); break;
+		default: SynErr(32); break;
 		}
 		if(instSize > 0){ inst.create(); currentBlock.addInstruction(inst); adress += instSize;} 
 	}
@@ -246,8 +240,8 @@ public Generator gen;
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x}
 
 	};
 } // end Parser
@@ -290,11 +284,10 @@ public class Errors {
 			case 26: s = "\"jlt\" expected"; break;
 			case 27: s = "\"call\" expected"; break;
 			case 28: s = "\"return\" expected"; break;
-			case 29: s = "\"goto\" expected"; break;
-			case 30: s = "\"lbl\" expected"; break;
-			case 31: s = "??? expected"; break;
+			case 29: s = "\"lbl\" expected"; break;
+			case 30: s = "??? expected"; break;
+			case 31: s = "invalid core"; break;
 			case 32: s = "invalid core"; break;
-			case 33: s = "invalid core"; break;
 
 			default: s = "error " + n; break;
 		}
