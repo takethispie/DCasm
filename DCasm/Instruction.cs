@@ -215,8 +215,12 @@ namespace DCasm
             parameters.Clear();
         }
 
-
-        public override string ToString()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="showSize"></param>
+        /// <returns></returns>
+        public string ToString(bool showSize)
         {
             string strParam = "";
             foreach (string para in parameters)
@@ -225,6 +229,22 @@ namespace DCasm
             }
             string result = op + strParam + shamt + function;
             return string.Format( result + " : " + result.Length);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="showSize"></param>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            string strParam = "";
+            foreach (string para in parameters)
+            {
+                strParam += para;
+            }
+            string result = op + strParam + shamt + function;
+            return result;
         }
 	}
 }

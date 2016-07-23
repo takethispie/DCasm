@@ -27,6 +27,17 @@ namespace DCasm
             return Convert.ToString(Convert.ToInt32(str, 16), 2).PadLeft(size, '0');
         }
 
+        /// <summary>
+        /// return an hexadecimal representation of a binary 
+        /// only work with number wich fits into Uint64
+        /// </summary>
+        /// <param name="str">the binary</param>
+        /// <returns></returns>
+        public static string BinToHex(string str)
+        {
+            return String.Format("{0:X2}", Convert.ToUInt64(str, 2));
+        }
+
 
         /// <summary>
         /// Gets the reg value   
