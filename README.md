@@ -28,7 +28,8 @@ to be implemented
 
 
 ## How to test
-do path/to/source/file
+>do path/to/source/file 
+
 currently there is no output file generation
 
  
