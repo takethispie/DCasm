@@ -7,7 +7,7 @@ namespace DCasm
 	{
 		public static void Main (string[] args)
 		{
-			string version = "0.2"; 
+			string version = "0.3"; 
 			Scanner sc;
 			Parser par;
 			string command = "";

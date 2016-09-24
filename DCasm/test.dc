@@ -7,7 +7,7 @@
 {
 	mov $1, 0xA
 	mov $2, 0xAF
-	lbl test;
+	lbl test
 	gpo $1, $2
 }
 -> print

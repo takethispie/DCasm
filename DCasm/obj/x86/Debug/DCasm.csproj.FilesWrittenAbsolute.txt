@@ -31,3 +31,5 @@
 /run/media/dustcat/Verbatim/Dev/CSharp/DCasm/DCasm/obj/x86/Debug/DCasm.exe
 /run/media/dustcat/Verbatim/Dev/CSharp/DCasm/DCasm/obj/x86/Debug/DCasm.exe.mdb
 /run/media/dustcat/Verbatim/Dev/CSharp/DCasm/DCasm/obj/x86/Debug/DCasm.pdb
+/run/media/dustcat/Verbatim/Dev/CSharp/DCasm/DCasm/obj/x86/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
+/run/media/dustcat/Verbatim/Dev/CSharp/DCasm/DCasm/bin/Debug/test.dc
