@@ -1,11 +1,6 @@
 #Autosave files
 *~
 
-#build
-[Oo]bj/
-[Bb]in/
-packages/
-TestResults/
 
 # globs
 Makefile.in
@@ -40,5 +35,7 @@ Thumbs.db
 *.dotCover
 
 DCasm/DCasm.userprefs
+DCasm/bin
+DCasm/obj
 .vscode/.browse.VC.db
 .vscode/.browse.VC.db-wal

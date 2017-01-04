@@ -47,7 +47,7 @@ namespace DCasm
 					else
 					{
 						parameters.Clear();
-						param = "00000000010000000000000000";
+						param = "00000100000000000000000000";
 					}
 				}
 			}
@@ -220,11 +220,7 @@ namespace DCasm
 			parameters.Clear();
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="showSize"></param>
-		/// <returns></returns>
+
 		public string ToString(bool showSize)
 		{
 			try

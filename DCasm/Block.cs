@@ -89,9 +89,7 @@ namespace DCasm
                     mainSet = true;
                 }
                 else
-                {
                     throw new Exception("Error: entry point already set !");
-                }
             }
             blocks.Add(this);
         }
