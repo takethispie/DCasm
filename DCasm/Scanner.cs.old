@@ -203,8 +203,8 @@ public class UTF8Buffer: Buffer {
 public class Scanner {
 	const char EOL = '\n';
 	const int eofSym = 0; /* pdt */
-	const int maxT = 30;
-	const int noSym = 30;
+	const int maxT = 28;
+	const int noSym = 28;
 
 
 	public Buffer buffer; // scanner buffer
@@ -355,19 +355,17 @@ public class Scanner {
 			case "mul": t.kind = 14; break;
 			case "div": t.kind = 15; break;
 			case "mup": t.kind = 16; break;
-			case "comp": t.kind = 17; break;
-			case "gpo": t.kind = 18; break;
-			case "gpi": t.kind = 19; break;
-			case "lw": t.kind = 20; break;
-			case "sw": t.kind = 21; break;
-			case "jmp": t.kind = 22; break;
-			case "bra": t.kind = 23; break;
-			case "jgt": t.kind = 24; break;
-			case "jeq": t.kind = 25; break;
-			case "jlt": t.kind = 26; break;
-			case "call": t.kind = 27; break;
-			case "return": t.kind = 28; break;
-			case "lbl": t.kind = 29; break;
+			case "gpo": t.kind = 17; break;
+			case "gpi": t.kind = 18; break;
+			case "lw": t.kind = 19; break;
+			case "sw": t.kind = 20; break;
+			case "jmp": t.kind = 21; break;
+			case "bra": t.kind = 22; break;
+			case "jgt": t.kind = 23; break;
+			case "jeq": t.kind = 24; break;
+			case "jlt": t.kind = 25; break;
+			case "call": t.kind = 26; break;
+			case "return": t.kind = 27; break;
 			default: break;
 		}
 	}

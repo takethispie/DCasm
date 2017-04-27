@@ -13,7 +13,7 @@ public class Parser {
 	public const int _number = 4;
 	public const int _string = 5;
 	public const int _semicolon = 6;
-	public const int maxT = 30;
+	public const int maxT = 28;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -112,7 +112,7 @@ public Generator gen;
 			Expect(3);
 			currentBlock.name = t.val;
 		}
-		currentBlock.addBlock(); currentBlock.resolveLabels();
+		currentBlock.addBlock();
 	}
 
 	void core() {
@@ -122,15 +122,15 @@ public Generator gen;
 			Get();
 			inst = new Instruction("mov"); 
 			Expect(2);
-			inst.param = Utils.getRegValue(t.val); inst.param = "00000"; 
+			inst.parameters.Add(Utils.getRegValue(t.val)); inst.parameters.Add("000"); 
 			Expect(11);
 			if (la.kind == 1) {
 				Get();
-				inst.param = Utils.bin(t.val, 16);
+				inst.parameters.Add(Utils.bin(t.val, 16));
 			} else if (la.kind == 4) {
 				Get();
-				inst.param = Utils.getRegValue(t.val);
-			} else SynErr(31);
+				inst.parameters.Add(Utils.getRegValue(t.val));
+			} else SynErr(29);
 			break;
 		}
 		case 12: case 13: case 14: case 15: case 16: {
@@ -147,83 +147,65 @@ public Generator gen;
 			}
 			inst = new Instruction(t.val);
 			Expect(2);
-			inst.param = Utils.getRegValue(t.val); 
+			inst.parameters.Add(Utils.getRegValue(t.val)); 
 			Expect(11);
 			Expect(2);
-			inst.param = Utils.getRegValue(t.val); 
+			inst.parameters.Add(Utils.getRegValue(t.val)); 
 			Expect(11);
 			Expect(2);
-			inst.param = Utils.getRegValue(t.val); 
-			if (la.kind == 4) {
-				Get();
-				inst.shamt = t.val; 
-			}
+			inst.parameters.Add(Utils.getRegValue(t.val)); 
 			break;
 		}
-		case 17: case 18: case 19: case 20: case 21: {
+		case 17: case 18: case 19: case 20: {
 			if (la.kind == 17) {
 				Get();
 			} else if (la.kind == 18) {
 				Get();
 			} else if (la.kind == 19) {
 				Get();
-			} else if (la.kind == 20) {
-				Get();
 			} else {
 				Get();
 			}
 			inst = new Instruction(t.val); 
 			Expect(2);
-			inst.param = Utils.getRegValue(t.val); 
+			inst.parameters.Add(Utils.getRegValue(t.val)); 
 			Expect(11);
 			Expect(2);
-			inst.param = Utils.getRegValue(t.val); 
-			if(inst.op == "lw" || inst.op == "sw"){
-			if (la.kind == 4) {
-				Get();
-				inst.shamt = t.val;
-			}
-			}
+			inst.parameters.Add(Utils.getRegValue(t.val)); 
 			break;
 		}
-		case 22: case 23: case 24: case 25: case 26: {
-			if (la.kind == 22) {
+		case 21: case 22: case 23: case 24: case 25: {
+			if (la.kind == 21) {
+				Get();
+			} else if (la.kind == 22) {
 				Get();
 			} else if (la.kind == 23) {
 				Get();
 			} else if (la.kind == 24) {
-				Get();
-			} else if (la.kind == 25) {
 				Get();
 			} else {
 				Get();
 			}
 			inst = new Instruction(t.val);
 			Expect(2);
-			inst.param = Utils.getRegValue(t.val);
+			inst.parameters.Add(Utils.getRegValue(t.val));
+			break;
+		}
+		case 26: {
+			Get();
+			Expect(3);
+			inst = new Instruction("mov"); inst.parameters.Add("call"); inst.parameters.Add(t.val);
+			currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
+			  adress++; inst.create(); inst = new Instruction("call"); inst.parameters.Add("call");
+			  inst.parameters.Add(t.val); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
 			break;
 		}
 		case 27: {
 			Get();
-			Expect(3);
-			inst = new Instruction("mov"); inst.param = "call"; inst.param = t.val;
-			currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
-			  adress++; inst.create(); inst = new Instruction("call"); inst.param = "call";
-			  inst.param = t.val; currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
-			break;
-		}
-		case 28: {
-			Get();
 			inst = new Instruction(t.val);
 			break;
 		}
-		case 29: {
-			Get();
-			Expect(3);
-			instSize = 0; currentBlock.addLabel(t.val,adress);
-			break;
-		}
-		default: SynErr(32); break;
+		default: SynErr(30); break;
 		}
 		if(instSize > 0){ inst.create(); currentBlock.addInstruction(inst); adress += instSize;} 
 	}
@@ -240,8 +222,8 @@ public Generator gen;
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x}
 
 	};
 } // end Parser
@@ -272,22 +254,20 @@ public class Errors {
 			case 14: s = "\"mul\" expected"; break;
 			case 15: s = "\"div\" expected"; break;
 			case 16: s = "\"mup\" expected"; break;
-			case 17: s = "\"comp\" expected"; break;
-			case 18: s = "\"gpo\" expected"; break;
-			case 19: s = "\"gpi\" expected"; break;
-			case 20: s = "\"lw\" expected"; break;
-			case 21: s = "\"sw\" expected"; break;
-			case 22: s = "\"jmp\" expected"; break;
-			case 23: s = "\"bra\" expected"; break;
-			case 24: s = "\"jgt\" expected"; break;
-			case 25: s = "\"jeq\" expected"; break;
-			case 26: s = "\"jlt\" expected"; break;
-			case 27: s = "\"call\" expected"; break;
-			case 28: s = "\"return\" expected"; break;
-			case 29: s = "\"lbl\" expected"; break;
-			case 30: s = "??? expected"; break;
-			case 31: s = "invalid core"; break;
-			case 32: s = "invalid core"; break;
+			case 17: s = "\"gpo\" expected"; break;
+			case 18: s = "\"gpi\" expected"; break;
+			case 19: s = "\"lw\" expected"; break;
+			case 20: s = "\"sw\" expected"; break;
+			case 21: s = "\"jmp\" expected"; break;
+			case 22: s = "\"bra\" expected"; break;
+			case 23: s = "\"jgt\" expected"; break;
+			case 24: s = "\"jeq\" expected"; break;
+			case 25: s = "\"jlt\" expected"; break;
+			case 26: s = "\"call\" expected"; break;
+			case 27: s = "\"return\" expected"; break;
+			case 28: s = "??? expected"; break;
+			case 29: s = "invalid core"; break;
+			case 30: s = "invalid core"; break;
 
 			default: s = "error " + n; break;
 		}

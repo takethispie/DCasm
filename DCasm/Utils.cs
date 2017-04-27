@@ -4,6 +4,8 @@ namespace DCasm
 {
     public static class Utils
     {
+		public static I_ISA currentIsa;
+
         /// <summary>
         /// convert to Hex the specified int
         /// </summary>
@@ -35,7 +37,7 @@ namespace DCasm
         /// <returns></returns>
         public static string BinToHex(string str)
         {
-            return String.Format("{0:X2}", Convert.ToUInt64(str, 2));
+            return String.Format("{0:X8}", Convert.ToUInt64(str, 2));
         }
 
 

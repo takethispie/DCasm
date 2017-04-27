@@ -13,11 +13,8 @@ namespace DCasm
 
         public delegate void ResolutionEvent(string name, int adress);
         public event ResolutionEvent onBlockRes;
-        public event ResolutionEvent onLabelRes;
 
         public List<string> blockQueue;
-
-        public Dictionary<string,int> labelTable;
 
 
         /// <summary>
@@ -61,7 +58,6 @@ namespace DCasm
             startAdress = 0;
             isMain = false;
             content = new List<Instruction>();
-            labelTable = new Dictionary<string, int>();
             blockQueue = new List<string>();
         }
 
@@ -81,10 +77,8 @@ namespace DCasm
         /// </summary>
         public void addBlock()
         {
-            if (name == "main")
-            {
-                if (!mainSet)
-                {
+            if (name == "main") {
+                if (!mainSet) {
                     this.isMain = true;
                     mainSet = true;
                 }
@@ -92,37 +86,6 @@ namespace DCasm
                     throw new Exception("Error: entry point already set !");
             }
             blocks.Add(this);
-        }
-
-        /// <summary>
-        /// replace all label reference by their adress
-        /// </summary>
-        /// <param name="lbl">label name</param>
-        /// <param name="adress">absolute adress of the label</param>
-        public void resolveLabels()
-        {
-            foreach (string lbl in labelTable.Keys)
-            {
-                if(onLabelRes != null)
-                    onLabelRes(lbl, labelTable[lbl] + startAdress);
-            }
-        }
-
-
-        /// <summary>
-        /// add a label to the label table
-        /// to be resolved later
-        /// </summary>
-        /// <param name="name">Name.</param>
-        /// <param name="absoluteAdress">Absolute adress.</param>
-        public void addLabel(string name, int adress)
-        {
-            if (!labelTable.ContainsKey(name))
-            {
-                labelTable.Add(name, adress - startAdress);
-            }
-            else
-                throw new Exception("Error: label already exists !");
         }
 
 
@@ -161,13 +124,11 @@ namespace DCasm
 
             //get all non-main blocks and process them
 			//set their start adress
-            foreach (Block b in blocks.FindAll(x => x.isMain == false))
-            {
+            foreach (Block b in blocks.FindAll(x => x.isMain == false)) {
                 b.startAdress = GlobalSize;
                 Console.WriteLine(b.name.PadRight(20) + b.size.ToString().PadLeft(10,'0') + " Lines | start adress: " + GlobalSize);
                 GlobalSize += b.size;
                 blockTable.Add(b.name, b.startAdress);
-                b.resolveLabels();
             }
         }
         
@@ -177,13 +138,10 @@ namespace DCasm
         /// </summary>
         static void ResolveBlocksCall()
         {
-           foreach (Block b in blocks)
-           {
-                foreach (string n in b.blockQueue)
-                {
+           foreach (Block b in blocks) {
+                foreach (string n in b.blockQueue) {
                      Block target = blocks.Find(x => x.name == n);
-                     if (target != null)
-                     {
+                     if (target != null) {
                         #if DEBUG
                             Console.WriteLine("resolving block call: " + target.name + " @ " + target.startAdress);
                         #endif
