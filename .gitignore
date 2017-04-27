@@ -35,7 +35,8 @@ Thumbs.db
 *.dotCover
 
 DCasm/DCasm.userprefs
-DCasm/bin
-DCasm/obj
+DCasm/bin/*
+DCasm/obj/*
+.vscode/
 .vscode/.browse.VC.db
 .vscode/.browse.VC.db-wal
