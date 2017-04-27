@@ -11,6 +11,7 @@ Makefile.in
 *.pidb
 *.userprefs
 *.usertasks
+*.exe
 config.log
 config.make
 config.status
@@ -33,7 +34,7 @@ Thumbs.db
 
 #dotCover
 *.dotCover
-
+.idea/
 DCasm/DCasm.userprefs
 DCasm/bin/*
 DCasm/obj/*

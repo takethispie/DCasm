@@ -1,0 +1,2 @@
+wrong register assigned to adress on function call 
+use output A instead of B as the output B ain't connected to the jump controller
