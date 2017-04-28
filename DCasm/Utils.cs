@@ -4,8 +4,6 @@ namespace DCasm
 {
     public static class Utils
     {
-		public static I_ISA currentIsa;
-
         /// <summary>
         /// convert to Hex the specified int
         /// </summary>

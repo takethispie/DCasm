@@ -1,8 +1,14 @@
 COMPILER DCasm
 
-    public Generator gen;
-    public Block currentBlock;
+	const int // types
+	  undef = 0, integer = 1, boolean = 2, symbol = 3;
+
+	const int // object kinds
+	  var = 0, proc = 1;
+
+    public CodeGenerator gen;
     public int adress = 0;
+    public I_ISA CurrentISA;
 
 /*--------------------------------------------------------------------------*/
 CHARACTERS
@@ -31,70 +37,124 @@ PRODUCTIONS
 
 //------------------------------------------------------//
 DCasm
-= block { block }
-EOF     (.Block.preGenerate(); gen.generate(Block.blocks);.).
+= (VarDecl | ProcDecl) { (VarDecl | ProcDecl) }
+EOF.
 //------------------------------------------------------//
 
 
-//------------------------------------------------------//
-block
-=
-"{"                         (.currentBlock = new Block(); currentBlock.startAdress = adress;.)
-	core
-	{
-		core
-	}
-"}"
-[ "->"
-	ident						(.currentBlock.name = t.val;.)
-]
-(.currentBlock.addBlock();.)
-.
-//------------------------------------------------------//
+
+/*------------------------------------------------------------------------*/
+AddOp<out string op>
+=                        (. op = "ADD"; .)
+  ( '+'
+  | '-'                  (. op = "SUB"; .)
+  ).
 
 
-//------------------------------------------------------//
-core
-=
-(.Instruction inst = new Instruction(""); int instSize = 1;.)
-(
-	(
-		"mov"          (. inst = new Instruction("mov"); .)
-		reg             (. inst.parameters.Add(Utils.getRegValue(t.val)); inst.parameters.Add("000"); .) ","
-		(
-			hex (.inst.parameters.Add(Utils.bin(t.val, 16));.)
-			|
-			number (.inst.parameters.Add(Utils.getRegValue(t.val));.)
-		)
+/*------------------------------------------------------------------------*/
+Expr<out int type>       (. int type1; string op; .)
+= SimExpr<out type>
+  [ RelOp<out op>
+    SimExpr<out type1>   (. /*if (type != type1) SemErr("incompatible types"); type = boolean;*/ .)
+  ].
+
+
+/*------------------------------------------------------------------------*/
+Factor<out int type, out string value>     (. int n; string name; .)
+=                        (. type = undef; value = "";.)
+  ( Ident<out name>      (. value = name; type = symbol;.)
+  | number               (. value = t.val; type = integer; .)
+  | '-' Factor<out type, out value> (. value = t.val; /*if (type != integer) { SemErr("integer type expected"); type = integer; }*/.)
+  | "true"               (. value = t.val; type = boolean; .)
+  | "false"              (. value = t.val; type = boolean; .)
+  ).
+
+
+/*------------------------------------------------------------------------*/
+Ident<out string name>
+= ident  
+
+                                (. name = t.val; .).
+/*------------------------------------------------------------------------*/
+MulOp<out string op>
+=                        (. op = "MUL"; .)
+  ( '*'
+  | '/'                  (. op = "DIV"; .)
+  ).
+
+
+/*------------------------------------------------------------------------*/
+ProcDecl                 (. string name; int adr; .)
+= "void"
+  Ident<out name>        //create scope, if main set start adress
+  '(' ')'
+  '{'                    //enter scope
+  { VarDecl | Stat }
+  '}'.    
+
+                                  //return, patch adress
+/*------------------------------------------------------------------------*/
+RelOp<out string op>
+=                        (. op = "EQU"; .)
+  ( "=="
+  | '<'                  (. op = "LSS"; .)
+  | '>'                  (. op = "GTR"; .)
+  ).
+
+
+/*------------------------------------------------------------------------*/
+SimExpr<out int type>    	(. int type1; string op; .)
+= Term<out type>
+  { AddOp<out op>
+    Term<out type1>      	(. /*if (type != integer || type1 != integer) SemErr("integer type expected");*/ .)
+	}.
+
+
+/*------------------------------------------------------------------------*/
+Stat                     	(. int type; string name; int adr, adr2, loopstart; .)
+= Ident<out name>        	
+  ( '='                  	(. /*if (obj.kind != var) SemErr("cannot assign to procedure");*/ .)
+		Expr<out type> ';'
+						   	(. /*if (type != obj.type) SemErr("incompatible types"); */ .)
+	| '(' ')' ';'          	(. /*if (obj.kind != proc) SemErr("object is not a procedure"); gen.Emit(Op.CALL, obj.adr);*/ .)
 	)
-|
-	(
-		("add" | "sub" | "mul" | "div" | "mup")          (.inst = new Instruction(t.val);.)
-		reg             (. inst.parameters.Add(Utils.getRegValue(t.val)); .) ","
-		reg             (. inst.parameters.Add(Utils.getRegValue(t.val)); .) ","
-		reg             (. inst.parameters.Add(Utils.getRegValue(t.val)); .)
-	)
-|
-	(
-		("gpo" | "gpi" | "lw" | "sw")          (.inst = new Instruction(t.val); .)
-		reg             (. inst.parameters.Add(Utils.getRegValue(t.val)); .) ","
-		reg             (. inst.parameters.Add(Utils.getRegValue(t.val)); .)
-	)
-|
-	(
-		("jmp" | "bra" | "jgt" | "jeq" | "jlt")        (.inst = new Instruction(t.val);.)
-		reg             		(. inst.parameters.Add(Utils.getRegValue(t.val));.)
-	)
-|
-	"call" ident (.inst = new Instruction("mov"); inst.parameters.Add("call"); inst.parameters.Add(t.val);
-					currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
-                   adress++; inst.create(); inst = new Instruction("call"); inst.parameters.Add("call");
-                   inst.parameters.Add(t.val); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;.)
-|
-	"return" (.inst = new Instruction(t.val);.)
-)
-(. if(instSize > 0){ inst.create(); currentBlock.addInstruction(inst); adress += instSize;} .)
-.
+
+| "if" 
+	'(' Expr<out type> ')' 	(. /*if (type != boolean) SemErr("boolean type expected");*/ .)
+	Stat
+	[ "else"               	
+		Stat 
+	]                      	//patch adress
+
+| "while"                	//set loop start adress
+	'(' Expr<out type> ')' 	(. /*if (type != boolean) SemErr("boolean type expected");*/.)
+	Stat                   	//patch adress, jump to loopstart
+
+| '{' { Stat | VarDecl } '}' .
+
+
+/*------------------------------------------------------------------------*/
+Term<out int type>       (. int type1; string op; string val1 = ""; string val2 = "";.)
+= Factor<out type,out val1>			(. Console.WriteLine(val1); .)
+  { MulOp<out op>
+    Factor<out type1, out val2>    (. Console.WriteLine(val2); /*if (type != integer || type1 != integer) SemErr("integer type expected");*/.)
+	}.
+
+
+/*------------------------------------------------------------------------*/
+Type<out int type>
+=                        (. type = undef; .)
+ ( "int"                 (. type = integer; .)
+ | "bool"                (. type = boolean; .)
+ ).
+
+
+/*------------------------------------------------------------------------*/
+VarDecl                  (. string name; int type; .)
+= Type<out type>
+  Ident<out name>        
+  { ',' Ident<out name>  
+  } ';'.
 //------------------------------------------------------//
 
 

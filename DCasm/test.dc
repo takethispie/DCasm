@@ -1,12 +1,13 @@
-{
-	mov $8, 0x18AA
-	call print
-}
--> main
+// This is a test program which can be compiled by the Taste-compiler.
+// It reads a sequence of numbers and computes the sum of all integers 
+// up to these numbers.
 
-{
-	mov $1, 0xA
-	mov $2, 0xAF
-	gpo $1, $2
+void Main() {
+	int i; 
+	i = 5;
+	int sum;
+	sum = 0;
+	while (i > 0) {
+		sum = sum + sum * i ;
+	}
 }
--> print

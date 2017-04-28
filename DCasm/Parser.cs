@@ -26,9 +26,15 @@ public class Parser {
 	public Token la;   // lookahead token
 	int errDist = minErrDist;
 
-public Generator gen;
-    public Block currentBlock;
+const int // types
+	  undef = 0, integer = 1, boolean = 2, symbol = 3;
+
+	const int // object kinds
+	  var = 0, proc = 1;
+
+    public CodeGenerator gen;
     public int adress = 0;
+    public I_ISA CurrentISA;
 
 /*--------------------------------------------------------------------------*/
 
@@ -91,123 +97,196 @@ public Generator gen;
 
 	
 	void DCasm() {
-		block();
-		while (la.kind == 7) {
-			block();
+		if (la.kind == 25 || la.kind == 26) {
+			VarDecl();
+		} else if (la.kind == 13) {
+			ProcDecl();
+		} else SynErr(29);
+		while (la.kind == 13 || la.kind == 25 || la.kind == 26) {
+			if (la.kind == 25 || la.kind == 26) {
+				VarDecl();
+			} else {
+				ProcDecl();
+			}
 		}
 		Expect(0);
-		Block.preGenerate(); gen.generate(Block.blocks);
 	}
 
-	void block() {
-		Expect(7);
-		currentBlock = new Block(); currentBlock.startAdress = adress;
-		core();
+	void VarDecl() {
+		string name; int type; 
+		Type(out type);
+		Ident(out name);
+		while (la.kind == 27) {
+			Get();
+			Ident(out name);
+		}
+		Expect(6);
+	}
+
+	void ProcDecl() {
+		string name; int adr; 
+		Expect(13);
+		Ident(out name);
+		Expect(14);
+		Expect(15);
+		Expect(16);
 		while (StartOf(1)) {
-			core();
+			if (la.kind == 25 || la.kind == 26) {
+				VarDecl();
+			} else {
+				Stat();
+			}
 		}
-		Expect(8);
-		if (la.kind == 9) {
-			Get();
-			Expect(3);
-			currentBlock.name = t.val;
-		}
-		currentBlock.addBlock();
+		Expect(17);
 	}
 
-	void core() {
-		Instruction inst = new Instruction(""); int instSize = 1;
-		switch (la.kind) {
-		case 10: {
+	void AddOp(out string op) {
+		op = "ADD"; 
+		if (la.kind == 7) {
 			Get();
-			inst = new Instruction("mov"); 
-			Expect(2);
-			inst.parameters.Add(Utils.getRegValue(t.val)); inst.parameters.Add("000"); 
-			Expect(11);
-			if (la.kind == 1) {
-				Get();
-				inst.parameters.Add(Utils.bin(t.val, 16));
-			} else if (la.kind == 4) {
-				Get();
-				inst.parameters.Add(Utils.getRegValue(t.val));
-			} else SynErr(29);
-			break;
+		} else if (la.kind == 8) {
+			Get();
+			op = "SUB"; 
+		} else SynErr(30);
+	}
+
+	void Expr(out int type) {
+		int type1; string op; 
+		SimExpr(out type);
+		if (la.kind == 18 || la.kind == 19 || la.kind == 20) {
+			RelOp(out op);
+			SimExpr(out type1);
+			
 		}
-		case 12: case 13: case 14: case 15: case 16: {
-			if (la.kind == 12) {
-				Get();
-			} else if (la.kind == 13) {
-				Get();
-			} else if (la.kind == 14) {
-				Get();
-			} else if (la.kind == 15) {
-				Get();
-			} else {
-				Get();
-			}
-			inst = new Instruction(t.val);
-			Expect(2);
-			inst.parameters.Add(Utils.getRegValue(t.val)); 
-			Expect(11);
-			Expect(2);
-			inst.parameters.Add(Utils.getRegValue(t.val)); 
-			Expect(11);
-			Expect(2);
-			inst.parameters.Add(Utils.getRegValue(t.val)); 
-			break;
+	}
+
+	void SimExpr(out int type) {
+		int type1; string op; 
+		Term(out type);
+		while (la.kind == 7 || la.kind == 8) {
+			AddOp(out op);
+			Term(out type1);
+			
 		}
-		case 17: case 18: case 19: case 20: {
-			if (la.kind == 17) {
-				Get();
-			} else if (la.kind == 18) {
-				Get();
-			} else if (la.kind == 19) {
-				Get();
-			} else {
-				Get();
-			}
-			inst = new Instruction(t.val); 
-			Expect(2);
-			inst.parameters.Add(Utils.getRegValue(t.val)); 
-			Expect(11);
-			Expect(2);
-			inst.parameters.Add(Utils.getRegValue(t.val)); 
-			break;
-		}
-		case 21: case 22: case 23: case 24: case 25: {
+	}
+
+	void RelOp(out string op) {
+		op = "EQU"; 
+		if (la.kind == 18) {
+			Get();
+		} else if (la.kind == 19) {
+			Get();
+			op = "LSS"; 
+		} else if (la.kind == 20) {
+			Get();
+			op = "GTR"; 
+		} else SynErr(31);
+	}
+
+	void Factor(out int type, out string value) {
+		int n; string name; 
+		type = undef; value = "";
+		if (la.kind == 3) {
+			Ident(out name);
+			value = name; type = symbol;
+		} else if (la.kind == 4) {
+			Get();
+			value = t.val; type = integer; 
+		} else if (la.kind == 8) {
+			Get();
+			Factor(out type, out value);
+			value = t.val; /*if (type != integer) { SemErr("integer type expected"); type = integer; }*/
+		} else if (la.kind == 9) {
+			Get();
+			value = t.val; type = boolean; 
+		} else if (la.kind == 10) {
+			Get();
+			value = t.val; type = boolean; 
+		} else SynErr(32);
+	}
+
+	void Ident(out string name) {
+		Expect(3);
+		name = t.val; 
+	}
+
+	void MulOp(out string op) {
+		op = "MUL"; 
+		if (la.kind == 11) {
+			Get();
+		} else if (la.kind == 12) {
+			Get();
+			op = "DIV"; 
+		} else SynErr(33);
+	}
+
+	void Stat() {
+		int type; string name; int adr, adr2, loopstart; 
+		if (la.kind == 3) {
+			Ident(out name);
 			if (la.kind == 21) {
 				Get();
-			} else if (la.kind == 22) {
+				
+				Expr(out type);
+				Expect(6);
+				
+			} else if (la.kind == 14) {
 				Get();
-			} else if (la.kind == 23) {
+				Expect(15);
+				Expect(6);
+				
+			} else SynErr(34);
+		} else if (la.kind == 22) {
+			Get();
+			Expect(14);
+			Expr(out type);
+			Expect(15);
+			
+			Stat();
+			if (la.kind == 23) {
 				Get();
-			} else if (la.kind == 24) {
-				Get();
-			} else {
-				Get();
+				Stat();
 			}
-			inst = new Instruction(t.val);
-			Expect(2);
-			inst.parameters.Add(Utils.getRegValue(t.val));
-			break;
-		}
-		case 26: {
+		} else if (la.kind == 24) {
 			Get();
-			Expect(3);
-			inst = new Instruction("mov"); inst.parameters.Add("call"); inst.parameters.Add(t.val);
-			currentBlock.addInstruction(inst); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
-			  adress++; inst.create(); inst = new Instruction("call"); inst.parameters.Add("call");
-			  inst.parameters.Add(t.val); currentBlock.addBlockRef(t.val); currentBlock.onBlockRes += inst.onBlckResolution;
-			break;
-		}
-		case 27: {
+			Expect(14);
+			Expr(out type);
+			Expect(15);
+			
+			Stat();
+		} else if (la.kind == 16) {
 			Get();
-			inst = new Instruction(t.val);
-			break;
+			while (StartOf(1)) {
+				if (StartOf(2)) {
+					Stat();
+				} else {
+					VarDecl();
+				}
+			}
+			Expect(17);
+		} else SynErr(35);
+	}
+
+	void Term(out int type) {
+		int type1; string op; string val1 = ""; string val2 = "";
+		Factor(out type,out val1);
+		Console.WriteLine(val1); 
+		while (la.kind == 11 || la.kind == 12) {
+			MulOp(out op);
+			Factor(out type1, out val2);
+			Console.WriteLine(val2); /*if (type != integer || type1 != integer) SemErr("integer type expected");*/
 		}
-		default: SynErr(30); break;
-		}
-		if(instSize > 0){ inst.create(); currentBlock.addInstruction(inst); adress += instSize;} 
+	}
+
+	void Type(out int type) {
+		type = undef; 
+		if (la.kind == 25) {
+			Get();
+			type = integer; 
+		} else if (la.kind == 26) {
+			Get();
+			type = boolean; 
+		} else SynErr(36);
 	}
 
 
@@ -223,7 +302,8 @@ public Generator gen;
 	
 	static readonly bool[,] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x}
+		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_T,_x, _T,_T,_T,_x, _x,_x},
+		{_x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_T,_x, _T,_x,_x,_x, _x,_x}
 
 	};
 } // end Parser
@@ -244,30 +324,36 @@ public class Errors {
 			case 4: s = "number expected"; break;
 			case 5: s = "string expected"; break;
 			case 6: s = "semicolon expected"; break;
-			case 7: s = "\"{\" expected"; break;
-			case 8: s = "\"}\" expected"; break;
-			case 9: s = "\"->\" expected"; break;
-			case 10: s = "\"mov\" expected"; break;
-			case 11: s = "\",\" expected"; break;
-			case 12: s = "\"add\" expected"; break;
-			case 13: s = "\"sub\" expected"; break;
-			case 14: s = "\"mul\" expected"; break;
-			case 15: s = "\"div\" expected"; break;
-			case 16: s = "\"mup\" expected"; break;
-			case 17: s = "\"gpo\" expected"; break;
-			case 18: s = "\"gpi\" expected"; break;
-			case 19: s = "\"lw\" expected"; break;
-			case 20: s = "\"sw\" expected"; break;
-			case 21: s = "\"jmp\" expected"; break;
-			case 22: s = "\"bra\" expected"; break;
-			case 23: s = "\"jgt\" expected"; break;
-			case 24: s = "\"jeq\" expected"; break;
-			case 25: s = "\"jlt\" expected"; break;
-			case 26: s = "\"call\" expected"; break;
-			case 27: s = "\"return\" expected"; break;
+			case 7: s = "\"+\" expected"; break;
+			case 8: s = "\"-\" expected"; break;
+			case 9: s = "\"true\" expected"; break;
+			case 10: s = "\"false\" expected"; break;
+			case 11: s = "\"*\" expected"; break;
+			case 12: s = "\"/\" expected"; break;
+			case 13: s = "\"void\" expected"; break;
+			case 14: s = "\"(\" expected"; break;
+			case 15: s = "\")\" expected"; break;
+			case 16: s = "\"{\" expected"; break;
+			case 17: s = "\"}\" expected"; break;
+			case 18: s = "\"==\" expected"; break;
+			case 19: s = "\"<\" expected"; break;
+			case 20: s = "\">\" expected"; break;
+			case 21: s = "\"=\" expected"; break;
+			case 22: s = "\"if\" expected"; break;
+			case 23: s = "\"else\" expected"; break;
+			case 24: s = "\"while\" expected"; break;
+			case 25: s = "\"int\" expected"; break;
+			case 26: s = "\"bool\" expected"; break;
+			case 27: s = "\",\" expected"; break;
 			case 28: s = "??? expected"; break;
-			case 29: s = "invalid core"; break;
-			case 30: s = "invalid core"; break;
+			case 29: s = "invalid DCasm"; break;
+			case 30: s = "invalid AddOp"; break;
+			case 31: s = "invalid RelOp"; break;
+			case 32: s = "invalid Factor"; break;
+			case 33: s = "invalid MulOp"; break;
+			case 34: s = "invalid Stat"; break;
+			case 35: s = "invalid Stat"; break;
+			case 36: s = "invalid Type"; break;
 
 			default: s = "error " + n; break;
 		}

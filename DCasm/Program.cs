@@ -12,7 +12,6 @@ namespace DCasm
 			Parser par;
 			string command = "";
 			//load DCASM8 Instruction Set Architecture
-			Utils.currentIsa = new DCASM8();
 
 			Console.Write("DustCat asm " + version + Environment.NewLine);
 			while (command.ToUpper () != "QUIT") 
@@ -24,13 +23,16 @@ namespace DCasm
 			    if (cmdSplit[0].ToUpper() != "DO") continue;
 			    if (File.Exists(cmdSplit[1]))
 			    {
-			        Block.Init();
 			        sc = new Scanner(cmdSplit[1]);
 			        par = new Parser(sc);
-			        par.gen = new Generator();
-			        Console.WriteLine("Starting compilation...");
-			        par.Parse();
-
+					par.CurrentISA = new DCASM8();
+					//par.tab = new SymbolTable(par);
+					par.gen = new CodeGenerator();
+					par.Parse();
+					if (par.errors.count == 0)
+					{
+						//interpret and/or compile
+					}
 			    }
 			    else
 			        Console.WriteLine("File does not exists !");
