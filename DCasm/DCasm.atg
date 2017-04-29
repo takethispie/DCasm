@@ -37,7 +37,9 @@ PRODUCTIONS
 
 //------------------------------------------------------//
 DCasm
-= (VarDecl | ProcDecl) { (VarDecl | ProcDecl) }
+= 
+(ProcDecl | VarDecl) 
+{ ProcDecl | VarDecl }
 EOF.
 //------------------------------------------------------//
 
@@ -64,17 +66,15 @@ Factor<out int type, out string value>     (. int n; string name; .)
 =                        (. type = undef; value = "";.)
   ( Ident<out name>      (. value = name; type = symbol;.)
   | number               (. value = t.val; type = integer; .)
-  | '-' Factor<out type, out value> (. value = t.val; /*if (type != integer) { SemErr("integer type expected"); type = integer; }*/.)
+  | '-' Factor<out type, out value> (. value = "-" + t.val; /*if (type != integer) { SemErr("integer type expected"); type = integer; }*/.)
   | "true"               (. value = t.val; type = boolean; .)
   | "false"              (. value = t.val; type = boolean; .)
   ).
 
 
 /*------------------------------------------------------------------------*/
-Ident<out string name>
-= ident  
+Ident<out string name> = ident  (. name = t.val; .).
 
-                                (. name = t.val; .).
 /*------------------------------------------------------------------------*/
 MulOp<out string op>
 =                        (. op = "MUL"; .)
@@ -106,7 +106,7 @@ RelOp<out string op>
 SimExpr<out int type>    	(. int type1; string op; .)
 = Term<out type>
   { AddOp<out op>
-    Term<out type1>      	(. /*if (type != integer || type1 != integer) SemErr("integer type expected");*/ .)
+    Term<out type1>      	(.  .) .)
 	}.
 
 
@@ -114,7 +114,7 @@ SimExpr<out int type>    	(. int type1; string op; .)
 Stat                     	(. int type; string name; int adr, adr2, loopstart; .)
 = Ident<out name>        	
   ( '='                  	(. /*if (obj.kind != var) SemErr("cannot assign to procedure");*/ .)
-		Expr<out type> ';'
+		SimExpr<out type> ';'
 						   	(. /*if (type != obj.type) SemErr("incompatible types"); */ .)
 	| '(' ')' ';'          	(. /*if (obj.kind != proc) SemErr("object is not a procedure"); gen.Emit(Op.CALL, obj.adr);*/ .)
 	)
@@ -135,9 +135,9 @@ Stat                     	(. int type; string name; int adr, adr2, loopstart; .)
 
 /*------------------------------------------------------------------------*/
 Term<out int type>       (. int type1; string op; string val1 = ""; string val2 = "";.)
-= Factor<out type,out val1>			(. Console.WriteLine(val1); .)
+= Factor<out type,out val1>	
   { MulOp<out op>
-    Factor<out type1, out val2>    (. Console.WriteLine(val2); /*if (type != integer || type1 != integer) SemErr("integer type expected");*/.)
+    Factor<out type1, out val2>    (. Term term = new Term(new Factor(val1,type),op,new Factor(val2,type)); .)
 	}.
 
 
@@ -155,7 +155,6 @@ VarDecl                  (. string name; int type; .)
   Ident<out name>        
   { ',' Ident<out name>  
   } ';'.
-//------------------------------------------------------//
 
 
 END DCasm.

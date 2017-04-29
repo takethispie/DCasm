@@ -50,6 +50,14 @@
     <Compile Include="ISA\DCASM8.cs" />
     <Compile Include="ISA\I_ISA.cs" />
     <Compile Include="CodeGenerator.cs" />
+    <Compile Include="Intermediate\Node.cs" />
+    <Compile Include="Intermediate\Symbol.cs" />
+    <Compile Include="Intermediate\Term.cs" />
+    <Compile Include="Intermediate\Expr.cs" />
+    <Compile Include="Intermediate\SymbTable.cs" />
+    <Compile Include="Intermediate\Factor.cs" />
+    <Compile Include="Intermediate\SimExpr.cs" />
+    <Compile Include="Intermediate\Command.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -64,6 +72,7 @@
   <ItemGroup>
     <Folder Include="bin\Debug\" />
     <Folder Include="ISA\" />
+    <Folder Include="Intermediate\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

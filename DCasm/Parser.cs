@@ -97,30 +97,19 @@ const int // types
 
 	
 	void DCasm() {
-		if (la.kind == 25 || la.kind == 26) {
-			VarDecl();
-		} else if (la.kind == 13) {
+		if (la.kind == 13) {
 			ProcDecl();
+		} else if (la.kind == 25 || la.kind == 26) {
+			VarDecl();
 		} else SynErr(29);
 		while (la.kind == 13 || la.kind == 25 || la.kind == 26) {
-			if (la.kind == 25 || la.kind == 26) {
-				VarDecl();
-			} else {
+			if (la.kind == 13) {
 				ProcDecl();
+			} else {
+				VarDecl();
 			}
 		}
 		Expect(0);
-	}
-
-	void VarDecl() {
-		string name; int type; 
-		Type(out type);
-		Ident(out name);
-		while (la.kind == 27) {
-			Get();
-			Ident(out name);
-		}
-		Expect(6);
 	}
 
 	void ProcDecl() {
@@ -138,6 +127,17 @@ const int // types
 			}
 		}
 		Expect(17);
+	}
+
+	void VarDecl() {
+		string name; int type; 
+		Type(out type);
+		Ident(out name);
+		while (la.kind == 27) {
+			Get();
+			Ident(out name);
+		}
+		Expect(6);
 	}
 
 	void AddOp(out string op) {
@@ -195,7 +195,7 @@ const int // types
 		} else if (la.kind == 8) {
 			Get();
 			Factor(out type, out value);
-			value = t.val; /*if (type != integer) { SemErr("integer type expected"); type = integer; }*/
+			value = "-" + t.val; /*if (type != integer) { SemErr("integer type expected"); type = integer; }*/
 		} else if (la.kind == 9) {
 			Get();
 			value = t.val; type = boolean; 
@@ -227,7 +227,7 @@ const int // types
 			if (la.kind == 21) {
 				Get();
 				
-				Expr(out type);
+				SimExpr(out type);
 				Expect(6);
 				
 			} else if (la.kind == 14) {
@@ -270,11 +270,10 @@ const int // types
 	void Term(out int type) {
 		int type1; string op; string val1 = ""; string val2 = "";
 		Factor(out type,out val1);
-		Console.WriteLine(val1); 
 		while (la.kind == 11 || la.kind == 12) {
 			MulOp(out op);
 			Factor(out type1, out val2);
-			Console.WriteLine(val2); /*if (type != integer || type1 != integer) SemErr("integer type expected");*/
+			Term term = new Term(new Factor(val1,type),op,new Factor(val2,type)); 
 		}
 	}
 
