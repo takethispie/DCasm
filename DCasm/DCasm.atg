@@ -1,14 +1,11 @@
 COMPILER DCasm
-
-	const int // types
-	  undef = 0, integer = 1, boolean = 2, symbol = 3;
-
-	const int // object kinds
-	  var = 0, proc = 1;
+	const int undef = 0, ident = 1, number = 2, hex = 3;
 
     public CodeGenerator gen;
+    public Block currentBlock;
     public int adress = 0;
     public I_ISA CurrentISA;
+    public CommandBuilder CBuild = new CommandBuilder();
 
 /*--------------------------------------------------------------------------*/
 CHARACTERS
@@ -37,124 +34,61 @@ PRODUCTIONS
 
 //------------------------------------------------------//
 DCasm
-= 
-(ProcDecl | VarDecl) 
-{ ProcDecl | VarDecl }
-EOF.
+= block { block }
+EOF
+.
 //------------------------------------------------------//
 
 
-
-/*------------------------------------------------------------------------*/
-AddOp<out string op>
-=                        (. op = "ADD"; .)
-  ( '+'
-  | '-'                  (. op = "SUB"; .)
-  ).
-
-
-/*------------------------------------------------------------------------*/
-Expr<out int type>       (. int type1; string op; .)
-= SimExpr<out type>
-  [ RelOp<out op>
-    SimExpr<out type1>   (. /*if (type != type1) SemErr("incompatible types"); type = boolean;*/ .)
-  ].
+//------------------------------------------------------//
+block =
+ident  		(. currentBlock = new Block(t.val); .)
+"->" 
+"{"
+	{ core
+	}
+"}" 		(. Block.Program.Add(currentBlock); .)
+.
+//------------------------------------------------------//
 
 
-/*------------------------------------------------------------------------*/
-Factor<out int type, out string value>     (. int n; string name; .)
-=                        (. type = undef; value = "";.)
-  ( Ident<out name>      (. value = name; type = symbol;.)
-  | number               (. value = t.val; type = integer; .)
-  | '-' Factor<out type, out value> (. value = "-" + t.val; /*if (type != integer) { SemErr("integer type expected"); type = integer; }*/.)
-  | "true"               (. value = t.val; type = boolean; .)
-  | "false"              (. value = t.val; type = boolean; .)
-  ).
+//------------------------------------------------------//
+core =            (. string value = "null"; int type = -1; .)
+(
+  arithm	
+| varDecl
+| "call" ident 
+| "return" 
+| "out" expr<out type, out value>
+| "in" ident
+).
+//------------------------------------------------------//
 
 
-/*------------------------------------------------------------------------*/
-Ident<out string name> = ident  (. name = t.val; .).
+//------------------------------------------------------//
+arithm =						(. string value = "null"; string value2 = ""; int type = -1; .)
+ident 							(. if(!currentBlock.LocalSymbols.SymbolExist(t.val)) { SemErr("the variable name does not exists !"); } .)
+"=" expr<out type, out value> 					
+[ ("+" | "-" | "*" | "/") 
+expr<out type, out value2>
+] ";".
 
-/*------------------------------------------------------------------------*/
-MulOp<out string op>
-=                        (. op = "MUL"; .)
-  ( '*'
-  | '/'                  (. op = "DIV"; .)
-  ).
-
-
-/*------------------------------------------------------------------------*/
-ProcDecl                 (. string name; int adr; .)
-= "void"
-  Ident<out name>        //create scope, if main set start adress
-  '(' ')'
-  '{'                    //enter scope
-  { VarDecl | Stat }
-  '}'.    
-
-                                  //return, patch adress
-/*------------------------------------------------------------------------*/
-RelOp<out string op>
-=                        (. op = "EQU"; .)
-  ( "=="
-  | '<'                  (. op = "LSS"; .)
-  | '>'                  (. op = "GTR"; .)
-  ).
+//------------------------------------------------------//
 
 
-/*------------------------------------------------------------------------*/
-SimExpr<out int type>    	(. int type1; string op; .)
-= Term<out type>
-  { AddOp<out op>
-    Term<out type1>      	(.  .) .)
-	}.
+//------------------------------------------------------//
+expr<out int type, out string value> = 		(. type = undef; value = "";.)
+(ident 					(. type = ident; value = t.val; .)
+| number 				(. type = number; value = t.val; .)
+| hex					(. type = hex; value = t.val; .)
+).
+//------------------------------------------------------//
 
 
-/*------------------------------------------------------------------------*/
-Stat                     	(. int type; string name; int adr, adr2, loopstart; .)
-= Ident<out name>        	
-  ( '='                  	(. /*if (obj.kind != var) SemErr("cannot assign to procedure");*/ .)
-		SimExpr<out type> ';'
-						   	(. /*if (type != obj.type) SemErr("incompatible types"); */ .)
-	| '(' ')' ';'          	(. /*if (obj.kind != proc) SemErr("object is not a procedure"); gen.Emit(Op.CALL, obj.adr);*/ .)
-	)
-
-| "if" 
-	'(' Expr<out type> ')' 	(. /*if (type != boolean) SemErr("boolean type expected");*/ .)
-	Stat
-	[ "else"               	
-		Stat 
-	]                      	//patch adress
-
-| "while"                	//set loop start adress
-	'(' Expr<out type> ')' 	(. /*if (type != boolean) SemErr("boolean type expected");*/.)
-	Stat                   	//patch adress, jump to loopstart
-
-| '{' { Stat | VarDecl } '}' .
-
-
-/*------------------------------------------------------------------------*/
-Term<out int type>       (. int type1; string op; string val1 = ""; string val2 = "";.)
-= Factor<out type,out val1>	
-  { MulOp<out op>
-    Factor<out type1, out val2>    (. Term term = new Term(new Factor(val1,type),op,new Factor(val2,type)); .)
-	}.
-
-
-/*------------------------------------------------------------------------*/
-Type<out int type>
-=                        (. type = undef; .)
- ( "int"                 (. type = integer; .)
- | "bool"                (. type = boolean; .)
- ).
-
-
-/*------------------------------------------------------------------------*/
-VarDecl                  (. string name; int type; .)
-= Type<out type>
-  Ident<out name>        
-  { ',' Ident<out name>  
-  } ';'.
-
-
+//------------------------------------------------------//
+varDecl =
+"var" ident 				(. currentBlock.LocalSymbols.Add(t.val,SymbolType.Var); /*use factory to construct instruction builder*/ .)
+";"
+.
+//------------------------------------------------------//
 END DCasm.
