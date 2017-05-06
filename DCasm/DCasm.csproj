@@ -19,6 +19,15 @@
     <WarningLevel>4</WarningLevel>
     <Externalconsole>true</Externalconsole>
     <PlatformTarget>x86</PlatformTarget>
+    <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>BeforeBuild</type>
+          <command>mono coco.exe DCasm.atg -namespace DCasm</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>full</DebugType>
@@ -41,16 +50,7 @@
     <Compile Include="ISA\DCASM8.cs" />
     <Compile Include="ISA\I_ISA.cs" />
     <Compile Include="CodeGenerator.cs" />
-    <Compile Include="Intermediate\ICommand.cs" />
-    <Compile Include="Intermediate\Block.cs" />
-    <Compile Include="Intermediate\SymbolTable.cs" />
-    <Compile Include="Intermediate\Symbol.cs" />
-    <Compile Include="Intermediate\CommandBuilder.cs" />
-    <Compile Include="Commands\ArithmCommand.cs" />
-    <Compile Include="Commands\StoreValueCommand.cs" />
-    <Compile Include="Commands\ValueAttributionCommand.cs" />
-    <Compile Include="Commands\ExprCommand.cs" />
-    <Compile Include="Intermediate\InstructionStack.cs" />
+    <Compile Include="SymbolTable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -65,8 +65,6 @@
   <ItemGroup>
     <Folder Include="bin\Debug\" />
     <Folder Include="ISA\" />
-    <Folder Include="Intermediate\" />
-    <Folder Include="Commands\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
