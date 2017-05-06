@@ -6,6 +6,7 @@ COMPILER DCasm
     public int adress = 0;
     public I_ISA CurrentISA;
     public CommandBuilder CBuild = new CommandBuilder();
+    public InstructionStack instList = new InstructionStack();
 
 /*--------------------------------------------------------------------------*/
 CHARACTERS
@@ -66,13 +67,15 @@ core =            (. string value = "null"; int type = -1; .)
 
 
 //------------------------------------------------------//
-arithm =						(. string value = "null"; string value2 = ""; int type = -1; .)
-ident 							(. if(!currentBlock.LocalSymbols.SymbolExist(t.val)) { SemErr("the variable name does not exists !"); } .)
-"=" expr<out type, out value> 					
-[ ("+" | "-" | "*" | "/") 
-expr<out type, out value2>
-] ";".
 
+arithm =						(. string value = "null"; string value2 = ""; int type = -1; string op = "";.)
+ident 							(. if(!currentBlock.LocalSymbols.SymbolExist(t.val)) { SemErr("the variable name does not exists !"); } .)
+"=" expr<out type, out value>       (. instList.Add(value + ":" + type); .)					
+{ ("+" | "-" | "*" | "/")           (. op = t.val; .)
+expr<out type, out value2>          (. instList.Add(value2 + ":" + type); instList.Add(op); .)
+}
+";"                               (.instList.Display();.)
+.
 //------------------------------------------------------//
 
 

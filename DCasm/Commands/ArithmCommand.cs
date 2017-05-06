@@ -6,9 +6,18 @@ namespace DCasm
 		//expr command
 		ICommand left,right;
 
-		public void Execute()
+        public ICommand Next { get; set; }
+
+        public bool IsFinal { get; set; }
+
+        public void Execute()
 		{
 			
 		}
-	}
+
+        void ICommand.Execute()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

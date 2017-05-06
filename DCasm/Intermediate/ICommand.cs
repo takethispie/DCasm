@@ -3,6 +3,9 @@ namespace DCasm
 {
     public interface ICommand
     {
-		void Execute();
+        ICommand Next { get; set; }
+
+        bool IsFinal { get; set; }
+        void Execute();
     }
 }

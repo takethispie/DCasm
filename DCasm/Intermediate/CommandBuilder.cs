@@ -7,16 +7,12 @@ namespace DCasm
         {
         }
 
-		public ICommand CreateArith(ICommand expr)
-		{
-			ValueAttributionCommand valCom;
-			return null;
-		}
-
 		public ICommand CreateArith(ICommand expr,ICommand rightExpr)
 		{
-			ArithmCommand arCo;
-			return null;   
+			if(rightExpr != null) {
+				Console.WriteLine("right expression is not null");
+			}
+			return null;
 		}
     }
 }

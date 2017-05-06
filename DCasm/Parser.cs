@@ -33,6 +33,7 @@ const int undef = 0, ident = 1, number = 2, hex = 3;
     public int adress = 0;
     public I_ISA CurrentISA;
     public CommandBuilder CBuild = new CommandBuilder();
+    public InstructionStack instList = new InstructionStack();
 
 /*--------------------------------------------------------------------------*/
 
@@ -149,12 +150,13 @@ const int undef = 0, ident = 1, number = 2, hex = 3;
 	}
 
 	void arithm() {
-		string value = "null"; string value2 = ""; int type = -1; 
+		string value = "null"; string value2 = ""; int type = -1; string op = "";
 		Expect(3);
 		if(!currentBlock.LocalSymbols.SymbolExist(t.val)) { SemErr("the variable name does not exists !"); } 
 		Expect(14);
 		expr(out type, out value);
-		if (StartOf(2)) {
+		instList.Add(value + ":" + type); 
+		while (StartOf(2)) {
 			if (la.kind == 15) {
 				Get();
 			} else if (la.kind == 16) {
@@ -164,9 +166,12 @@ const int undef = 0, ident = 1, number = 2, hex = 3;
 			} else {
 				Get();
 			}
+			op = t.val; 
 			expr(out type, out value2);
+			instList.Add(value2 + ":" + type); instList.Add(op); 
 		}
 		Expect(6);
+		instList.Display();
 	}
 
 	void varDecl() {

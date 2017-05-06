@@ -7,6 +7,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>DCasm</RootNamespace>
     <AssemblyName>DCasm</AssemblyName>
+    <UseMSBuildEngine>false</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,7 +43,6 @@
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="Intermediate\ICommand.cs" />
     <Compile Include="Intermediate\Block.cs" />
-    <Compile Include="Intermediate\Node.cs" />
     <Compile Include="Intermediate\SymbolTable.cs" />
     <Compile Include="Intermediate\Symbol.cs" />
     <Compile Include="Intermediate\CommandBuilder.cs" />
@@ -50,6 +50,7 @@
     <Compile Include="Commands\StoreValueCommand.cs" />
     <Compile Include="Commands\ValueAttributionCommand.cs" />
     <Compile Include="Commands\ExprCommand.cs" />
+    <Compile Include="Intermediate\InstructionStack.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
