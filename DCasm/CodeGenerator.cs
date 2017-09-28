@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -45,22 +45,21 @@ namespace DCasm
 			Emit(op); Put(val);
 		}
 
+		//TODO fix problem, patching erase 5 value from a = 5;
 		public void Patch(int adr, int val)
 		{
 			code[adr] = val;
 		}
 
-		public void Decode()
+        public void Decode()
 		{
 			pc = 0;
 			while (pc < code.Count)
 			{
-				Op code = (Op)Next();
-				Console.Write("{0,3}: {1} ", pc - 1, opcode[(int)code]);
-				switch (code)
+				Op pcode = (Op)Next();
+				Console.Write("{0,3}: {1} ", pc - 1, opcode[(int)pcode]);
+				switch (pcode)
 				{
-					case Op.LOAD:
-					case Op.LOADG:
 					case Op.CONST:
 					case Op.STO:
 					case Op.STOG:
@@ -68,6 +67,8 @@ namespace DCasm
 					case Op.ENTER:
 					case Op.JMP:
 					case Op.FJMP:
+					case Op.LOAD:
+					case Op.LOADG:
 						Console.WriteLine(Next()); break;
 					case Op.ADD:
 					case Op.SUB:
@@ -84,9 +85,8 @@ namespace DCasm
 						Console.WriteLine(); break;
 				}
 			}
+			this.code.ForEach(Console.WriteLine);
 		}
-
-		//----- interpreter methods -----
 
 		int Next()
 		{
@@ -100,7 +100,34 @@ namespace DCasm
 			pc = 0;
 			while (pc < code.Count)
 			{
-				
+				Op pcode = (Op)Next();
+				switch (pcode)
+				{
+					case Op.LOAD:
+					case Op.LOADG:
+					case Op.CONST:
+					case Op.STO:
+					case Op.STOG:
+					case Op.CALL:
+					case Op.ENTER:
+					case Op.JMP:
+					case Op.FJMP:
+						int value = Next(); 
+						break;
+					case Op.ADD:
+					case Op.SUB:
+					case Op.MUL:
+					case Op.DIV:
+					case Op.NEG:
+					case Op.EQU:
+					case Op.LSS:
+					case Op.GTR:
+					case Op.RET:
+					case Op.LEAVE:
+					case Op.READ:
+					case Op.WRITE:
+						break;
+				}
 			}
 		}
 	}

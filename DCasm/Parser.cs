@@ -148,7 +148,7 @@ const int // types
 			} else SemErr("variable expected"); 
 		} else if (la.kind == 2) {
 			Get();
-			n = Convert.ToInt32(t.val); gen.Emit(Op.CONST, n); type = integer; 
+			n = int.Parse(t.val); gen.Emit(Op.CONST, n); type = integer; 
 		} else if (la.kind == 4) {
 			Get();
 			Factor(out type);

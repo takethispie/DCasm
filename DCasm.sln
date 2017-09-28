@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCasm", "DCasm\DCasm.csproj", "{CE524BD8-AF03-4113-A414-3EF0B80451AE}"
 EndProject
 Global
@@ -13,5 +15,11 @@ Global
 		{CE524BD8-AF03-4113-A414-3EF0B80451AE}.Debug|x86.Build.0 = Debug|x86
 		{CE524BD8-AF03-4113-A414-3EF0B80451AE}.Release|x86.ActiveCfg = Release|x86
 		{CE524BD8-AF03-4113-A414-3EF0B80451AE}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6A5C04E1-5D8B-4002-9700-85F5FC9E2A41}
 	EndGlobalSection
 EndGlobal

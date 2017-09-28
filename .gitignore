@@ -39,5 +39,6 @@ DCasm/DCasm.userprefs
 DCasm/bin/*
 DCasm/obj/*
 .vscode/
+.vs/
 .vscode/.browse.VC.db
 .vscode/.browse.VC.db-wal
