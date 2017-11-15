@@ -27,7 +27,6 @@ COMMENTS FROM "//" TO lf
 IGNORE cr + lf + tab
 
 
-
 PRODUCTIONS
 /*------------------------------------------------------------------------*/
 AddOp<out Op op>
@@ -50,10 +49,10 @@ Factor<out int type>     (. int n; Obj obj; string name; .)
 =                        (. type = undef; .)
   ( Ident<out name>      (. obj = tab.Find(name); type = obj.type;
                             if (obj.kind == var) {
-								if (obj.level == 0) gen.Emit(Op.LOADG, obj.adr);
-								else gen.Emit(Op.LOAD, obj.adr);
+                              if (obj.level == 0) gen.Emit(Op.LOADG, obj.adr);
+                              else gen.Emit(Op.LOAD, obj.adr);
                             } else SemErr("variable expected"); .)
-  | number               (. n = int.Parse(t.val); gen.Emit(Op.CONST, n); type = integer; .)
+  | number               (. n = int.Parse(t.val); gen.Emit(Op.CONST, n); Console.WriteLine("constant emiter");type = integer; .)
   | '-'
     Factor<out type>     (. if (type != integer) {
                               SemErr("integer type expected"); type = integer;
@@ -87,6 +86,8 @@ ProcDecl                 (. string name; Obj obj; int adr; .)
   '{'                    (. gen.Emit(Op.ENTER, 0); adr = gen.pc - 1; .)
   { VarDecl | Stat }
   '}'                    (. gen.Emit(Op.LEAVE); gen.Emit(Op.RET); gen.Patch(adr, tab.topScope.nextAdr); tab.CloseScope(); .).
+
+
 /*------------------------------------------------------------------------*/
 RelOp<out Op op>
 =                        (. op = Op.EQU; .)
@@ -109,7 +110,7 @@ SimExpr<out int type>    (. int type1; Op op; .)
 /*------------------------------------------------------------------------*/
 Stat                     (. int type; string name; Obj obj;
                             int adr, adr2, loopstart; .)
-= Ident<out name>        (. obj = tab.Find(name); .)
+= Ident<out name>        (. obj = tab.Find(name);.)
   ( '='                  (. if (obj.kind != var) SemErr("cannot assign to procedure"); .)
 		Expr<out type> ';'
 						   (. if (type != obj.type) SemErr("incompatible types");

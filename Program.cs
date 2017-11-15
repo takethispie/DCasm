@@ -3,11 +3,11 @@ using System.IO;
 
 namespace DCasm
 {
-	class MainClass
-	{
-		public static void Main (string[] args)
-		{
-			const string version = "0.3";
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            const string version = "0.3";
 			Scanner sc;
 			Parser par;
 			string command = "";
@@ -38,6 +38,6 @@ namespace DCasm
 			    else
 			        Console.WriteLine("File does not exists !");
 			}
-		}
-	}
+        }
+    }
 }

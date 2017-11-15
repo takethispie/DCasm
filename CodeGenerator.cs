@@ -60,9 +60,12 @@ namespace DCasm
 				Console.Write("{0,3}: {1} ", pc - 1, opcode[(int)pcode]);
 				switch (pcode)
 				{
-					case Op.CONST:
 					case Op.STO:
 					case Op.STOG:
+
+                        Console.WriteLine(pcode + " " + code[pc-1] + " " + code[pc - 2]); 
+                        break;
+					case Op.CONST:
 					case Op.CALL:
 					case Op.ENTER:
 					case Op.JMP:
@@ -85,7 +88,6 @@ namespace DCasm
 						Console.WriteLine(); break;
 				}
 			}
-			this.code.ForEach(Console.WriteLine);
 		}
 
 		int Next()
