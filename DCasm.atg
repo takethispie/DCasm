@@ -52,7 +52,7 @@ Factor<out int type>     (. int n; Obj obj; string name; .)
                               if (obj.level == 0) gen.Emit(Op.LOADG, obj.adr);
                               else gen.Emit(Op.LOAD, obj.adr);
                             } else SemErr("variable expected"); .)
-  | number               (. n = int.Parse(t.val); gen.Emit(Op.CONST, n); Console.WriteLine("constant emiter");type = integer; .)
+  | number               (. n = int.Parse(t.val); gen.Emit(Op.CONST, n); type = integer; .)
   | '-'
     Factor<out type>     (. if (type != integer) {
                               SemErr("integer type expected"); type = integer;

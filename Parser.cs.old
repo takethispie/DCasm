@@ -143,8 +143,8 @@ const int // types
 			Ident(out name);
 			obj = tab.Find(name); type = obj.type;
 			if (obj.kind == var) {
-			if (obj.level == 0) gen.Emit(Op.LOADG, obj.adr);
-			else gen.Emit(Op.LOAD, obj.adr);
+			 if (obj.level == 0) gen.Emit(Op.LOADG, obj.adr);
+			 else gen.Emit(Op.LOAD, obj.adr);
 			} else SemErr("variable expected"); 
 		} else if (la.kind == 2) {
 			Get();
@@ -221,7 +221,7 @@ const int // types
 		switch (la.kind) {
 		case 1: {
 			Ident(out name);
-			obj = tab.Find(name); Console.WriteLine("test");
+			obj = tab.Find(name);
 			if (la.kind == 17) {
 				Get();
 				if (obj.kind != var) SemErr("cannot assign to procedure"); 

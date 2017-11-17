@@ -31,15 +31,18 @@ namespace DCasm
 
 		public void Put(int x)
 		{
+			Console.WriteLine(x);
 			code.Add(x);
 			pc++;
 		}
 
 		public void Emit(Op op)
 		{
+			Console.WriteLine(op);
 			Put((int)op);
 		}
 
+		//rendre intelligent cette methode pour pre process les instruction qui lui sont passé
 		public void Emit(Op op, int val)
 		{
 			Emit(op); Put(val);

@@ -148,7 +148,7 @@ const int // types
 			} else SemErr("variable expected"); 
 		} else if (la.kind == 2) {
 			Get();
-			n = int.Parse(t.val); gen.Emit(Op.CONST, n); Console.WriteLine("constant emiter");type = integer; 
+			n = int.Parse(t.val); gen.Emit(Op.CONST, n); type = integer; 
 		} else if (la.kind == 4) {
 			Get();
 			Factor(out type);
