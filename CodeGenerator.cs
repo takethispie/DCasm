@@ -31,14 +31,12 @@ namespace DCasm
 
 		public void Put(int x)
 		{
-			Console.WriteLine(x);
 			code.Add(x);
 			pc++;
 		}
 
 		public void Emit(Op op)
 		{
-			Console.WriteLine(op);
 			Put((int)op);
 		}
 
@@ -54,86 +52,19 @@ namespace DCasm
 			code[adr] = val;
 		}
 
-        public void Decode()
-		{
-			pc = 0;
-			while (pc < code.Count)
-			{
-				Op pcode = (Op)Next();
-				Console.Write("{0,3}: {1} ", pc - 1, opcode[(int)pcode]);
-				switch (pcode)
-				{
-					case Op.STO:
-					case Op.STOG:
-
-                        Console.WriteLine(pcode + " " + code[pc-1] + " " + code[pc - 2]); 
-                        break;
-					case Op.CONST:
-					case Op.CALL:
-					case Op.ENTER:
-					case Op.JMP:
-					case Op.FJMP:
-					case Op.LOAD:
-					case Op.LOADG:
-						Console.WriteLine(Next()); break;
-					case Op.ADD:
-					case Op.SUB:
-					case Op.MUL:
-					case Op.DIV:
-					case Op.NEG:
-					case Op.EQU:
-					case Op.LSS:
-					case Op.GTR:
-					case Op.RET:
-					case Op.LEAVE:
-					case Op.READ:
-					case Op.WRITE:
-						Console.WriteLine(); break;
-				}
-			}
-		}
-
 		int Next()
 		{
 			return code[pc++];
 		}
 
-
+        public void Decode()
+		{
+			
+		}
 
 		public void Compile()
 		{
-			pc = 0;
-			while (pc < code.Count)
-			{
-				Op pcode = (Op)Next();
-				switch (pcode)
-				{
-					case Op.LOAD:
-					case Op.LOADG:
-					case Op.CONST:
-					case Op.STO:
-					case Op.STOG:
-					case Op.CALL:
-					case Op.ENTER:
-					case Op.JMP:
-					case Op.FJMP:
-						int value = Next(); 
-						break;
-					case Op.ADD:
-					case Op.SUB:
-					case Op.MUL:
-					case Op.DIV:
-					case Op.NEG:
-					case Op.EQU:
-					case Op.LSS:
-					case Op.GTR:
-					case Op.RET:
-					case Op.LEAVE:
-					case Op.READ:
-					case Op.WRITE:
-						break;
-				}
-			}
+			
 		}
 	}
 }
