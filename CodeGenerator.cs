@@ -20,41 +20,25 @@ namespace DCasm
 
 		public int progStart;   // address of first instruction of main program
 		public int pc;              // program counter
-		List<int> code = new List<int>();
+		List<Node> code = new List<Node>();
+		Node Current;
 
 		public CodeGenerator()
 		{
 			pc = 1; progStart = -1;
+			code = new List<Node>();
 		}
 
 		//----- code generation methods -----
-
-		public void Put(int x)
-		{
-			code.Add(x);
-			pc++;
-		}
-
 		public void Emit(Op op)
 		{
-			Put((int)op);
+			
 		}
 
 		//rendre intelligent cette methode pour pre process les instruction qui lui sont passé
 		public void Emit(Op op, int val)
 		{
-			Emit(op); Put(val);
-		}
-
-		//TODO fix problem, patching erase 5 value from a = 5;
-		public void Patch(int adr, int val)
-		{
-			code[adr] = val;
-		}
-
-		int Next()
-		{
-			return code[pc++];
+			
 		}
 
         public void Decode()

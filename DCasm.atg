@@ -85,7 +85,7 @@ ProcDecl                 (. string name; Obj obj; int adr; .)
   '(' ')'
   '{'                    (. gen.Emit(Op.ENTER, 0); adr = gen.pc - 1; .)
   { VarDecl | Stat }
-  '}'                    (. gen.Emit(Op.LEAVE); gen.Emit(Op.RET); gen.Patch(adr, tab.topScope.nextAdr); tab.CloseScope(); .).
+  '}'                    (. gen.Emit(Op.LEAVE); gen.Emit(Op.RET); tab.CloseScope(); .).
 
 
 /*------------------------------------------------------------------------*/
@@ -123,14 +123,14 @@ Stat                     (. int type; string name; Obj obj;
 	'(' Expr<out type> ')' (. if (type != boolean) SemErr("boolean type expected");
 							  gen.Emit(Op.FJMP, 0); adr = gen.pc - 2; .)
 	Stat
-	[ "else"               (. gen.Emit(Op.JMP, 0); adr2 = gen.pc - 2; gen.Patch(adr, gen.pc); adr = adr2; .)
+	[ "else"               (. gen.Emit(Op.JMP, 0); adr2 = gen.pc - 2; adr = adr2; .)
 		Stat 
-	]                      (. gen.Patch(adr, gen.pc); .)
+	]                      (.  .)
 
 | "while"                (. loopstart = gen.pc; .)
 	'(' Expr<out type> ')' (. if (type != boolean) SemErr("boolean type expected");
 							  gen.Emit(Op.FJMP, 0); adr = gen.pc - 2; .)
-	Stat                   (. gen.Emit(Op.JMP, loopstart); gen.Patch(adr, gen.pc); .)
+	Stat                   (. gen.Emit(Op.JMP, loopstart); .)
 
 | "read"
 	Ident<out name> ';'    (. obj = tab.Find(name);

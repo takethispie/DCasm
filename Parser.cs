@@ -199,7 +199,7 @@ const int // types
 			}
 		}
 		Expect(13);
-		gen.Emit(Op.LEAVE); gen.Emit(Op.RET); gen.Patch(adr, tab.topScope.nextAdr); tab.CloseScope(); 
+		gen.Emit(Op.LEAVE); gen.Emit(Op.RET); tab.CloseScope(); 
 	}
 
 	void VarDecl() {
@@ -248,10 +248,10 @@ const int // types
 			Stat();
 			if (la.kind == 20) {
 				Get();
-				gen.Emit(Op.JMP, 0); adr2 = gen.pc - 2; gen.Patch(adr, gen.pc); adr = adr2; 
+				gen.Emit(Op.JMP, 0); adr2 = gen.pc - 2; adr = adr2; 
 				Stat();
 			}
-			gen.Patch(adr, gen.pc); 
+			
 			break;
 		}
 		case 21: {
@@ -263,7 +263,7 @@ const int // types
 			if (type != boolean) SemErr("boolean type expected");
 			gen.Emit(Op.FJMP, 0); adr = gen.pc - 2; 
 			Stat();
-			gen.Emit(Op.JMP, loopstart); gen.Patch(adr, gen.pc); 
+			gen.Emit(Op.JMP, loopstart); 
 			break;
 		}
 		case 22: {
