@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 
 namespace  DCasm {
-    public class Node {
-        List<Node> childrens;
+    public abstract class Node {
+        public List<Node> childrens;
 
         public Node() {
             childrens = new List<Node>();
@@ -20,6 +20,6 @@ namespace  DCasm {
             childrens.Add(child2);
         }
 
-        public virtual void accept(Visitor v) {}
+        public abstract void Accept(Visitor v);
     }
 }

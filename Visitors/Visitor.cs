@@ -7,9 +7,7 @@ namespace  DCasm {
         public virtual void VisitGlobStore(Node n){}
         public virtual void VisitConst(Node n){}
         public virtual void VisitCall(Node n){}
-        public virtual void VisitEnter(Node n){}
-        public virtual void VisitJMP(Node n){}
-        public virtual void VisitFJMP(Node n){}
+        public virtual void VisitFunction(Node n){}
         public virtual void VisitLoad(Node n){}
         public virtual void VisitGlobLoad(Node n){}
         public virtual void VisitAdd(Node n){}
@@ -21,7 +19,6 @@ namespace  DCasm {
         public virtual void VisitLSS(Node n){}
         public virtual void VisitGTR(Node n){}
         public virtual void VisitRet(Node n){}
-        public virtual void VisitLeave(Node n){}
         public virtual void VisitRead(Node n){}
         public virtual void VisitWrite(Node n){}
     }
