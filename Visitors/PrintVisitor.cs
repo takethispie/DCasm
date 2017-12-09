@@ -5,7 +5,7 @@ namespace DCasm
 {
     public class PrintVisitor : Visitor
     {
-        protected PrintVisitor()
+        public PrintVisitor()
         {
         }
 
@@ -90,7 +90,10 @@ namespace DCasm
 
         public override void VisitStore(Node n)
         {
-            throw new NotImplementedException();
+            if(n.Childrens.Count > 1) {
+                n.Childrens[0].Accept(this);
+                n.Childrens[1].Accept(this);
+            }
         }
 
         public override void VisitSub(Node n)

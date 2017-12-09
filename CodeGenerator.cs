@@ -38,7 +38,16 @@ namespace DCasm
 		//rendre intelligent cette methode pour pre process les instruction qui lui sont passé
 		public void Emit(Op op, int val)
 		{
-			
+			switch(op) {
+				case Op.CONST:
+					Current = new Const(val);
+				break;
+
+				case Op.STO:
+					Console.Write("store: ");
+					Current.Accept(new PrintVisitor());
+				break;
+			}
 		}
 
         public void Decode()
