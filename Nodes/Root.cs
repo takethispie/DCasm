@@ -11,7 +11,7 @@ namespace DCasm
         }
 
         public void AddNode(Node n) {
-            this.childrens.Add(n);
+            this.Childrens.Add(n);
         }
 
         public override void Accept(Visitor v) { v.VisitRoot(this); }

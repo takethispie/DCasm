@@ -1,6 +1,4 @@
 program Test {
-	int i;
-
 	void Main() {
 		int a;
 		int b;

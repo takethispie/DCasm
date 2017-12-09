@@ -6,13 +6,17 @@ namespace DCasm
 {
     public class Function : Node
     {
-        public Function(Node child1) : base(child1)
+        private string name;
+        public string Name { get => name; set => name = value; }
+
+        public Function(string name) : base()
         {
+            this.name = name;
         }
 
         public void AddNode(Node n)
         {
-            this.childrens.Add(n);
+            this.Childrens.Add(n);
         }
 
         public override void Accept(Visitor v) { v.VisitFunction(this); }

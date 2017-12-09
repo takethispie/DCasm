@@ -20,13 +20,13 @@ namespace DCasm
 
 		public int progStart;   // address of first instruction of main program
 		public int pc;              // program counter
-		List<Node> code = new List<Node>();
+		Node root;
 		Node Current;
 
 		public CodeGenerator()
 		{
 			pc = 1; progStart = -1;
-			code = new List<Node>();
+			root = new Root();
 		}
 
 		//----- code generation methods -----
