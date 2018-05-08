@@ -9,6 +9,6 @@ namespace DCasm
         {
         }
 
-        public override void Accept(Visitor v) { v.VisitStore(this); }
+        public override void Accept(IVisitor v) { v.Visit(this); }
     }
 }

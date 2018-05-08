@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace DCasm
 {
-    public class PrintVisitor : Visitor
+    public class PrintVisitor : IVisitor
     {
         public PrintVisitor()
         {
         }
 
-        public override void VisitAdd(Node n)
+        public void Visit(Add n)
         {
             if(n.Childrens.Count > 1) {
                 n.Childrens[0].Accept(this);
@@ -18,77 +18,12 @@ namespace DCasm
             }
         }
 
-        public override void VisitCall(Node n)
+        public void Visit(Const n)
         {
-            Console.WriteLine("Calling function: " + ((Function)n).Name);
+            Console.WriteLine((n).GetValue());
         }
 
-        public override void VisitConst(Node n)
-        {
-            Console.WriteLine(((Const)n).GetValue());
-        }
-
-        public override void VisitDiv(Node n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void VisitEqu(Node n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void VisitFunction(Node n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void VisitGlobLoad(Node n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void VisitGlobStore(Node n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void VisitGTR(Node n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void VisitLoad(Node n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void VisitLSS(Node n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void VisitMul(Node n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void VisitNeg(Node n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void VisitRead(Node n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void VisitRoot(Node n)
-        {
-            n.Childrens.ForEach(child => child.Accept(this));
-        }
-
-        public override void VisitStore(Node n)
+        public void Visit(Store n)
         {
             if(n.Childrens.Count > 1) {
                 n.Childrens[0].Accept(this);
@@ -96,14 +31,36 @@ namespace DCasm
             }
         }
 
-        public override void VisitSub(Node n)
+        public void Visit(Root n)
         {
-            throw new NotImplementedException();
         }
 
-        public override void VisitWrite(Node n)
+        public void Visit(Function n)
         {
-            throw new NotImplementedException();
+        }
+
+        public void Visit(Load n)
+        {
+        }
+
+        public void Visit(Sub n)
+        {
+        }
+
+        public void Visit(Mul n)
+        {
+        }
+
+        public void Visit(Div n)
+        {
+        }
+
+        public void VisitRead(Node n)
+        {
+        }
+
+        public void VisitWrite(Node n)
+        {
         }
     }
 }

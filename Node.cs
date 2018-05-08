@@ -22,6 +22,6 @@ namespace  DCasm {
         }
 
 
-        public abstract void Accept(Visitor v);
+        public abstract void Accept(IVisitor v);
     }
 }

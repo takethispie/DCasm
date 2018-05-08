@@ -15,6 +15,6 @@ namespace DCasm
             return this.value;
         }
 
-        public override void Accept(Visitor v) { v.VisitConst(this); }
+        public override void Accept(IVisitor v) { v.Visit(this); }
     }
 }

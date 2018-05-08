@@ -10,6 +10,6 @@ namespace DCasm
         {
         }
 
-        public override void Accept(Visitor v) { v.VisitSub(this); }
+        public override void Accept(IVisitor v) { v.Visit(this); }
     }
 }

@@ -19,6 +19,6 @@ namespace DCasm
             this.Childrens.Add(n);
         }
 
-        public override void Accept(Visitor v) { v.VisitFunction(this); }
+        public override void Accept(IVisitor v) { v.Visit(this); }
     }
 }
