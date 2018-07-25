@@ -4,17 +4,15 @@ using System.IO;
 
 namespace DCasm
 {
-    public class Const : Node {
-        private int value;
+    public class Const : INode {
+        public List<INode> Childrens { get; set; }
+        public string Value { get; set; }
 
         public Const(int value) {
-            this.value = value;    
+            this.Value = value.ToString();  
+            Childrens = new List<INode>();  
         }
 
-        public int GetValue() {
-            return this.value;
-        }
-
-        public override void Accept(IVisitor v) { v.Visit(this); }
+        public void Accept(IVisitor v) { v.Visit(this); }
     }
 }

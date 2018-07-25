@@ -4,21 +4,17 @@ using System.IO;
 
 namespace DCasm
 {
-    public class Function : Node
+    public class Function : INode
     {
-        private string name;
-        public string Name { get => name; set => name = value; }
+        public List<INode> Childrens { get; set; }
+        public string Value { get; set; }
 
-        public Function(string name) : base()
+        public Function(string name)
         {
-            this.name = name;
+            Value = name;
+            Childrens = new List<INode>();
         }
 
-        public void AddNode(Node n)
-        {
-            this.Childrens.Add(n);
-        }
-
-        public override void Accept(IVisitor v) { v.Visit(this); }
+        public void Accept(IVisitor v) { v.Visit(this); }
     }
 }

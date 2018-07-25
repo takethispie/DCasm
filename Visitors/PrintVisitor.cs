@@ -20,7 +20,7 @@ namespace DCasm
 
         public void Visit(Const n)
         {
-            Console.WriteLine((n).GetValue());
+            Console.WriteLine(n.Value);
         }
 
         public void Visit(Store n)
@@ -52,14 +52,6 @@ namespace DCasm
         }
 
         public void Visit(Div n)
-        {
-        }
-
-        public void VisitRead(Node n)
-        {
-        }
-
-        public void VisitWrite(Node n)
         {
         }
     }

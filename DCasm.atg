@@ -8,6 +8,7 @@ COMPILER DCasm
 
 	public SymbolTable   tab;
 	public CodeGenerator gen;
+  public NodeFactory factory;
   
 /*--------------------------------------------------------------------------*/
 CHARACTERS
@@ -37,12 +38,32 @@ AddOp<out Op op>
 
 
 /*------------------------------------------------------------------------*/
+//simexpr = arithmetic 
 Expr<out int type>       (. int type1; Op op; .)
 = SimExpr<out type>
   [ RelOp<out op>
     SimExpr<out type1>   (. if (type != type1) SemErr("incompatible types"); gen.Emit(op); type = boolean; .)
   ].
 
+/*------------------------------------------------------------------------*/
+Ident<out string name>
+= ident                  (. name = t.val; .).
+
+
+/*------------------------------------------------------------------------*/
+MulOp<out Op op>
+=                        (. op = Op.MUL; .)
+  ( '*'
+  | '/'                  (. op = Op.DIV; .)
+  ).
+
+/*------------------------------------------------------------------------*/
+RelOp<out Op op>
+=                        (. op = Op.EQU; .)
+  ( "=="
+  | '<'                  (. op = Op.LSS; .)
+  | '>'                  (. op = Op.GTR; .)
+  ).
 
 /*------------------------------------------------------------------------*/
 Factor<out int type>     (. int n; Obj obj; string name; .)
@@ -63,17 +84,6 @@ Factor<out int type>     (. int n; Obj obj; string name; .)
   ).
 
 
-/*------------------------------------------------------------------------*/
-Ident<out string name>
-= ident                  (. name = t.val; .).
-
-
-/*------------------------------------------------------------------------*/
-MulOp<out Op op>
-=                        (. op = Op.MUL; .)
-  ( '*'
-  | '/'                  (. op = Op.DIV; .)
-  ).
 
 
 /*------------------------------------------------------------------------*/
@@ -88,13 +98,6 @@ ProcDecl                 (. string name; Obj obj; int adr; .)
   '}'                    (. gen.Emit(Op.LEAVE); gen.Emit(Op.RET); tab.CloseScope(); .).
 
 
-/*------------------------------------------------------------------------*/
-RelOp<out Op op>
-=                        (. op = Op.EQU; .)
-  ( "=="
-  | '<'                  (. op = Op.LSS; .)
-  | '>'                  (. op = Op.GTR; .)
-  ).
 
 
 /*------------------------------------------------------------------------*/

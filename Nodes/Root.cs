@@ -4,16 +4,20 @@ using System.IO;
 
 namespace DCasm
 {
-    public class Root : Node
+    public class Root : INode
     {
-        public Root() : base()
+        public List<INode> Childrens { get; set; }
+        public string Value { get; set; }
+
+        public Root()
         {
+            Childrens = new List<INode>();
         }
 
-        public void AddNode(Node n) {
+        public void AddNode(INode n) {
             this.Childrens.Add(n);
         }
 
-        public override void Accept(IVisitor v) { v.Visit(this); }
+        public void Accept(IVisitor v) { v.Visit(this); }
     }
 }

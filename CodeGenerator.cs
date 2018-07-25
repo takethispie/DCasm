@@ -20,8 +20,8 @@ namespace DCasm
 
 		public int progStart;   // address of first instruction of main program
 		public int pc;              // program counter
-		Node root;
-		Node Current;
+		INode root;
+		INode Current;
 
 		public CodeGenerator()
 		{

@@ -4,12 +4,16 @@ using System.IO;
 
 namespace DCasm
 {
-    public class Mul : Node
+    public class Mul : INode
     {
-        public Mul(Node child1, Node child2) : base(child1, child2)
+        public List<INode> Childrens { get; set; }
+        public string Value { get; set; }
+        
+        public Mul()
         {
+            Childrens = new List<INode>();
         }
 
-        public override void Accept(IVisitor v) { v.Visit(this); }
+        public void Accept(IVisitor v) { v.Visit(this); }
     }
 }

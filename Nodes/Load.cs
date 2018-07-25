@@ -4,11 +4,14 @@ using System.IO;
 
 namespace DCasm
 {
-    public class Load : Node{
-        public Load(Node child1, Node child2) : base(child1, child2)
+    public class Load : INode {
+        public List<INode> Childrens { get; set; }
+        public string Value { get; set; }
+        public Load()
         {
+            Childrens = new List<INode>();
         }
 
-        public override void Accept(IVisitor v) { v.Visit(this); }
+        public void Accept(IVisitor v) { v.Visit(this); }
     }
 }
