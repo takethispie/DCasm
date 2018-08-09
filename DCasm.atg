@@ -158,11 +158,11 @@ DCasm                    (. string name; .)
 
 
 /*------------------------------------------------------------------------*/
-Term<out int type>       (. int type1; Op op; .)
-= Factor<out type>
+Term<out int type, out INode n>       (. int type1; Op op; INode n, left, right; .)
+= Factor<out type, out INode left>    (. n = factory.Create(op.toString());  .)
   { MulOp<out op>
-    Factor<out type1>    (. if (type != integer || type1 != integer)  SemErr("integer type expected");
-                            gen.Emit(op); .)
+    Factor<out type1, out INode right>    
+    (. if (type != integer || type1 != integer)  SemErr("integer type expected"); gen.Emit(op); .)
 	}.
 
 

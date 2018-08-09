@@ -233,13 +233,13 @@ public class Scanner {
 		start[45] = 4; 
 		start[42] = 5; 
 		start[47] = 6; 
-		start[40] = 7; 
-		start[41] = 8; 
-		start[123] = 9; 
-		start[125] = 10; 
 		start[61] = 16; 
-		start[60] = 12; 
-		start[62] = 13; 
+		start[60] = 8; 
+		start[62] = 9; 
+		start[40] = 10; 
+		start[41] = 11; 
+		start[123] = 12; 
+		start[125] = 13; 
 		start[59] = 14; 
 		start[44] = 15; 
 		start[Buffer.EOF] = -1;
@@ -354,9 +354,9 @@ public class Scanner {
 
 	void CheckLiteral() {
 		switch (t.val) {
-			case "true": t.kind = 5; break;
-			case "false": t.kind = 6; break;
-			case "void": t.kind = 9; break;
+			case "true": t.kind = 10; break;
+			case "false": t.kind = 11; break;
+			case "void": t.kind = 12; break;
 			case "if": t.kind = 19; break;
 			case "else": t.kind = 20; break;
 			case "while": t.kind = 21; break;
@@ -404,15 +404,15 @@ public class Scanner {
 			case 4:
 				{t.kind = 4; break;}
 			case 5:
-				{t.kind = 7; break;}
+				{t.kind = 5; break;}
 			case 6:
-				{t.kind = 8; break;}
+				{t.kind = 6; break;}
 			case 7:
-				{t.kind = 10; break;}
+				{t.kind = 7; break;}
 			case 8:
-				{t.kind = 11; break;}
+				{t.kind = 8; break;}
 			case 9:
-				{t.kind = 12; break;}
+				{t.kind = 9; break;}
 			case 10:
 				{t.kind = 13; break;}
 			case 11:
@@ -427,7 +427,7 @@ public class Scanner {
 				{t.kind = 27; break;}
 			case 16:
 				recEnd = pos; recKind = 17;
-				if (ch == '=') {AddCh(); goto case 11;}
+				if (ch == '=') {AddCh(); goto case 7;}
 				else {t.kind = 17; break;}
 
 		}

@@ -22,11 +22,13 @@ namespace DCasm
 		public int pc;              // program counter
 		INode root;
 		INode Current;
+		List<INode> Nodes;
 
 		public CodeGenerator()
 		{
 			pc = 1; progStart = -1;
 			root = new Root();
+			Nodes = new List<INode>();
 		}
 
 		//----- code generation methods -----
