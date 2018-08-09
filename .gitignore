@@ -43,3 +43,4 @@ obj/*
 .vscode/.browse.VC.db
 .vscode/.browse.VC.db-wal
 *.old
+Parser.cs.old

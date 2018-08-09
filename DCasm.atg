@@ -66,7 +66,7 @@ RelOp<out Op op>
   ).
 
 /*------------------------------------------------------------------------*/
-Factor<out int type>     (. int n; Obj obj; string name; .)
+Factor<out int type, out INode n>     (. int n; Obj obj; string name; INode n;.)
 =                        (. type = undef; .)
   ( Ident<out name>      (. obj = tab.Find(name); type = obj.type;
                             if (obj.kind == var) {
@@ -87,7 +87,7 @@ Factor<out int type>     (. int n; Obj obj; string name; .)
 
 
 /*------------------------------------------------------------------------*/
-ProcDecl                 (. string name; Obj obj; int adr; .)
+ProcDecl                 (. string name; Obj obj; int adr; INode fun; .)
 = "void"
   Ident<out name>        (. obj = tab.NewObj(name, proc, undef); obj.adr = gen.pc;
                             if (name == "Main") gen.progStart = gen.pc; 
@@ -101,7 +101,7 @@ ProcDecl                 (. string name; Obj obj; int adr; .)
 
 
 /*------------------------------------------------------------------------*/
-SimExpr<out int type>    (. int type1; Op op; .)
+SimExpr<out int type, out INode node>    (. int type1; Op op; INode node, left, right; .)
 = Term<out type>
   { AddOp<out op>
     Term<out type1>      (. if (type != integer || type1 != integer) 
