@@ -154,7 +154,7 @@ const int // types
 	}
 
 	void Factor(out int type, out INode node) {
-		int n; Obj obj; string name;
+		int n; Obj obj; string name; node = new Error(); 
 		type = undef; 
 		if (la.kind == 1) {
 			Ident(out name);

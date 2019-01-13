@@ -225,8 +225,7 @@ const int // types
 
 	void Stat(out INode n) {
 		int type; string name; Obj obj; int adr, adr2, loopstart; INode t1, t2; n = new Error();
-		switch (la.kind) {
-		case 1: {
+		if (la.kind == 1) {
 			Ident(out name);
 			obj = tab.Find(name);
 			if (la.kind == 17) {
@@ -241,11 +240,9 @@ const int // types
 				Get();
 				Expect(14);
 				Expect(18);
-				if (obj.kind != proc) SemErr("object is not a procedure"); gen.Emit(Op.CALL, obj.adr); 
+				if (obj.kind != proc) SemErr("object is not a procedure"); n = new Call(name); 
 			} else SynErr(33);
-			break;
-		}
-		case 19: {
+		} else if (la.kind == 19) {
 			Get();
 			Expect(13);
 			Expr(out type);
@@ -259,9 +256,7 @@ const int // types
 				Stat(out t2);
 			}
 			
-			break;
-		}
-		case 21: {
+		} else if (la.kind == 21) {
 			Get();
 			loopstart = gen.pc; 
 			Expect(13);
@@ -271,9 +266,7 @@ const int // types
 			gen.Emit(Op.FJMP, 0); adr = gen.pc - 2; 
 			Stat(out t1);
 			gen.Emit(Op.JMP, loopstart); 
-			break;
-		}
-		case 22: {
+		} else if (la.kind == 22) {
 			Get();
 			Ident(out name);
 			Expect(18);
@@ -282,29 +275,12 @@ const int // types
 			gen.Emit(Op.READ);
 			if (obj.level == 0) gen.Emit(Op.STOG, obj.adr);
 			else gen.Emit(Op.STO, obj.adr); 
-			break;
-		}
-		case 23: {
+		} else if (la.kind == 23) {
 			Get();
 			Expr(out type);
 			Expect(18);
 			if (type != integer) SemErr("integer type expected"); gen.Emit(Op.WRITE); 
-			break;
-		}
-		case 15: {
-			Get();
-			while (StartOf(1)) {
-				if (StartOf(2)) {
-					Stat(out t1);
-				} else {
-					VarDecl();
-				}
-			}
-			Expect(16);
-			break;
-		}
-		default: SynErr(34); break;
-		}
+		} else SynErr(34);
 	}
 
 	void Term(out int type, out INode n) {
@@ -360,8 +336,7 @@ const int // types
 	
 	static readonly bool[,] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_T, _x,_T,_T,_T, _x,_T,_T,_x, _x,_x},
-		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_T, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x}
+		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_T,_T, _x,_T,_T,_x, _x,_x}
 
 	};
 } // end Parser
