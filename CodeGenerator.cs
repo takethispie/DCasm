@@ -13,7 +13,6 @@ namespace DCasm
 
 	public class CodeGenerator
 	{
-
 		string[] opcode = { "ADD  ", "SUB  ", "MUL  ", "DIV  ", "EQU  ", "LSS  ", "GTR  ", "NEG  ",
 	   "LOAD ", "LOADG", "STO  ", "STOG ", "CONST", "CALL ", "RET  ", "ENTER",
 	   "LEAVE", "JMP  ", "FJMP ", "READ ", "WRITE" };
