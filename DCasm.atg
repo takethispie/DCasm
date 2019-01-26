@@ -30,54 +30,12 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 /*------------------------------------------------------------------------*/
-AddOp<out Op op>
-= (. op = Op.ADD; .) ( '+' | '-' (. op = Op.SUB; .)).
-
-/*------------------------------------------------------------------------*/
-//simexpr = arithmetic 
-Expr<out int type>       (. int type1; Op op; INode left; INode right; INode temp;.)
-= SimExpr<out type, out left>
-  [ RelOp<out op>
-    SimExpr<out type1, out temp>   (. if (type != type1) SemErr("incompatible types"); type = boolean; .)
-  ].
-
-/*------------------------------------------------------------------------*/
-Ident<out string name>
-= ident                  (. name = t.val; .).
-
-/*------------------------------------------------------------------------*/
-MulOp<out Op op>
-= (. op = Op.MUL; .) ( '*' | '/' (. op = Op.DIV; .)).
-
-/*------------------------------------------------------------------------*/
-RelOp<out Op op>
-= (. op = Op.EQU; .) ( "==" | '<' (. op = Op.LSS; .) | '>' (. op = Op.GTR; .)).
-
-/*------------------------------------------------------------------------*/
-Factor<out int type, out INode node>     (. int n; Obj obj; string name; node = new Error(); .)
-=                        (. type = undef; .)
-  ( Ident<out name>      (. obj = tab.Find(name); type = obj.type;
-                            if (obj.kind == var) {
-                              if (obj.level == 0) {
-                                node = factory.Create("gvar");
-                                node.Value = obj.adr.ToString(); 
-                              } else {
-                                node = factory.Create("gvar");
-                                node.Value = obj.adr.ToString(); 
-                              } 
-                            } else SemErr("variable expected"); .)
-  | number               (. n = int.Parse(t.val); node = factory.Create("const"); 
-                            node.Value = t.val; type = integer; .)
-  | '-'
-    Factor<out type, out node>     (. if (type != integer) {
-                              SemErr("integer type expected"); type = integer;
-                            }
-                            node.Value = '-' + node.Value; .)
-  | "true"               (. node = new Bool(); node.Value = "true"; type = boolean; .)
-  | "false"              (.  node = new Bool(); node.Value = "false"; type = boolean; .)
-  ).
-
-
+DCasm                    (. string name; Root root; .)
+= "program"
+  Ident<out name>        (. tab.OpenScope(); root = new Root(); .)
+  '{'
+  { VarDecl | ProcDecl }
+  '}'                    (. tab.CloseScope(); if (gen.progStart == -1) SemErr("main function never defined"); .).
 
 
 /*------------------------------------------------------------------------*/
@@ -92,18 +50,12 @@ ProcDecl                 (. string name; Obj obj; int adr; INode fun, t1; .)
   '}'                    (. tab.CloseScope(); .).
 
 
-
-
 /*------------------------------------------------------------------------*/
-SimExpr<out int type, out INode node>    
-(. int type1; Op op; INode left, temp; .)
-= Term<out type, out left> (. node = left; .)
-  { 
-    AddOp<out op> (. temp = node; node = factory.Create(op.ToString()); .)
-    Term<out type1, out INode right>
-	  (. if (type != integer || type1 != integer) SemErr("integer type expected"); .)
-    (. node.Childrens.Add(temp); node.Childrens.Add(right); .)      
-	}.
+VarDecl                  (. string name; int type; .)
+= Type<out type>
+  Ident<out name>        (. tab.NewObj(name, var, type); .)
+  { ',' Ident<out name>  (. tab.NewObj(name, var, type); .)
+  } ';'.
 
 
 /*------------------------------------------------------------------------*/
@@ -141,12 +93,24 @@ Stat<out INode n>                     (. int type; string name; Obj obj; int adr
 
 
 /*------------------------------------------------------------------------*/
-DCasm                    (. string name; Root root; .)
-= "program"
-  Ident<out name>        (. tab.OpenScope(); root = new Root(); .)
-  '{'
-  { VarDecl | ProcDecl }
-  '}'                    (. tab.CloseScope(); if (gen.progStart == -1) SemErr("main function never defined"); .).
+//simexpr = arithmetic 
+Expr<out int type>       (. int type1; Op op; INode left; INode right; INode temp;.)
+= SimExpr<out type, out left>
+  [ RelOp<out op>
+    SimExpr<out type1, out temp>   (. if (type != type1) SemErr("incompatible types"); type = boolean; .)
+  ].
+
+
+/*------------------------------------------------------------------------*/
+SimExpr<out int type, out INode node>    
+(. int type1; Op op; INode left, temp; .)
+= Term<out type, out left> (. node = left; .)
+  { 
+    AddOp<out op> (. temp = node; node = factory.Create(op.ToString()); .)
+    Term<out type1, out INode right>
+	  (. if (type != integer || type1 != integer) SemErr("integer type expected"); .)
+    (. node.Childrens.Add(temp); node.Childrens.Add(right); .)      
+	}.
 
 
 /*------------------------------------------------------------------------*/
@@ -159,17 +123,54 @@ Term<out int type, out INode n>       (. int type1; Op op; .)
 
 
 /*------------------------------------------------------------------------*/
+Factor<out int type, out INode node>     (. int n; Obj obj; string name; node = new Error(); .)
+=                        (. type = undef; .)
+  ( Ident<out name>      (. obj = tab.Find(name); type = obj.type;
+                            if (obj.kind == var) {
+                              if (obj.level == 0) {
+                                node = factory.Create("gvar");
+                                node.Value = obj.adr.ToString(); 
+                              } else {
+                                node = factory.Create("gvar");
+                                node.Value = obj.adr.ToString(); 
+                              } 
+                            } else SemErr("variable expected"); .)
+  | number               (. n = int.Parse(t.val); node = factory.Create("const"); 
+                            node.Value = t.val; type = integer; .)
+  | '-'
+    Factor<out type, out node>     (. if (type != integer) {
+                              SemErr("integer type expected"); type = integer;
+                            }
+                            node.Value = '-' + node.Value; .)
+  | "true"               (. node = new Bool(); node.Value = "true"; type = boolean; .)
+  | "false"              (.  node = new Bool(); node.Value = "false"; type = boolean; .)
+  ).
+
+
+/*------------------------------------------------------------------------*/
+AddOp<out Op op>
+= (. op = Op.ADD; .) ( '+' | '-' (. op = Op.SUB; .)).
+
+
+/*------------------------------------------------------------------------*/
+Ident<out string name>
+= ident                  (. name = t.val; .).
+
+
+/*------------------------------------------------------------------------*/
+MulOp<out Op op>
+= (. op = Op.MUL; .) ( '*' | '/' (. op = Op.DIV; .)).
+
+
+/*------------------------------------------------------------------------*/
+RelOp<out Op op>
+= (. op = Op.EQU; .) ( "==" | '<' (. op = Op.LSS; .) | '>' (. op = Op.GTR; .)).
+
+
+/*------------------------------------------------------------------------*/
 Type<out int type>
 =                        (. type = undef; .)
  ( "int"                 (. type = integer; .)
  | "bool"                (. type = boolean; .)
  ).
-
-
-/*------------------------------------------------------------------------*/
-VarDecl                  (. string name; int type; .)
-= Type<out type>
-  Ident<out name>        (. tab.NewObj(name, var, type); .)
-  { ',' Ident<out name>  (. tab.NewObj(name, var, type); .)
-  } ';'.
 END DCasm.
