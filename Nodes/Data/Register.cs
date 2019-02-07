@@ -9,15 +9,13 @@ namespace DCasm
         public int Id { get; set; }
         public List<INode> Childrens { get; set; }
 
-        public Register(int id, string value) {
-            if(int.TryParse(value, out int parsedVal)) Value = value;
-            else throw new Exception("Incorrect Integer as value in register ctor");
-            Id = id;
+        public Register() {
+            Childrens = new List<INode>();
         }
 
         public void Accept(IVisitor v)
         {
-            //v.Visit(this);
+            v.Visit(this);
         }
     }
 }

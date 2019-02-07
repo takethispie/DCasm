@@ -8,19 +8,20 @@ namespace DCasm
 	{
 		public int pc;              // program counter
         public int progStart;
-        INode root;
-		INode Current;
+        public INode treeRoot;
+		public INode Current;
 
 		public CodeGenerator()
 		{
 			pc = 1; 
 			progStart = -1;
-			root = new Root();
+			treeRoot = new Root();
 		}
 
 		public void Compile()
 		{
-			
+			PrintVisitor v = new PrintVisitor();
+			treeRoot.Childrens.ForEach(x => x.Accept(v));
 		}
 	}
 }

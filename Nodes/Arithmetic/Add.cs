@@ -10,6 +10,7 @@ namespace DCasm
 
         public Add() {
             Childrens = new List<INode>();
+            Value = "add";
         }
 
         public void Accept(IVisitor v) => v.Visit(this); 

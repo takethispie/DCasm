@@ -26,19 +26,23 @@ IGNORE cr + lf + tab
 PRODUCTIONS
 /*------------------------------------------------------------------------*/
 DCasm
-= "program" { arithm<out INode exp> } EOF.
+= "program" 
+{ 
+  arithm<out INode exp> (. gen.treeRoot.Childrens.Add(exp); .)
+} 
+EOF.
 
 
 register<out INode node> 
-= registerNum (. node = factory.Create("register"); .).
+= registerNum (. node = factory.Create("register"); node.Value = t.val; .).
 
 
 constant<out INode val>
-= number (.val = factory.Create("Const"); val.Value = t.val; .).
+= number (.val = new Const(t.val); .).
 
 
 arithm<out INode exp>
-= (. exp = factory.Create("Error"); .)
+= (. exp = factory.Create("error"); .)
   (
     arithmOp<out string op> 
     register<out INode dest> 

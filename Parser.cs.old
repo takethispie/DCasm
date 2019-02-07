@@ -90,6 +90,7 @@ public CodeGenerator gen;
 		Expect(4);
 		while (StartOf(1)) {
 			arithm(out INode exp);
+			gen.root.Add(exp); 
 		}
 		Expect(0);
 	}
@@ -113,12 +114,12 @@ public CodeGenerator gen;
 
 	void register(out INode node) {
 		Expect(3);
-		node = factory.Create("register"); 
+		node = factory.Create("register"); node.Value = t.val; 
 	}
 
 	void constant(out INode val) {
 		Expect(2);
-		val = factory.Create("Const"); val.Value = t.val; 
+		val = new Const(t.val); 
 	}
 
 	void arithmOp(out string op) {

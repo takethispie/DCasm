@@ -12,6 +12,7 @@ namespace DCasm
         public Div()
         {
             Childrens = new List<INode>();
+            Value = "div";
         }
 
         public void Accept(IVisitor v) { v.Visit(this); }

@@ -11,6 +11,8 @@ namespace DCasm
         
         public Mul()
         {
+            Childrens = new List<INode>();
+            Value = "mul";
         }
 
         public void Accept(IVisitor v) { v.Visit(this); }

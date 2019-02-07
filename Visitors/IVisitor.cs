@@ -14,5 +14,6 @@ namespace DCasm
         void Visit(Sub n);
         void Visit(Mul n);
         void Visit(Div n);
+        void Visit(Register n);
     }
 }
