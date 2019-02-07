@@ -6,22 +6,19 @@ namespace DCasm
 {
 	public class CodeGenerator
 	{
-		public int pc;              // program counter
-        public int progStart;
         public INode treeRoot;
-		public INode Current;
+		public Dictionary<string,INode> symbolTable;
 
 		public CodeGenerator()
 		{
-			pc = 1; 
-			progStart = -1;
 			treeRoot = new Root();
+			symbolTable = new Dictionary<string, INode>();
 		}
 
 		public void Compile()
 		{
 			PrintVisitor v = new PrintVisitor();
-			treeRoot.Childrens.ForEach(x => x.Accept(v));
+			treeRoot.Accept(v);
 		}
 	}
 }
