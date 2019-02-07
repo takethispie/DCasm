@@ -1,9 +1,0 @@
-program Test {
-	void Main() {
-		int a;
-		int b;
-		a = 5;
-		b = 234;
-		a = a * 2;
-	}
-}

@@ -54,9 +54,5 @@ namespace DCasm
         public void Visit(Div n)
         {
         }
-
-        public void Visit(Bool n) {
-            
-        }
     }
 }

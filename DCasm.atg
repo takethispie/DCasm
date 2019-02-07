@@ -1,12 +1,5 @@
 COMPILER DCasm
 
-	const int // types
-	  undef = 0, integer = 1, boolean = 2;
-
-	const int // object kinds
-	  var = 0, proc = 1;
-
-	public SymbolTable   tab;
 	public CodeGenerator gen;
   public NodeFactory factory;
   
@@ -14,6 +7,7 @@ COMPILER DCasm
 CHARACTERS
   letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   digit = "0123456789".
+  firstDigit = "0123".
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
@@ -21,6 +15,7 @@ CHARACTERS
 TOKENS
   ident  = letter {letter | digit}.
   number = digit {digit}.
+  registerNum = "$" [firstDigit] digit.
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -31,146 +26,33 @@ IGNORE cr + lf + tab
 PRODUCTIONS
 /*------------------------------------------------------------------------*/
 DCasm                    (. string name; Root root; .)
-= "program"
-  Ident<out name>        (. tab.OpenScope(); root = new Root(); .)
-  '{'
-  { VarDecl | ProcDecl }
-  '}'                    (. tab.CloseScope(); if (gen.progStart == -1) SemErr("main function never defined"); .).
+= "program"   
+  { arithm  }
+  EOF.
 
 
-/*------------------------------------------------------------------------*/
-ProcDecl                 (. string name; Obj obj; int adr; INode fun, t1; .)
-= "void"
-  Ident<out name>        (. obj = tab.NewObj(name, proc, undef); obj.adr = gen.pc;
-                            if (name == "Main") gen.progStart = gen.pc; 
-                            tab.OpenScope(); .)
-  '(' ')'
-  '{'                    (. adr = gen.pc - 1; .)
-  { VarDecl | Stat<out t1> }
-  '}'                    (. tab.CloseScope(); .).
+register<out INode node> 
+= registerNum (. node = factory.Create("register"); .).
 
 
-/*------------------------------------------------------------------------*/
-VarDecl                  (. string name; int type; .)
-= Type<out type>
-  Ident<out name>        (. tab.NewObj(name, var, type); .)
-  { ',' Ident<out name>  (. tab.NewObj(name, var, type); .)
-  } ';'.
+const<out string val>
+= number (. val = t.val; .).
 
 
-/*------------------------------------------------------------------------*/
-Stat<out INode n>                     (. int type; string name; Obj obj; int adr, adr2, loopstart; INode t1, t2; n = new Error();.)
-= Ident<out name>        (. obj = tab.Find(name);.)
-  ( '='                  (. if (obj.kind != var) SemErr("cannot assign to procedure"); .)
-		Expr<out type> ';'
-						   (. if (type != obj.type) SemErr("incompatible types");
-							  if (obj.level == 0) gen.Emit(Op.STOG, obj.adr);
-							  else gen.Emit(Op.STO, obj.adr); .)
-	| '(' ')' ';'          (. if (obj.kind != proc) SemErr("object is not a procedure"); n = new Call(name); .)
-	)
-
-| "if" 
-	'(' Expr<out type> ')' (. if (type != boolean) SemErr("boolean type expected");
-							  adr = gen.pc - 2; .)
-	Stat<out t1>
-	[ "else"               (. adr2 = gen.pc - 2; adr = adr2; .)
-		Stat<out t2>
-	]                      (.  .)
-
-| "while"                (. loopstart = gen.pc; .)
-	'(' Expr<out type> ')' (. if (type != boolean) SemErr("boolean type expected"); adr = gen.pc - 2; .)
-	Stat<out t1>                 
-
-| "read"
-	Ident<out name> ';'    (. obj = tab.Find(name);
-							  if (obj.type != integer) SemErr("integer type expected");
-							  gen.Emit(Op.READ);
-							  if (obj.level == 0) gen.Emit(Op.STOG, obj.adr);
-							  else gen.Emit(Op.STO, obj.adr); .)
-
-| "write" 
-	Expr<out type> ';'     (. if (type != integer) SemErr("integer type expected");.).
-
-
-/*------------------------------------------------------------------------*/
-//simexpr = arithmetic 
-Expr<out int type>       (. int type1; Op op; INode left; INode right; INode temp;.)
-= SimExpr<out type, out left>
-  [ RelOp<out op>
-    SimExpr<out type1, out temp>   (. if (type != type1) SemErr("incompatible types"); type = boolean; .)
-  ].
-
-
-/*------------------------------------------------------------------------*/
-SimExpr<out int type, out INode node>    
-(. int type1; Op op; INode left, temp; .)
-= Term<out type, out left> (. node = left; .)
-  { 
-    AddOp<out op> (. temp = node; node = factory.Create(op.ToString()); .)
-    Term<out type1, out INode right>
-	  (. if (type != integer || type1 != integer) SemErr("integer type expected"); .)
-    (. node.Childrens.Add(temp); node.Childrens.Add(right); .)      
-	}.
-
-
-/*------------------------------------------------------------------------*/
-Term<out int type, out INode n>       (. int type1; Op op; .)
-= Factor<out type, out INode left>   (. n = left; .)
-  { MulOp<out op>  (. n = factory.Create(op);  .)
-    Factor<out type1, out INode right>    
-    (. if (type != integer || type1 != integer) SemErr("integer type expected"); .)
-	}.
-
-
-/*------------------------------------------------------------------------*/
-Factor<out int type, out INode node>     (. int n; Obj obj; string name; node = new Error(); .)
-=                        (. type = undef; .)
-  ( Ident<out name>      (. obj = tab.Find(name); type = obj.type;
-                            if (obj.kind == var) {
-                              if (obj.level == 0) {
-                                node = factory.Create("gvar");
-                                node.Value = obj.adr.ToString(); 
-                              } else {
-                                node = factory.Create("gvar");
-                                node.Value = obj.adr.ToString(); 
-                              } 
-                            } else SemErr("variable expected"); .)
-  | number               (. n = int.Parse(t.val); node = factory.Create("const"); 
-                            node.Value = t.val; type = integer; .)
-  | '-'
-    Factor<out type, out node>     (. if (type != integer) {
-                              SemErr("integer type expected"); type = integer;
-                            }
-                            node.Value = '-' + node.Value; .)
-  | "true"               (. node = new Bool(); node.Value = "true"; type = boolean; .)
-  | "false"              (.  node = new Bool(); node.Value = "false"; type = boolean; .)
+arithm 
+= (. string op; .)
+  (
+    arithmOp<out string op> register<out INode dest> register<out INode src1> register<out INode src2>
+    |
+    arithmImOp<out string op> register<out INode dest> register<out INode src1> const<out string imm>
   ).
 
 
-/*------------------------------------------------------------------------*/
-AddOp<out Op op>
-= (. op = Op.ADD; .) ( '+' | '-' (. op = Op.SUB; .)).
+arithmOp<out string op>
+= ("add" | "sub" | "div" | "mul") (. op = t.val; .).
 
 
-/*------------------------------------------------------------------------*/
-Ident<out string name>
-= ident                  (. name = t.val; .).
+arithmImOp<out string op>
+= ("addi" | "subu" | "divu" | "mulu") (. op = t.val .).
 
-
-/*------------------------------------------------------------------------*/
-MulOp<out Op op>
-= (. op = Op.MUL; .) ( '*' | '/' (. op = Op.DIV; .)).
-
-
-/*------------------------------------------------------------------------*/
-RelOp<out Op op>
-= (. op = Op.EQU; .) ( "==" | '<' (. op = Op.LSS; .) | '>' (. op = Op.GTR; .)).
-
-
-/*------------------------------------------------------------------------*/
-Type<out int type>
-=                        (. type = undef; .)
- ( "int"                 (. type = integer; .)
- | "bool"                (. type = boolean; .)
- ).
 END DCasm.
