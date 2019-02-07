@@ -11,11 +11,7 @@ namespace DCasm
 
         public void Visit(Add n)
         {
-            if(n.Childrens.Count > 1) {
-                n.Childrens[0].Accept(this);
-                Console.WriteLine("+");
-                n.Childrens[1].Accept(this);
-            }
+            
         }
 
         public void Visit(Const n)
@@ -25,10 +21,7 @@ namespace DCasm
 
         public void Visit(Store n)
         {
-            if(n.Childrens.Count > 1) {
-                n.Childrens[0].Accept(this);
-                n.Childrens[1].Accept(this);
-            }
+            
         }
 
         public void Visit(Root n)

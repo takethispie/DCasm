@@ -4,14 +4,13 @@ using System.IO;
 
 namespace DCasm
 {
-    public class Sub : INode
+    public class Mul : INode
     {
-        public List<INode> Childrens { get; set; }
         public string Value { get; set; }
-
-        public Sub()
+        public List<INode> Childrens { get; set; }
+        
+        public Mul()
         {
-            Childrens = new List<INode>();
         }
 
         public void Accept(IVisitor v) { v.Visit(this); }

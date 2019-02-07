@@ -5,12 +5,12 @@ using System.IO;
 namespace DCasm
 {
     public class Const : INode {
-        public List<INode> Childrens { get; set; }
         public string Value { get; set; }
+        public List<INode> Childrens { get; set; }
 
-        public Const(int value) {
-            this.Value = value.ToString();  
-            Childrens = new List<INode>();  
+        public Const(string value) {
+            this.Value = value;  
+            Childrens = new List<INode>();
         }
 
         public void Accept(IVisitor v) { v.Visit(this); }

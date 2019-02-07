@@ -87,26 +87,27 @@ public CodeGenerator gen;
 
 	
 	void DCasm() {
-		string name; Root root; 
 		Expect(4);
 		while (StartOf(1)) {
-			arithm();
+			arithm(out INode exp);
 		}
 		Expect(0);
 	}
 
-	void arithm() {
-		string op; 
+	void arithm(out INode exp) {
+		exp = factory.Create("Error"); 
 		if (StartOf(2)) {
 			arithmOp(out string op);
 			register(out INode dest);
 			register(out INode src1);
 			register(out INode src2);
+			exp = factory.Create(op); exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(src2); 
 		} else if (StartOf(3)) {
 			arithmImOp(out string op);
 			register(out INode dest);
 			register(out INode src1);
-			const(out string val);
+			constant(out INode imm);
+			exp = factory.Create(op); exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(imm); 
 		} else SynErr(14);
 	}
 
@@ -115,9 +116,9 @@ public CodeGenerator gen;
 		node = factory.Create("register"); 
 	}
 
-	void const(out string val) {
+	void constant(out INode val) {
 		Expect(2);
-		val = t.val; 
+		val = factory.Create("Const"); val.Value = t.val; 
 	}
 
 	void arithmOp(out string op) {
@@ -143,7 +144,7 @@ public CodeGenerator gen;
 		} else if (la.kind == 12) {
 			Get();
 		} else SynErr(16);
-		op = t.val 
+		op = t.val; 
 	}
 
 

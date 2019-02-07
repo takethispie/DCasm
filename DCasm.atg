@@ -25,26 +25,30 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 /*------------------------------------------------------------------------*/
-DCasm                    (. string name; Root root; .)
-= "program"   
-  { arithm  }
-  EOF.
+DCasm
+= "program" { arithm<out INode exp> } EOF.
 
 
 register<out INode node> 
 = registerNum (. node = factory.Create("register"); .).
 
 
-const<out string val>
-= number (. val = t.val; .).
+constant<out INode val>
+= number (.val = factory.Create("Const"); val.Value = t.val; .).
 
 
-arithm 
-= (. string op; .)
+arithm<out INode exp>
+= (. exp = factory.Create("Error"); .)
   (
-    arithmOp<out string op> register<out INode dest> register<out INode src1> register<out INode src2>
+    arithmOp<out string op> 
+    register<out INode dest> 
+    register<out INode src1> 
+    register<out INode src2> (. exp = factory.Create(op); exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(src2); .)
     |
-    arithmImOp<out string op> register<out INode dest> register<out INode src1> const<out string imm>
+    arithmImOp<out string op> 
+    register<out INode dest> 
+    register<out INode src1> 
+    constant<out INode imm> (. exp = factory.Create(op); exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(imm); .)
   ).
 
 
@@ -53,6 +57,6 @@ arithmOp<out string op>
 
 
 arithmImOp<out string op>
-= ("addi" | "subu" | "divu" | "mulu") (. op = t.val .).
+= ("addi" | "subu" | "divu" | "mulu") (. op = t.val; .).
 
 END DCasm.

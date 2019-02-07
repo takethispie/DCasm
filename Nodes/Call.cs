@@ -4,8 +4,8 @@ namespace DCasm
 {
     public class Call : INode 
     {
-        public List<INode> Childrens { get; set; }
         public string Value { get; set; }
+        public List<INode> Childrens { get; set; }
 
         public Call(string name)
         {

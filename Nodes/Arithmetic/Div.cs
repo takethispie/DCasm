@@ -4,11 +4,13 @@ using System.IO;
 
 namespace DCasm
 {
-    public class Add : INode {
-        public List<INode> Childrens { get; set; }
+    public class Div : INode
+    {
         public string Value { get; set; }
+        public List<INode> Childrens { get; set; }
 
-        public Add() {
+        public Div()
+        {
             Childrens = new List<INode>();
         }
 

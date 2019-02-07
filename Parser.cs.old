@@ -87,50 +87,64 @@ public CodeGenerator gen;
 
 	
 	void DCasm() {
-		string name; Root root; 
 		Expect(4);
 		while (StartOf(1)) {
-			arithm();
+			arithm(out INode exp);
 		}
 		Expect(0);
 	}
 
-	void arithm() {
+	void arithm(out INode exp) {
+		exp = factory.Create("Error"); 
 		if (StartOf(2)) {
-			if (la.kind == 5) {
-				Get();
-			} else if (la.kind == 6) {
-				Get();
-			} else if (la.kind == 7) {
-				Get();
-			} else {
-				Get();
-			}
-			register();
-			register();
-			register();
+			arithmOp(out string op);
+			register(out INode dest);
+			register(out INode src1);
+			register(out INode src2);
+			exp = factory.Create(op); exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(src2); 
 		} else if (StartOf(3)) {
-			if (la.kind == 9) {
-				Get();
-			} else if (la.kind == 10) {
-				Get();
-			} else if (la.kind == 11) {
-				Get();
-			} else {
-				Get();
-			}
-			register();
-			register();
-			const();
+			arithmImOp(out string op);
+			register(out INode dest);
+			register(out INode src1);
+			constant(out INode imm);
+			exp = factory.Create(op); exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(imm); 
 		} else SynErr(14);
 	}
 
-	void register() {
+	void register(out INode node) {
 		Expect(3);
+		node = factory.Create("register"); 
 	}
 
-	void const() {
+	void constant(out INode val) {
 		Expect(2);
+		val = factory.Create("Const"); val.Value = t.val; 
+	}
+
+	void arithmOp(out string op) {
+		if (la.kind == 5) {
+			Get();
+		} else if (la.kind == 6) {
+			Get();
+		} else if (la.kind == 7) {
+			Get();
+		} else if (la.kind == 8) {
+			Get();
+		} else SynErr(15);
+		op = t.val; 
+	}
+
+	void arithmImOp(out string op) {
+		if (la.kind == 9) {
+			Get();
+		} else if (la.kind == 10) {
+			Get();
+		} else if (la.kind == 11) {
+			Get();
+		} else if (la.kind == 12) {
+			Get();
+		} else SynErr(16);
+		op = t.val; 
 	}
 
 
@@ -177,6 +191,8 @@ public class Errors {
 			case 12: s = "\"mulu\" expected"; break;
 			case 13: s = "??? expected"; break;
 			case 14: s = "invalid arithm"; break;
+			case 15: s = "invalid arithmOp"; break;
+			case 16: s = "invalid arithmImOp"; break;
 
 			default: s = "error " + n; break;
 		}
