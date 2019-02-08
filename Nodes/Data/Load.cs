@@ -11,6 +11,7 @@ namespace DCasm
         public bool FromMemory { get; set; }
 
         public Load() {
+            Value = "load";
             Childrens = new List<INode>();
         }
 

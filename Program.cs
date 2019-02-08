@@ -26,7 +26,6 @@ namespace DCasm
 			        sc = new Scanner(cmdSplit[1]);
 			        par = new Parser(sc);
 					//par.CurrentISA = new DCASM8();
-					par.factory = new NodeFactory();
 					par.gen = new CodeGenerator();
 					par.Parse();
 					if (par.errors.count == 0) par.gen.Compile();

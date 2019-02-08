@@ -8,11 +8,13 @@ namespace DCasm
     {
         public string Value { get; set; }
         public List<INode> Childrens { get; set; }
+        public bool Unsigned { get; set; }
 
-        public Div()
+        public Div(string op, bool unsigned)
         {
             Childrens = new List<INode>();
-            Value = "div";
+            Value = op;
+            Unsigned = unsigned;
         }
 
         public void Accept(IVisitor v) { v.Visit(this); }

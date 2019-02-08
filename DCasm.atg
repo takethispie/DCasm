@@ -1,7 +1,6 @@
 COMPILER DCasm
 
 	public CodeGenerator gen;
-  public NodeFactory factory;
   
 /*--------------------------------------------------------------------------*/
 CHARACTERS
@@ -34,7 +33,7 @@ EOF.
 
 
 register<out INode node> 
-= registerNum (. node = factory.Create("register"); node.Value = t.val; .).
+= registerNum (. node = new Register(); node.Value = t.val; .).
 
 
 constant<out INode val>
@@ -42,25 +41,51 @@ constant<out INode val>
 
 
 arithm<out INode exp>
-= (. exp = factory.Create("error"); .)
+= (. exp = new Error(); .)
   (
-    arithmOp<out string op> 
+    arithmOp<out exp> 
     register<out INode dest> 
     register<out INode src1> 
-    register<out INode src2> (. exp = factory.Create(op); exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(src2); .)
+    register<out INode src2> 
+    (. exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(src2); .)
     |
-    arithmImOp<out string op> 
+    arithmImOp<out exp> 
     register<out INode dest> 
     register<out INode src1> 
-    constant<out INode imm> (. exp = factory.Create(op); exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(imm); .)
+    constant<out INode imm> 
+    (. exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(imm); .)
   ).
 
 
-arithmOp<out string op>
-= ("add" | "sub" | "div" | "mul") (. op = t.val; .).
+arithmOp<out INode exp>
+= (. exp = new Error(); .)
+  (
+    "add" (. exp = new Add("add", true); .)
+    | "sub" (. exp = new Sub("sub", true); .)
+    | "div" (. exp = new Div("sub", true); .)
+    | "mul" (. exp = new Mul("sub", true); .)
+
+    | "addu" (. exp = new Add("addu", false); .)
+    | "subu" (. exp = new Sub("subu", false); .)
+    | "mulu" (. exp = new Mul("mulu", false); .)
+    | "divu" (. exp = new Div("divu", false); .)
+  )
+.
 
 
-arithmImOp<out string op>
-= ("addi" | "subu" | "divu" | "mulu") (. op = t.val; .).
+arithmImOp<out INode exp>
+= (. exp = new Error(); .)
+  (
+    "addi" (. exp = new Add("addi", true); .)
+    | "subi" (. exp = new Sub("subi", true); .)
+    | "divi" (. exp = new Div("subi", true); .)
+    | "muli" (. exp = new Mul("subi", true); .)
+
+    | "addiu" (. exp = new Add("addiu", false); .)
+    | "subiu" (. exp = new Sub("subiu", false); .)
+    | "muliu" (. exp = new Mul("muliu", false); .)
+    | "diviu" (. exp = new Div("diviu", false); .)
+  )
+.
 
 END DCasm.

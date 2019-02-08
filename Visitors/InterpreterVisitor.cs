@@ -45,7 +45,7 @@ namespace DCasm
 
         public void Visit(Add n)
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Visit(Sub n)

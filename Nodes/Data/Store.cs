@@ -10,6 +10,8 @@ namespace DCasm
         public List<INode> Childrens { get; set; }
         
         public Store() {
+            Childrens = new List<INode>();
+            Value = "store";
         }
 
         public void Accept(IVisitor v) { v.Visit(this); }
