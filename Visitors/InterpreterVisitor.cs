@@ -25,22 +25,18 @@ namespace DCasm
 
         public void Visit(Store n)
         {
-            throw new System.NotImplementedException();
         }
 
         public void Visit(Const n)
         {
-            throw new System.NotImplementedException();
         }
 
         public void Visit(Function n)
         {
-            throw new System.NotImplementedException();
         }
 
         public void Visit(Load n)
         {
-            throw new System.NotImplementedException();
         }
 
         public void Visit(Add n)
@@ -50,22 +46,27 @@ namespace DCasm
 
         public void Visit(Sub n)
         {
-            throw new System.NotImplementedException();
         }
 
         public void Visit(Mul n)
         {
-            throw new System.NotImplementedException();
         }
 
         public void Visit(Div n)
         {
-            throw new System.NotImplementedException();
         }
 
         public void Visit(Register n)
         {
-            throw new System.NotImplementedException();
+        }
+
+        public void Visit(ImmediateLoad n)
+        {
+            var reg = n.Childrens[0].Value.Remove(0,1);
+            var correctReg = int.TryParse(reg, out int regNumber);
+            var correctValue = int.TryParse(n.Childrens[1].Value, out int value);
+            if(correctReg && correctValue)  registers[regNumber] = value;
+            else throw new Exception("cannot parse immediate load parameters !");
         }
     }
 }

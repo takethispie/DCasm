@@ -17,7 +17,7 @@ namespace DCasm
 
 		public void Compile()
 		{
-			PrintVisitor v = new PrintVisitor();
+			IVisitor v = new InterpreterVisitor();
 			treeRoot.Accept(v);
 		}
 	}

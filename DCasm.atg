@@ -25,67 +25,54 @@ IGNORE cr + lf + tab
 PRODUCTIONS
 /*------------------------------------------------------------------------*/
 DCasm
-= "program" 
+= (. INode exp; exp = new Error(); .) 
+"program" 
 { 
-  arithm<out INode exp> (. gen.treeRoot.Childrens.Add(exp); .)
+  (
+    arithm<out exp>
+    |
+    immediateLoad<out exp> 
+  )
+  (. gen.treeRoot.Childrens.Add(exp); .)
 } 
 EOF.
 
 
-register<out INode node> 
+register<out Register node> 
 = registerNum (. node = new Register(); node.Value = t.val; .).
 
 
-constant<out INode val>
+constant<out Const val>
 = number (.val = new Const(t.val); .).
 
 
 arithm<out INode exp>
-= (. exp = new Error(); .)
+= (. exp = new Error(); bool unsigned = false; .)
   (
-    arithmOp<out exp> 
-    register<out INode dest> 
-    register<out INode src1> 
-    register<out INode src2> 
-    (. exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(src2); .)
-    |
-    arithmImOp<out exp> 
-    register<out INode dest> 
-    register<out INode src1> 
-    constant<out INode imm> 
-    (. exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(imm); .)
-  ).
-
-
-arithmOp<out INode exp>
-= (. exp = new Error(); .)
-  (
-    "add" (. exp = new Add("add", true); .)
-    | "sub" (. exp = new Sub("sub", true); .)
-    | "div" (. exp = new Div("sub", true); .)
-    | "mul" (. exp = new Mul("sub", true); .)
-
-    | "addu" (. exp = new Add("addu", false); .)
-    | "subu" (. exp = new Sub("subu", false); .)
-    | "mulu" (. exp = new Mul("mulu", false); .)
-    | "divu" (. exp = new Div("divu", false); .)
+    arithmOp<out string op> 
+    ["uns" (. unsigned = true; .)]
+    register<out Register dest> 
+    register<out Register src1> 
+    (
+      register<out Register src2> 
+      (.exp = ArithmFactory.Create(op, dest, src1, src2); .)
+      |
+      constant<out Const src2> 
+      (.exp = ArithmFactory.Create(op, dest, src1, src2); .)
+    )
   )
 .
 
+immediateLoad<out INode exp>
+= 
+"li" register<out Register dest> constant<out Const val>
+(. exp = new ImmediateLoad(); exp.Childrens.Add(dest); exp.Childrens.Add(val); .)
+.
 
-arithmImOp<out INode exp>
-= (. exp = new Error(); .)
-  (
-    "addi" (. exp = new Add("addi", true); .)
-    | "subi" (. exp = new Sub("subi", true); .)
-    | "divi" (. exp = new Div("subi", true); .)
-    | "muli" (. exp = new Mul("subi", true); .)
 
-    | "addiu" (. exp = new Add("addiu", false); .)
-    | "subiu" (. exp = new Sub("subiu", false); .)
-    | "muliu" (. exp = new Mul("muliu", false); .)
-    | "diviu" (. exp = new Div("diviu", false); .)
-  )
+arithmOp<out string op>
+= (. op = "";.)
+  ("add" | "sub" | "div" | "mul" ) (. op = t.val; .)
 .
 
 END DCasm.

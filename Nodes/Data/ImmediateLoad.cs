@@ -1,16 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace DCasm
 {
-    public class Load : INode {
+    public class ImmediateLoad : INode
+    {
         public string Value { get; set; }
         public List<INode> Childrens { get; set; }
-        public bool Immediate { get; set; }
-        public bool FromMemory { get; set; }
 
-        public Load() {
+        public ImmediateLoad() {
             Value = "li";
             Childrens = new List<INode>();
         }

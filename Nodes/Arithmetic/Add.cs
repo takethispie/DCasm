@@ -10,10 +10,9 @@ namespace DCasm
         public List<INode> Childrens { get; set; }
         public bool Unsigned { get; set; }
 
-        public Add(string op, bool unsigned) {
+        public Add(string op) {
             Childrens = new List<INode>();
             Value = op;
-            Unsigned = unsigned;
         }
 
         public void Accept(IVisitor v) => v.Visit(this); 

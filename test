@@ -1,3 +1,7 @@
 program
+li $2 5
+li $3 10
+li $8 10
+li $19 10
 add $1 $2 $3
 sub $4 $8 $19

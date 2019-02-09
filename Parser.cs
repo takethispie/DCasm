@@ -10,7 +10,7 @@ public class Parser {
 	public const int _ident = 1;
 	public const int _number = 2;
 	public const int _registerNum = 3;
-	public const int maxT = 21;
+	public const int maxT = 11;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -86,133 +86,66 @@ public CodeGenerator gen;
 
 	
 	void DCasm() {
+		INode exp; exp = new Error(); 
 		Expect(4);
 		while (StartOf(1)) {
-			arithm(out INode exp);
+			if (StartOf(2)) {
+				arithm(out exp);
+			} else {
+				immediateLoad(out exp);
+			}
 			gen.treeRoot.Childrens.Add(exp); 
 		}
 		Expect(0);
 	}
 
 	void arithm(out INode exp) {
-		exp = new Error(); 
-		if (StartOf(2)) {
-			arithmOp(out exp);
-			register(out INode dest);
-			register(out INode src1);
-			register(out INode src2);
-			exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(src2); 
-		} else if (StartOf(3)) {
-			arithmImOp(out exp);
-			register(out INode dest);
-			register(out INode src1);
-			constant(out INode imm);
-			exp.Childrens.Add(dest); exp.Childrens.Add(src1); exp.Childrens.Add(imm); 
-		} else SynErr(22);
+		exp = new Error(); bool unsigned = false; 
+		arithmOp(out string op);
+		if (la.kind == 5) {
+			Get();
+			unsigned = true; 
+		}
+		register(out Register dest);
+		register(out Register src1);
+		if (la.kind == 3) {
+			register(out Register src2);
+			exp = ArithmFactory.Create(op, dest, src1, src2); 
+		} else if (la.kind == 2) {
+			constant(out Const src2);
+			exp = ArithmFactory.Create(op, dest, src1, src2); 
+		} else SynErr(12);
 	}
 
-	void register(out INode node) {
+	void immediateLoad(out INode exp) {
+		Expect(6);
+		register(out Register dest);
+		constant(out Const val);
+		exp = new ImmediateLoad(); exp.Childrens.Add(dest); exp.Childrens.Add(val); 
+	}
+
+	void register(out Register node) {
 		Expect(3);
 		node = new Register(); node.Value = t.val; 
 	}
 
-	void constant(out INode val) {
+	void constant(out Const val) {
 		Expect(2);
 		val = new Const(t.val); 
 	}
 
-	void arithmOp(out INode exp) {
-		exp = new Error(); 
-		switch (la.kind) {
-		case 5: {
+	void arithmOp(out string op) {
+		op = "";
+		if (la.kind == 7) {
 			Get();
-			exp = new Add("add", true); 
-			break;
-		}
-		case 6: {
+		} else if (la.kind == 8) {
 			Get();
-			exp = new Sub("sub", true); 
-			break;
-		}
-		case 7: {
+		} else if (la.kind == 9) {
 			Get();
-			exp = new Div("sub", true); 
-			break;
-		}
-		case 8: {
+		} else if (la.kind == 10) {
 			Get();
-			exp = new Mul("sub", true); 
-			break;
-		}
-		case 9: {
-			Get();
-			exp = new Add("addu", false); 
-			break;
-		}
-		case 10: {
-			Get();
-			exp = new Sub("subu", false); 
-			break;
-		}
-		case 11: {
-			Get();
-			exp = new Mul("mulu", false); 
-			break;
-		}
-		case 12: {
-			Get();
-			exp = new Div("divu", false); 
-			break;
-		}
-		default: SynErr(23); break;
-		}
-	}
-
-	void arithmImOp(out INode exp) {
-		exp = new Error(); 
-		switch (la.kind) {
-		case 13: {
-			Get();
-			exp = new Add("addi", true); 
-			break;
-		}
-		case 14: {
-			Get();
-			exp = new Sub("subi", true); 
-			break;
-		}
-		case 15: {
-			Get();
-			exp = new Div("subi", true); 
-			break;
-		}
-		case 16: {
-			Get();
-			exp = new Mul("subi", true); 
-			break;
-		}
-		case 17: {
-			Get();
-			exp = new Add("addiu", false); 
-			break;
-		}
-		case 18: {
-			Get();
-			exp = new Sub("subiu", false); 
-			break;
-		}
-		case 19: {
-			Get();
-			exp = new Mul("muliu", false); 
-			break;
-		}
-		case 20: {
-			Get();
-			exp = new Div("diviu", false); 
-			break;
-		}
-		default: SynErr(24); break;
-		}
+		} else SynErr(13);
+		op = t.val; 
 	}
 
 
@@ -227,10 +160,9 @@ public CodeGenerator gen;
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x}
 
 	};
 } // end Parser
@@ -249,26 +181,15 @@ public class Errors {
 			case 2: s = "number expected"; break;
 			case 3: s = "registerNum expected"; break;
 			case 4: s = "\"program\" expected"; break;
-			case 5: s = "\"add\" expected"; break;
-			case 6: s = "\"sub\" expected"; break;
-			case 7: s = "\"div\" expected"; break;
-			case 8: s = "\"mul\" expected"; break;
-			case 9: s = "\"addu\" expected"; break;
-			case 10: s = "\"subu\" expected"; break;
-			case 11: s = "\"mulu\" expected"; break;
-			case 12: s = "\"divu\" expected"; break;
-			case 13: s = "\"addi\" expected"; break;
-			case 14: s = "\"subi\" expected"; break;
-			case 15: s = "\"divi\" expected"; break;
-			case 16: s = "\"muli\" expected"; break;
-			case 17: s = "\"addiu\" expected"; break;
-			case 18: s = "\"subiu\" expected"; break;
-			case 19: s = "\"muliu\" expected"; break;
-			case 20: s = "\"diviu\" expected"; break;
-			case 21: s = "??? expected"; break;
-			case 22: s = "invalid arithm"; break;
-			case 23: s = "invalid arithmOp"; break;
-			case 24: s = "invalid arithmImOp"; break;
+			case 5: s = "\"uns\" expected"; break;
+			case 6: s = "\"li\" expected"; break;
+			case 7: s = "\"add\" expected"; break;
+			case 8: s = "\"sub\" expected"; break;
+			case 9: s = "\"div\" expected"; break;
+			case 10: s = "\"mul\" expected"; break;
+			case 11: s = "??? expected"; break;
+			case 12: s = "invalid arithm"; break;
+			case 13: s = "invalid arithmOp"; break;
 
 			default: s = "error " + n; break;
 		}

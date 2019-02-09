@@ -68,5 +68,12 @@ namespace DCasm
         public void Visit(Register n) {
             Console.Write(n.Value + ":");
         }
+
+        public void Visit(ImmediateLoad n)
+        {
+            Console.Write("li ");
+            Console.Write(n.Childrens[0].Value + " ");
+            Console.WriteLine(n.Childrens[1].Value);
+        }
     }
 }

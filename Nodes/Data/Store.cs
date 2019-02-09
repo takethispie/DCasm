@@ -11,7 +11,7 @@ namespace DCasm
         
         public Store() {
             Childrens = new List<INode>();
-            Value = "store";
+            Value = "sw";
         }
 
         public void Accept(IVisitor v) { v.Visit(this); }
