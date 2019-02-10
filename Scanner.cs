@@ -343,8 +343,8 @@ public class Scanner {
 	void CheckLiteral() {
 		switch (t.val) {
 			case "program": t.kind = 4; break;
-			case "uns": t.kind = 5; break;
-			case "li": t.kind = 6; break;
+			case "li": t.kind = 5; break;
+			case "lui": t.kind = 6; break;
 			case "add": t.kind = 7; break;
 			case "sub": t.kind = 8; break;
 			case "div": t.kind = 9; break;

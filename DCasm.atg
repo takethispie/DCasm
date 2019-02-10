@@ -47,10 +47,9 @@ constant<out Const val>
 
 
 arithm<out INode exp>
-= (. exp = new Error(); bool unsigned = false; .)
+= (. exp = new Error();.)
   (
     arithmOp<out string op> 
-    ["uns" (. unsigned = true; .)]
     register<out Register dest> 
     register<out Register src1> 
     (
@@ -65,9 +64,16 @@ arithm<out INode exp>
 
 immediateLoad<out INode exp>
 = 
-"li" register<out Register dest> constant<out Const val>
-(. exp = new ImmediateLoad(); exp.Childrens.Add(dest); exp.Childrens.Add(val); .)
+(. exp = new Error(); .)
+(
+  "li" (. exp = new ImmediateLoad(false); .)
+  |
+  "lui" (. exp = new ImmediateLoad(true); .)
+)
+register<out Register dest> constant<out Const val> (. exp.Childrens.Add(dest); exp.Childrens.Add(val); .)
 .
+
+
 
 
 arithmOp<out string op>

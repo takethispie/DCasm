@@ -7,9 +7,12 @@ namespace DCasm
         public string Value { get; set; }
         public List<INode> Childrens { get; set; }
 
-        public ImmediateLoad() {
+        public bool Upper { get; set; }
+
+        public ImmediateLoad(bool upper) {
             Value = "li";
             Childrens = new List<INode>();
+            Upper = upper;
         }
 
         public void Accept(IVisitor v) { v.Visit(this); }
