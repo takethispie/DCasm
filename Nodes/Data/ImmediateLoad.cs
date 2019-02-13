@@ -10,7 +10,7 @@ namespace DCasm
         public bool Upper { get; set; }
 
         public ImmediateLoad(bool upper) {
-            Value = "li";
+            Value = upper ? "lui" : "li";
             Childrens = new List<INode>();
             Upper = upper;
         }

@@ -14,7 +14,6 @@ namespace DCasm
         
         public void Accept(IVisitor v)
         {
-            throw new System.NotImplementedException();
         }
     }
 }

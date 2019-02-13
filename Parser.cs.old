@@ -114,6 +114,7 @@ public CodeGenerator gen;
 	}
 
 	void immediateLoad(out INode exp) {
+		exp = new Error(); 
 		if (la.kind == 5) {
 			Get();
 			exp = new ImmediateLoad(false); 

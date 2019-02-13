@@ -15,13 +15,10 @@ namespace DCasm
             gt = false;
             eq = false;
             lt = false;
-            registers= new int[32];
+            registers = new int[32];
         }
 
-        public void Visit(Root n)
-        {
-            n.Childrens.ForEach(x => x.Accept(this));
-        }
+        public void Visit(Root n) => n.Childrens.ForEach(x => x.Accept(this));
 
         public void Visit(Store n)
         {
@@ -58,6 +55,7 @@ namespace DCasm
 
         public void Visit(Register n)
         {
+            
         }
 
         public void Visit(ImmediateLoad n)
@@ -67,6 +65,7 @@ namespace DCasm
             var correctValue = int.TryParse(n.Childrens[1].Value, out int value);
             if(correctReg && correctValue)  registers[regNumber] = value;
             else throw new Exception("cannot parse immediate load parameters !");
+            Console.WriteLine("stored " + value + " in $" + regNumber);
         }
     }
 }

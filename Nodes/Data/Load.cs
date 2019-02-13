@@ -7,11 +7,9 @@ namespace DCasm
     public class Load : INode {
         public string Value { get; set; }
         public List<INode> Childrens { get; set; }
-        public bool Immediate { get; set; }
-        public bool FromMemory { get; set; }
 
         public Load() {
-            Value = "li";
+            Value = "lw";
             Childrens = new List<INode>();
         }
 
