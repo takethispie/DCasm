@@ -10,7 +10,7 @@ public class Parser {
 	public const int _ident = 1;
 	public const int _number = 2;
 	public const int _registerNum = 3;
-	public const int maxT = 11;
+	public const int maxT = 13;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -91,8 +91,10 @@ public CodeGenerator gen;
 		while (StartOf(1)) {
 			if (StartOf(2)) {
 				arithm(out exp);
-			} else {
+			} else if (la.kind == 5 || la.kind == 6) {
 				immediateLoad(out exp);
+			} else {
+				data(out exp);
 			}
 			gen.treeRoot.Childrens.Add(exp); 
 		}
@@ -110,7 +112,7 @@ public CodeGenerator gen;
 		} else if (la.kind == 2) {
 			constant(out Const src2);
 			exp = ArithmFactory.Create(op, dest, src1, src2); 
-		} else SynErr(12);
+		} else SynErr(14);
 	}
 
 	void immediateLoad(out INode exp) {
@@ -121,10 +123,29 @@ public CodeGenerator gen;
 		} else if (la.kind == 6) {
 			Get();
 			exp = new ImmediateLoad(true); 
-		} else SynErr(13);
+		} else SynErr(15);
 		register(out Register dest);
 		constant(out Const val);
 		exp.Childrens.Add(dest); exp.Childrens.Add(val); 
+	}
+
+	void data(out INode exp) {
+		exp = new Error(); INode temp;
+		if (la.kind == 11) {
+			Get();
+			register(out Register dest);
+			register(out Register source);
+			exp = new Move(source, dest); 
+		} else if (la.kind == 12) {
+			Get();
+			register(out Register OutputSelection);
+			if (la.kind == 3) {
+				register(out temp);
+			} else if (la.kind == 2) {
+				constant(out temp);
+			} else SynErr(16);
+			exp = new Write(OutputSelection, temp); 
+		} else SynErr(17);
 	}
 
 	void register(out Register node) {
@@ -147,7 +168,7 @@ public CodeGenerator gen;
 			Get();
 		} else if (la.kind == 10) {
 			Get();
-		} else SynErr(14);
+		} else SynErr(18);
 		op = t.val; 
 	}
 
@@ -163,9 +184,9 @@ public CodeGenerator gen;
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x,_x,_x}
 
 	};
 } // end Parser
@@ -190,10 +211,14 @@ public class Errors {
 			case 8: s = "\"sub\" expected"; break;
 			case 9: s = "\"div\" expected"; break;
 			case 10: s = "\"mul\" expected"; break;
-			case 11: s = "??? expected"; break;
-			case 12: s = "invalid arithm"; break;
-			case 13: s = "invalid immediateLoad"; break;
-			case 14: s = "invalid arithmOp"; break;
+			case 11: s = "\"mov\" expected"; break;
+			case 12: s = "\"out\" expected"; break;
+			case 13: s = "??? expected"; break;
+			case 14: s = "invalid arithm"; break;
+			case 15: s = "invalid immediateLoad"; break;
+			case 16: s = "invalid data"; break;
+			case 17: s = "invalid data"; break;
+			case 18: s = "invalid arithmOp"; break;
 
 			default: s = "error " + n; break;
 		}

@@ -87,5 +87,9 @@ namespace DCasm
             Console.Write("out ");
             Console.WriteLine("");
         }
+        
+        public void Visit(Move n) {
+
+        }
     }
 }

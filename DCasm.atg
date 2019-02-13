@@ -32,6 +32,8 @@ DCasm
     arithm<out exp>
     |
     immediateLoad<out exp> 
+    |
+    data<out exp>
   )
   (. gen.treeRoot.Childrens.Add(exp); .)
 } 
@@ -73,12 +75,20 @@ immediateLoad<out INode exp>
 register<out Register dest> constant<out Const val> (. exp.Childrens.Add(dest); exp.Childrens.Add(val); .)
 .
 
-
-
-
 arithmOp<out string op>
 = (. op = "";.)
   ("add" | "sub" | "div" | "mul" ) (. op = t.val; .)
+.
+
+
+data<out INode exp>
+=
+(. exp = new Error(); INode temp;.)
+(
+  "mov" register<out Register dest> register<out Register source> (. exp = new Move(source, dest); .)
+  |
+  "out" register<out Register OutputSelection> (register<out temp> | constant<out temp>) (. exp = new Write(OutputSelection, temp); .)
+)
 .
 
 END DCasm.

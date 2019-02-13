@@ -5,11 +5,11 @@ namespace DCasm
 {
     public class InterpreterVisitor : IVisitor
     {
-        public int pc;
-        public bool gt, eq, lt;
-        public List<string> ram;
-        public int[] registers;
-        public Stack<int> stack;
+        private int pc;
+        private bool gt, eq, lt;
+        private Dictionary<int, int> ram;
+        private int[] registers;
+        private Stack<int> stack;
 
         public InterpreterVisitor() {
             pc = 0;
@@ -18,6 +18,7 @@ namespace DCasm
             lt = false;
             registers = new int[32];
             stack = new Stack<int>();
+            ram = new Dictionary<int, int>();
         }
 
         private int GetRegisterValue(INode n) {
@@ -109,13 +110,19 @@ namespace DCasm
             Console.WriteLine("stored " + value + " in $" + regNumber);
         }
 
-
         public void Visit(Read n)
         {
         }
 
         public void Visit(Write n)
         {
+        }
+
+        public void Visit(Move n) {
+            var source = stack.Pop();
+            var destination = stack.Pop();
+            registers[destination] = registers[source];
+            Console.WriteLine("$" + source + "(" + registers[source] + ") => $" + destination + "(" + registers[destination] + ")");
         }
     }
 }
