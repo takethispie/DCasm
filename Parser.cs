@@ -140,11 +140,12 @@ public CodeGenerator gen;
 			Get();
 			register(out Register OutputSelection);
 			if (la.kind == 3) {
-				register(out temp);
+				register(out Register val);
+				exp = new Write(OutputSelection, val); 
 			} else if (la.kind == 2) {
-				constant(out temp);
+				constant(out Const val);
+				exp = new Write(OutputSelection, val); 
 			} else SynErr(16);
-			exp = new Write(OutputSelection, temp); 
 		} else SynErr(17);
 	}
 

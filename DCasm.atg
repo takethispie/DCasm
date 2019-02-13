@@ -87,7 +87,12 @@ data<out INode exp>
 (
   "mov" register<out Register dest> register<out Register source> (. exp = new Move(source, dest); .)
   |
-  "out" register<out Register OutputSelection> (register<out temp> | constant<out temp>) (. exp = new Write(OutputSelection, temp); .)
+  "out" register<out Register OutputSelection> 
+    (
+      register<out Register val> (. exp = new Write(OutputSelection, val); .)
+      | 
+      constant<out Const val> (. exp = new Write(OutputSelection, val); .)
+    ) 
 )
 .
 
