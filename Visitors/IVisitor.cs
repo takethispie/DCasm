@@ -16,5 +16,7 @@ namespace DCasm
         void Visit(Div n);
         void Visit(Register n);
         void Visit(ImmediateLoad n);
+        void Visit(Read n);
+        void Visit (Write n);
     }
 }

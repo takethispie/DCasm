@@ -75,5 +75,17 @@ namespace DCasm
             Console.Write(n.Childrens[0].Value + " ");
             Console.WriteLine(n.Childrens[1].Value);
         }
+
+        public void Visit(Read n)
+        {
+            Console.Write("in ");
+            Console.WriteLine("");
+        }
+
+        public void Visit(Write n)
+        {
+            Console.Write("out ");
+            Console.WriteLine("");
+        }
     }
 }
