@@ -8,9 +8,12 @@ namespace DCasm
         public string Value { get; set; }
         public List<INode> Childrens { get; set; }
 
-        public Load() {
+        public Load(Register dest, Register baseReg, Const offset) {
             Value = "lw";
             Childrens = new List<INode>();
+            Childrens.Add(dest);
+            Childrens.Add(baseReg);
+            Childrens.Add(offset);
         }
 
         public void Accept(IVisitor v) { v.Visit(this); }

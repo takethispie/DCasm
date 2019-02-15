@@ -8,9 +8,9 @@ namespace DCasm
         public string Value { get; set; }
         public List<INode> Childrens { get; set; }
 
-        public Read(Register outputSelection, INode value) {
+        public Read(Register inputSelection, INode value) {
             Childrens = new List<INode>();
-            Childrens.Add(outputSelection);
+            Childrens.Add(inputSelection);
             Childrens.Add(value);
             Value = "in";
         }
