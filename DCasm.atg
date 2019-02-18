@@ -34,6 +34,10 @@ DCasm
     immediateLoad<out exp> 
     |
     data<out exp>
+    |
+    function<out exp>
+    |
+    call<out exp>
   )
   (. gen.treeRoot.Childrens.Add(exp); .)
 } 
@@ -64,6 +68,7 @@ arithm<out INode exp>
   )
 .
 
+
 immediateLoad<out INode exp>
 = 
 (. exp = new Error(); .)
@@ -74,6 +79,7 @@ immediateLoad<out INode exp>
 )
 register<out Register dest> constant<out Const val> (. exp.Childrens.Add(dest); exp.Childrens.Add(val); .)
 .
+
 
 arithmOp<out string op>
 = (. op = "";.)
@@ -101,5 +107,30 @@ data<out INode exp>
   "sw" register<out Register value> register<out Register baseReg> constant<out Const offset> (. exp = new Store(baseReg, offset, value); .) 
 )
 .
+
+
+function<out INode function>
+=
+"function" functionName<out string name>
+(. INode exp = new Error(); function = new Function(name); .)
+{
+  (
+    arithm<out exp>
+    |
+    immediateLoad<out exp> 
+    |
+    data<out exp>
+  )
+  (. function.Childrens.Add(exp); .)
+}
+"end" (. function.Value = name; gen.Functions.Add(name, function); .)
+.
+
+
+functionName<out string name> = ident (. name = t.val; .).
+
+
+call<out INode exp> = "call" functionName<out string name> (. exp = new Call(name); .).
+
 
 END DCasm.

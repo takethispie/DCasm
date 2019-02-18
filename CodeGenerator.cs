@@ -7,17 +7,17 @@ namespace DCasm
 	public class CodeGenerator
 	{
         public INode treeRoot;
-		public Dictionary<string,INode> symbolTable;
+		public Dictionary<string, INode> Functions;
 
 		public CodeGenerator()
 		{
 			treeRoot = new Root();
-			symbolTable = new Dictionary<string, INode>();
+			Functions = new Dictionary<string, INode>();
 		}
 
 		public void Compile()
 		{
-			IVisitor v = new Interpreter();
+			IVisitor v = new Interpreter(Functions);
 			treeRoot.Accept(v);
 		}
 	}

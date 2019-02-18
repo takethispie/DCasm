@@ -5,3 +5,14 @@ li $8 10
 li $19 10
 add $1 $2 $3
 sub $4 $8 $19
+
+function foobar
+li $2 123
+end
+
+function myfunction
+add $3 $2 $1
+li $1 255
+end
+
+call foobar

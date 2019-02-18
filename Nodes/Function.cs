@@ -12,6 +12,7 @@ namespace DCasm
         public Function(string name)
         {
             Value = name;
+            Childrens = new List<INode>();
         }
 
         public void Accept(IVisitor v) { v.Visit(this); }

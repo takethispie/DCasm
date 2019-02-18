@@ -10,8 +10,10 @@ namespace DCasm
         private Dictionary<int, int> ram;
         private int[] registers;
         private Stack<int> stack;
+        public Dictionary<string, INode> Functions;
+        public INode root;
 
-        public Interpreter() {
+        public Interpreter(Dictionary<string, INode> functions) {
             pc = 0;
             gt = false;
             eq = false;
@@ -19,6 +21,7 @@ namespace DCasm
             registers = new int[32];
             stack = new Stack<int>();
             ram = new Dictionary<int, int>();
+            Functions = functions;
         }
 
         private int GetRegisterValue(INode n) {
@@ -33,8 +36,10 @@ namespace DCasm
             else throw new Exception("cannot parse register number !");
         }
 
-        public void Visit(Root n) => n.Childrens.ForEach(x => x.Accept(this));
-
+        public void Visit(Root n) {
+            root = n;
+            n.Childrens.ForEach(x => x.Accept(this));
+        }
         public void Visit(Store n)
         {
             string valueReg = n.Childrens[0].Value.Remove(0,1);
@@ -61,10 +66,19 @@ namespace DCasm
 
         public void Visit(Function n)
         {
+            Console.WriteLine("defined function with name: " + n.Value);
         }
 
         public void Visit(Call n) {
-
+            Console.WriteLine("calling " + n.Value);
+            if(Functions.ContainsKey(n.Value)) Functions[n.Value].Childrens.ForEach(x => x.Accept(this));
+            else {
+                Console.WriteLine("function was not found in dictionnary");
+                var fun = root.Childrens.Find(x => x.GetType() == typeof(Function) && x.Value == n.Value);
+                if(fun == null) throw new Exception("function is not defined !");
+                else fun.Childrens.ForEach(x => x.Accept(this));
+            }
+            Console.WriteLine("return from " + n.Value);
         }
 
         public void Visit(Load n)

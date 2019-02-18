@@ -12,8 +12,6 @@ namespace DCasm
             this.Value = name;
         }
         
-        public void Accept(IVisitor v)
-        {
-        }
+        public void Accept(IVisitor v) => v.Visit(this);
     }
 }
