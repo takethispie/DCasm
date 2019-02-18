@@ -89,7 +89,7 @@ arithmOp<out string op>
 
 data<out INode exp>
 =
-(. exp = new Error(); INode temp;.)
+(. exp = new Error(); .)
 (
   "mov" register<out Register dest> register<out Register source> (. exp = new Move(source, dest); .)
   |

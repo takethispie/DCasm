@@ -13,6 +13,8 @@ namespace DCasm
         public Dictionary<string, INode> Functions;
         public INode root;
 
+        public bool verbose;
+
         public Interpreter(Dictionary<string, INode> functions) {
             pc = 0;
             gt = false;
@@ -22,6 +24,15 @@ namespace DCasm
             stack = new Stack<int>();
             ram = new Dictionary<int, int>();
             Functions = functions;
+            verbose = true;
+        }
+
+        private void ConsoleWrite(string str) {
+            if(verbose) Console.Write(str);
+        }
+
+        private void ConsoleWriteLine(string str) {
+            if(verbose) Console.WriteLine(str);
         }
 
         private int GetRegisterValue(INode n) {
@@ -59,26 +70,26 @@ namespace DCasm
 
             if(!ram.ContainsKey(storeAddress)) ram.Add(storeAddress, valueToStore);    
             else ram[storeAddress] = valueToStore;
-            Console.WriteLine("stored " + valueToStore + " to adress " + storeAddress);
+            ConsoleWriteLine("stored " + valueToStore + " to adress " + storeAddress);
         }
 
         public void Visit(Const n) => stack.Push(n.ToInt());
 
         public void Visit(Function n)
         {
-            Console.WriteLine("defined function with name: " + n.Value);
+            ConsoleWriteLine("defined function with name: " + n.Value);
         }
 
         public void Visit(Call n) {
-            Console.WriteLine("calling " + n.Value);
+            ConsoleWriteLine("calling " + n.Value);
             if(Functions.ContainsKey(n.Value)) Functions[n.Value].Childrens.ForEach(x => x.Accept(this));
             else {
-                Console.WriteLine("function was not found in dictionnary");
+                ConsoleWriteLine("function was not found in dictionnary");
                 var fun = root.Childrens.Find(x => x.GetType() == typeof(Function) && x.Value == n.Value);
                 if(fun == null) throw new Exception("function is not defined !");
                 else fun.Childrens.ForEach(x => x.Accept(this));
             }
-            Console.WriteLine("return from " + n.Value);
+            ConsoleWriteLine("return from " + n.Value);
         }
 
         public void Visit(Load n)
@@ -100,7 +111,7 @@ namespace DCasm
 
             if(!ram.ContainsKey(loadAddress)) registers[destRegister] = 0;
             else registers[destRegister] = ram[loadAddress];
-            Console.WriteLine("Loaded value " + registers[destRegister] + " from adress " + loadAddress);
+            ConsoleWriteLine("Loaded value " + registers[destRegister] + " from adress " + loadAddress);
             
         }
 
@@ -112,8 +123,8 @@ namespace DCasm
             stack.Pop();
             var regNumber = GetRegisterIndex(n.Childrens[0]);
             registers[regNumber] = src1 + src2;
-            Console.WriteLine(src1 + " + " + src2 + " => $" + regNumber);
-            Console.WriteLine("$" + regNumber + " = " + registers[regNumber]);
+            ConsoleWriteLine(src1 + " + " + src2 + " => $" + regNumber);
+            ConsoleWriteLine("$" + regNumber + " = " + registers[regNumber]);
         }
 
         public void Visit(Sub n)
@@ -124,8 +135,8 @@ namespace DCasm
             stack.Pop();
             var regNumber = GetRegisterIndex(n.Childrens[0]);
             registers[regNumber] = src1 - src2;
-            Console.WriteLine(src1 + " - " + src2 + " => $" + regNumber);
-            Console.WriteLine("$" + regNumber + " = " + registers[regNumber]);
+            ConsoleWriteLine(src1 + " - " + src2 + " => $" + regNumber);
+            ConsoleWriteLine("$" + regNumber + " = " + registers[regNumber]);
         }
 
         public void Visit(Mul n)
@@ -136,8 +147,8 @@ namespace DCasm
             stack.Pop();
             var regNumber = GetRegisterIndex(n.Childrens[0]);
             registers[regNumber] = src1 * src2;
-            Console.WriteLine(src1 + " * " + src2 + " => $" + regNumber);
-            Console.WriteLine("$" + regNumber + " = " + registers[regNumber]);
+            ConsoleWriteLine(src1 + " * " + src2 + " => $" + regNumber);
+            ConsoleWriteLine("$" + regNumber + " = " + registers[regNumber]);
         }
 
         public void Visit(Div n)
@@ -149,8 +160,8 @@ namespace DCasm
             var regNumber = GetRegisterIndex(n.Childrens[0]);
             if(src2 == 0) throw new DivideByZeroException();
             registers[regNumber] = src1 / src2;
-            Console.WriteLine(src1 + " - " + src2 + " => $" + regNumber);
-            Console.WriteLine("$" + regNumber + " = " + registers[regNumber]);
+            ConsoleWriteLine(src1 + " - " + src2 + " => $" + regNumber);
+            ConsoleWriteLine("$" + regNumber + " = " + registers[regNumber]);
         }
 
         public void Visit(Register n) => stack.Push(GetRegisterValue(n));
@@ -162,7 +173,7 @@ namespace DCasm
             var correctValue = int.TryParse(n.Childrens[1].Value, out int value);
             if(correctReg && correctValue)  registers[regNumber] = value;
             else throw new Exception("cannot parse immediate load parameters !");
-            Console.WriteLine("stored " + value + " in $" + regNumber);
+            ConsoleWriteLine("stored " + value + " in $" + regNumber);
         }
 
         public void Visit(Read n)
@@ -180,8 +191,8 @@ namespace DCasm
                 Console.Write("IN>");
                 var key = Console.Read();
                 registers[parsedDestReg] = key;
-                Console.Write(Environment.NewLine);
-                Console.WriteLine("read " + key + " from terminal and stored it in " + parsedDestReg);
+                ConsoleWrite(Environment.NewLine);
+                ConsoleWriteLine("read " + key + " from terminal and stored it in " + parsedDestReg);
                 break;
             }
         }
@@ -200,7 +211,8 @@ namespace DCasm
                 case 0:
                 Console.Write("OUT>");
                 var val = registers[parsedSourceReg];
-                Console.WriteLine(val);
+                var convVal = char.ConvertFromUtf32(val);
+                Console.Write(convVal);
                 break;
             }
         }
@@ -209,7 +221,7 @@ namespace DCasm
             var source = stack.Pop();
             var destination = stack.Pop();
             registers[destination] = registers[source];
-            Console.WriteLine("$" + source + "(" + registers[source] + ") => $" + destination + "(" + registers[destination] + ")");
+            ConsoleWriteLine("$" + source + "(" + registers[source] + ") => $" + destination + "(" + registers[destination] + ")");
         }
     }
 }

@@ -19,7 +19,7 @@ namespace DCasm
 				Console.Write (">");
 				command = Console.ReadLine();
 				string[] cmdSplit = command.Split(' ');
-
+				if(cmdSplit.Length < 2) throw new Exception("missing command argument !");
 			    if (cmdSplit[0].ToUpper() != "DO") continue;
 			    if (File.Exists(cmdSplit[1]))
 			    {
