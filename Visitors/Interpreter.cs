@@ -3,7 +3,7 @@ using System;
 
 namespace DCasm
 {
-    public class InterpreterVisitor : IVisitor
+    public class Interpreter : IVisitor
     {
         private int pc;
         private bool gt, eq, lt;
@@ -11,7 +11,7 @@ namespace DCasm
         private int[] registers;
         private Stack<int> stack;
 
-        public InterpreterVisitor() {
+        public Interpreter() {
             pc = 0;
             gt = false;
             eq = false;
@@ -61,6 +61,10 @@ namespace DCasm
 
         public void Visit(Function n)
         {
+        }
+
+        public void Visit(Call n) {
+
         }
 
         public void Visit(Load n)

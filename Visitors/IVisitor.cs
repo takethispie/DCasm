@@ -9,6 +9,7 @@ namespace DCasm
         void Visit(Store n);
         void Visit(Const n);
         void Visit(Function n);
+        void Visit(Call n);
         void Visit(Load n);
         void Visit(Add n);
         void Visit(Sub n);

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace DCasm
 {
-    public class PrintVisitor : IVisitor
+    public class Printer : IVisitor
     {
-        public PrintVisitor()
+        public Printer()
         {
         }
 
@@ -37,6 +37,10 @@ namespace DCasm
         public void Visit(Function n)
         {
             Console.Write(n.Value + ":");
+        }
+
+        public void Visit(Call n) {
+            
         }
 
         public void Visit(Load n)

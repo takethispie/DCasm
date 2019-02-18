@@ -17,7 +17,7 @@ namespace DCasm
 
 		public void Compile()
 		{
-			IVisitor v = new InterpreterVisitor();
+			IVisitor v = new Interpreter();
 			treeRoot.Accept(v);
 		}
 	}
