@@ -10,7 +10,7 @@ public class Parser {
 	public const int _ident = 1;
 	public const int _number = 2;
 	public const int _registerNum = 3;
-	public const int maxT = 19;
+	public const int maxT = 26;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -89,16 +89,31 @@ public CodeGenerator gen;
 		INode exp; exp = new Error(); 
 		Expect(4);
 		while (StartOf(1)) {
-			if (StartOf(2)) {
+			switch (la.kind) {
+			case 7: case 8: case 9: case 10: {
 				arithm(out exp);
-			} else if (la.kind == 5 || la.kind == 6) {
+				break;
+			}
+			case 5: case 6: {
 				immediateLoad(out exp);
-			} else if (StartOf(3)) {
+				break;
+			}
+			case 11: case 12: case 13: case 14: case 15: {
 				data(out exp);
-			} else if (la.kind == 16) {
+				break;
+			}
+			case 16: {
 				function(out exp);
-			} else {
+				break;
+			}
+			case 18: {
 				call(out exp);
+				break;
+			}
+			case 19: {
+				Condition(out exp);
+				break;
+			}
 			}
 			gen.treeRoot.Childrens.Add(exp); 
 		}
@@ -116,7 +131,7 @@ public CodeGenerator gen;
 		} else if (la.kind == 2) {
 			constant(out Const src2);
 			exp = ArithmFactory.Create(op, dest, src1, src2); 
-		} else SynErr(20);
+		} else SynErr(27);
 	}
 
 	void immediateLoad(out INode exp) {
@@ -127,14 +142,14 @@ public CodeGenerator gen;
 		} else if (la.kind == 6) {
 			Get();
 			exp = new ImmediateLoad(true); 
-		} else SynErr(21);
+		} else SynErr(28);
 		register(out Register dest);
 		constant(out Const val);
 		exp.Childrens.Add(dest); exp.Childrens.Add(val); 
 	}
 
 	void data(out INode exp) {
-		exp = new Error(); INode temp;
+		exp = new Error(); 
 		if (la.kind == 11) {
 			Get();
 			register(out Register dest);
@@ -149,7 +164,7 @@ public CodeGenerator gen;
 			} else if (la.kind == 2) {
 				constant(out Const val);
 				exp = new Write(OutputSelection, val); 
-			} else SynErr(22);
+			} else SynErr(29);
 		} else if (la.kind == 13) {
 			Get();
 			register(out Register inputSelection);
@@ -167,15 +182,15 @@ public CodeGenerator gen;
 			register(out Register baseReg);
 			constant(out Const offset);
 			exp = new Store(baseReg, offset, value); 
-		} else SynErr(23);
+		} else SynErr(30);
 	}
 
 	void function(out INode function) {
 		Expect(16);
 		functionName(out string name);
 		INode exp = new Error(); function = new Function(name); 
-		while (StartOf(4)) {
-			if (StartOf(2)) {
+		while (StartOf(2)) {
+			if (StartOf(3)) {
 				arithm(out exp);
 			} else if (la.kind == 5 || la.kind == 6) {
 				immediateLoad(out exp);
@@ -192,6 +207,16 @@ public CodeGenerator gen;
 		Expect(18);
 		functionName(out string name);
 		exp = new Call(name); 
+	}
+
+	void Condition(out INode node) {
+		Expect(19);
+		register(out Register reg1);
+		ConditionOp(out string op);
+		register(out Register reg2);
+		Expect(20);
+		call(out INode exp);
+		node = new Condition(reg1, op, reg2, exp); 
 	}
 
 	void register(out Register node) {
@@ -214,13 +239,28 @@ public CodeGenerator gen;
 			Get();
 		} else if (la.kind == 10) {
 			Get();
-		} else SynErr(24);
+		} else SynErr(31);
 		op = t.val; 
 	}
 
 	void functionName(out string name) {
 		Expect(1);
 		name = t.val; 
+	}
+
+	void ConditionOp(out string op) {
+		if (la.kind == 21) {
+			Get();
+		} else if (la.kind == 22) {
+			Get();
+		} else if (la.kind == 23) {
+			Get();
+		} else if (la.kind == 24) {
+			Get();
+		} else if (la.kind == 25) {
+			Get();
+		} else SynErr(32);
+		op = t.val; 
 	}
 
 
@@ -235,11 +275,10 @@ public CodeGenerator gen;
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_T,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
+		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x},
+		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x}
 
 	};
 } // end Parser
@@ -272,12 +311,20 @@ public class Errors {
 			case 16: s = "\"function\" expected"; break;
 			case 17: s = "\"end\" expected"; break;
 			case 18: s = "\"call\" expected"; break;
-			case 19: s = "??? expected"; break;
-			case 20: s = "invalid arithm"; break;
-			case 21: s = "invalid immediateLoad"; break;
-			case 22: s = "invalid data"; break;
-			case 23: s = "invalid data"; break;
-			case 24: s = "invalid arithmOp"; break;
+			case 19: s = "\"if\" expected"; break;
+			case 20: s = "\"then\" expected"; break;
+			case 21: s = "\">\" expected"; break;
+			case 22: s = "\"<\" expected"; break;
+			case 23: s = "\"=\" expected"; break;
+			case 24: s = "\">=\" expected"; break;
+			case 25: s = "\"<=\" expected"; break;
+			case 26: s = "??? expected"; break;
+			case 27: s = "invalid arithm"; break;
+			case 28: s = "invalid immediateLoad"; break;
+			case 29: s = "invalid data"; break;
+			case 30: s = "invalid data"; break;
+			case 31: s = "invalid arithmOp"; break;
+			case 32: s = "invalid ConditionOp"; break;
 
 			default: s = "error " + n; break;
 		}

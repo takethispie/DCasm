@@ -95,5 +95,9 @@ namespace DCasm
         public void Visit(Move n) {
 
         }
+
+        public void Visit(Condition n)
+        {
+        }
     }
 }

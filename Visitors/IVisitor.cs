@@ -20,5 +20,6 @@ namespace DCasm
         void Visit(Read n);
         void Visit(Write n);
         void Visit(Move n);
+        void Visit(Condition n);
     }
 }

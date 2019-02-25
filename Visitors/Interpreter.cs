@@ -51,6 +51,7 @@ namespace DCasm
             root = n;
             n.Childrens.ForEach(x => x.Accept(this));
         }
+        
         public void Visit(Store n)
         {
             string valueReg = n.Childrens[0].Value.Remove(0,1);
@@ -222,6 +223,10 @@ namespace DCasm
             var destination = stack.Pop();
             registers[destination] = registers[source];
             ConsoleWriteLine("$" + source + "(" + registers[source] + ") => $" + destination + "(" + registers[destination] + ")");
+        }
+
+        public void Visit(Condition n)
+        {
         }
     }
 }

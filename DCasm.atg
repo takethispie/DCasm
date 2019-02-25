@@ -38,6 +38,8 @@ DCasm
     function<out exp>
     |
     call<out exp>
+    |
+    Condition<out exp>
   )
   (. gen.treeRoot.Childrens.Add(exp); .)
 } 
@@ -137,14 +139,9 @@ ConditionOp<out string op>
 register<out Register reg2>
 "then"
 call<out INode exp>
-(.  .)
+(. node = new Condition(reg1, op, reg2, exp); .)
 .
 
-ConditionOp<out string op>
-= 
-(">" | "<" | "=" | ">=" | "<=") (. op = t.val; .)
-.
-
-
+ConditionOp<out string op> = (">" | "<" | "=" | ">=" | "<=") (. op = t.val; .).
 
 END DCasm.
