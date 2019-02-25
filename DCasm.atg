@@ -47,7 +47,6 @@ EOF.
 register<out Register node> 
 = registerNum (. node = new Register(); node.Value = t.val; .).
 
-
 constant<out Const val>
 = number (.val = new Const(t.val); .).
 
@@ -126,11 +125,26 @@ function<out INode function>
 "end" (. function.Value = name; gen.Functions.Add(name, function); .)
 .
 
-
 functionName<out string name> = ident (. name = t.val; .).
 
-
 call<out INode exp> = "call" functionName<out string name> (. exp = new Call(name); .).
+
+Condition<out INode node>
+=
+"if" 
+register<out Register reg1> 
+ConditionOp<out string op> 
+register<out Register reg2>
+"then"
+call<out INode exp>
+(.  .)
+.
+
+ConditionOp<out string op>
+= 
+(">" | "<" | "=" | ">=" | "<=") (. op = t.val; .)
+.
+
 
 
 END DCasm.
