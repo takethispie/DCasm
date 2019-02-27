@@ -227,6 +227,31 @@ namespace DCasm
 
         public void Visit(Condition n)
         {
+            n.Childrens[0].Accept(this);
+            n.Childrens[1].Accept(this);
+            var left = stack.Pop();
+            var right = stack.Pop();
+            switch(n.Op) {
+                case ">":
+                if(left > right) n.Childrens[2].Accept(this);
+                break;
+
+                case "==":
+                if(left == right) n.Childrens[2].Accept(this);
+                break;
+
+                case "<":
+                if(left < right) n.Childrens[2].Accept(this);
+                break;
+
+                case ">=":
+                if(left >= right) n.Childrens[2].Accept(this);
+                break;
+
+                case "<=":
+                if(left <= right) n.Childrens[2].Accept(this);
+                break;
+            }
         }
     }
 }

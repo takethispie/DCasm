@@ -131,6 +131,7 @@ functionName<out string name> = ident (. name = t.val; .).
 
 call<out INode exp> = "call" functionName<out string name> (. exp = new Call(name); .).
 
+
 Condition<out INode node>
 =
 "if" 
@@ -142,6 +143,6 @@ call<out INode exp>
 (. node = new Condition(reg1, op, reg2, exp); .)
 .
 
-ConditionOp<out string op> = (">" | "<" | "=" | ">=" | "<=") (. op = t.val; .).
+ConditionOp<out string op> = (">" | "<" | "==" | ">=" | "<=") (. op = t.val; .).
 
 END DCasm.

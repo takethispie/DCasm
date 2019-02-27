@@ -216,7 +216,7 @@ public CodeGenerator gen;
 		register(out Register reg2);
 		Expect(20);
 		call(out INode exp);
-		
+		node = new Condition(reg1, op, reg2, exp); 
 	}
 
 	void register(out Register node) {

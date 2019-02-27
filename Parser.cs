@@ -315,7 +315,7 @@ public class Errors {
 			case 20: s = "\"then\" expected"; break;
 			case 21: s = "\">\" expected"; break;
 			case 22: s = "\"<\" expected"; break;
-			case 23: s = "\"=\" expected"; break;
+			case 23: s = "\"==\" expected"; break;
 			case 24: s = "\">=\" expected"; break;
 			case 25: s = "\"<=\" expected"; break;
 			case 26: s = "??? expected"; break;

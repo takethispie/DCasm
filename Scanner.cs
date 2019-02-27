@@ -230,8 +230,8 @@ public class Scanner {
 		for (int i = 97; i <= 122; ++i) start[i] = 1;
 		for (int i = 48; i <= 57; ++i) start[i] = 2;
 		start[36] = 3; 
-		start[62] = 9; 
-		start[60] = 10; 
+		start[62] = 10; 
+		start[60] = 11; 
 		start[61] = 6; 
 		start[Buffer.EOF] = -1;
 
@@ -407,18 +407,21 @@ public class Scanner {
 				if (ch >= '0' && ch <= '9') {AddCh(); goto case 4;}
 				else {t.kind = 3; break;}
 			case 6:
-				{t.kind = 23; break;}
-			case 7:
-				{t.kind = 24; break;}
-			case 8:
-				{t.kind = 25; break;}
-			case 9:
-				recEnd = pos; recKind = 21;
 				if (ch == '=') {AddCh(); goto case 7;}
-				else {t.kind = 21; break;}
+				else {goto case 0;}
+			case 7:
+				{t.kind = 23; break;}
+			case 8:
+				{t.kind = 24; break;}
+			case 9:
+				{t.kind = 25; break;}
 			case 10:
-				recEnd = pos; recKind = 22;
+				recEnd = pos; recKind = 21;
 				if (ch == '=') {AddCh(); goto case 8;}
+				else {t.kind = 21; break;}
+			case 11:
+				recEnd = pos; recKind = 22;
+				if (ch == '=') {AddCh(); goto case 9;}
 				else {t.kind = 22; break;}
 
 		}

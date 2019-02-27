@@ -7,7 +7,21 @@ namespace DCasm
     {
         static void Main(string[] args)
         {
-            const string version = "0.3";
+            Program.Interpret("test");
+        }
+
+		static void Interpret(string filePath) {
+			if (File.Exists(filePath)) {
+				var sc = new Scanner(filePath);
+				var par = new Parser(sc);
+				par.gen = new CodeGenerator();
+				par.Parse();
+				if (par.errors.count == 0) par.gen.Compile();
+			} else Console.WriteLine("File does not exists !");
+		}
+
+		static void RunCli() {
+			const string version = "0.3";
 			Scanner sc;
 			Parser par;
 			string command = "";
@@ -33,6 +47,6 @@ namespace DCasm
 			    else
 			        Console.WriteLine("File does not exists !");
 			}
-        }
+		}
     }
 }
