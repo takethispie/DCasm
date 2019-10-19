@@ -203,8 +203,8 @@ public class UTF8Buffer: Buffer {
 public class Scanner {
 	const char EOL = '\n';
 	const int eofSym = 0; /* pdt */
-	const int maxT = 28;
-	const int noSym = 28;
+	const int maxT = 29;
+	const int noSym = 29;
 
 
 	public Buffer buffer; // scanner buffer
@@ -228,11 +228,11 @@ public class Scanner {
 		start = new Dictionary<int, int>(128);
 		for (int i = 65; i <= 90; ++i) start[i] = 1;
 		for (int i = 97; i <= 122; ++i) start[i] = 1;
-		for (int i = 48; i <= 57; ++i) start[i] = 2;
-		start[36] = 3; 
-		start[62] = 10; 
-		start[60] = 11; 
-		start[61] = 6; 
+		for (int i = 48; i <= 57; ++i) start[i] = 4;
+		start[36] = 5; 
+		start[62] = 12; 
+		start[60] = 13; 
+		start[61] = 8; 
 		start[Buffer.EOF] = -1;
 
 	}
@@ -347,23 +347,24 @@ public class Scanner {
 		switch (t.val) {
 			case "program": t.kind = 4; break;
 			case "module": t.kind = 5; break;
-			case "li": t.kind = 6; break;
-			case "lui": t.kind = 7; break;
-			case "add": t.kind = 8; break;
-			case "sub": t.kind = 9; break;
-			case "div": t.kind = 10; break;
-			case "mul": t.kind = 11; break;
-			case "mov": t.kind = 12; break;
-			case "out": t.kind = 13; break;
-			case "in": t.kind = 14; break;
-			case "lw": t.kind = 15; break;
-			case "sw": t.kind = 16; break;
-			case "function": t.kind = 17; break;
-			case "end": t.kind = 18; break;
-			case "call": t.kind = 19; break;
-			case "if": t.kind = 20; break;
-			case "then": t.kind = 21; break;
-			case "else": t.kind = 22; break;
+			case "import": t.kind = 6; break;
+			case "li": t.kind = 7; break;
+			case "lui": t.kind = 8; break;
+			case "add": t.kind = 9; break;
+			case "sub": t.kind = 10; break;
+			case "div": t.kind = 11; break;
+			case "mul": t.kind = 12; break;
+			case "mov": t.kind = 13; break;
+			case "out": t.kind = 14; break;
+			case "in": t.kind = 15; break;
+			case "lw": t.kind = 16; break;
+			case "sw": t.kind = 17; break;
+			case "function": t.kind = 18; break;
+			case "end": t.kind = 19; break;
+			case "call": t.kind = 20; break;
+			case "if": t.kind = 21; break;
+			case "then": t.kind = 22; break;
+			case "else": t.kind = 23; break;
 			default: break;
 		}
 	}
@@ -393,38 +394,46 @@ public class Scanner {
 			case 1:
 				recEnd = pos; recKind = 1;
 				if (ch >= '0' && ch <= '9' || ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z') {AddCh(); goto case 1;}
+				else if (ch == '.') {AddCh(); goto case 2;}
 				else {t.kind = 1; t.val = new String(tval, 0, tlen); CheckLiteral(); return t;}
 			case 2:
-				recEnd = pos; recKind = 2;
-				if (ch >= '0' && ch <= '9') {AddCh(); goto case 2;}
-				else {t.kind = 2; break;}
+				if (ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z') {AddCh(); goto case 3;}
+				else {goto case 0;}
 			case 3:
-				if (ch >= '4' && ch <= '9') {AddCh(); goto case 4;}
-				else if (ch >= '0' && ch <= '3') {AddCh(); goto case 5;}
-				else {goto case 0;}
+				recEnd = pos; recKind = 1;
+				if (ch >= '0' && ch <= '9' || ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z') {AddCh(); goto case 3;}
+				else {t.kind = 1; t.val = new String(tval, 0, tlen); CheckLiteral(); return t;}
 			case 4:
-				{t.kind = 3; break;}
-			case 5:
-				recEnd = pos; recKind = 3;
+				recEnd = pos; recKind = 2;
 				if (ch >= '0' && ch <= '9') {AddCh(); goto case 4;}
-				else {t.kind = 3; break;}
-			case 6:
-				if (ch == '=') {AddCh(); goto case 7;}
+				else {t.kind = 2; break;}
+			case 5:
+				if (ch >= '4' && ch <= '9') {AddCh(); goto case 6;}
+				else if (ch >= '0' && ch <= '3') {AddCh(); goto case 7;}
 				else {goto case 0;}
+			case 6:
+				{t.kind = 3; break;}
 			case 7:
-				{t.kind = 25; break;}
+				recEnd = pos; recKind = 3;
+				if (ch >= '0' && ch <= '9') {AddCh(); goto case 6;}
+				else {t.kind = 3; break;}
 			case 8:
-				{t.kind = 26; break;}
-			case 9:
-				{t.kind = 27; break;}
-			case 10:
-				recEnd = pos; recKind = 23;
-				if (ch == '=') {AddCh(); goto case 8;}
-				else {t.kind = 23; break;}
-			case 11:
-				recEnd = pos; recKind = 24;
 				if (ch == '=') {AddCh(); goto case 9;}
+				else {goto case 0;}
+			case 9:
+				{t.kind = 26; break;}
+			case 10:
+				{t.kind = 27; break;}
+			case 11:
+				{t.kind = 28; break;}
+			case 12:
+				recEnd = pos; recKind = 24;
+				if (ch == '=') {AddCh(); goto case 10;}
 				else {t.kind = 24; break;}
+			case 13:
+				recEnd = pos; recKind = 25;
+				if (ch == '=') {AddCh(); goto case 11;}
+				else {t.kind = 25; break;}
 
 		}
 		t.val = new String(tval, 0, tlen);

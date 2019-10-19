@@ -1,4 +1,5 @@
-program
+module
+import myModule
 li $2 5
 li $3 10
 li $8 10
@@ -15,4 +16,4 @@ add $3 $2 $1
 li $1 255
 end
 
-if $3 < $2 then call foobar else call myfunction
+if $3 < $2 then call foobar else call myModule.moduleFunction

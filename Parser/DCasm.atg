@@ -12,7 +12,7 @@ CHARACTERS
   tab = '\t'.
 
 TOKENS
-  ident  = letter {letter | digit}.
+  ident  = letter {letter | digit} ['.' letter {letter | digit}].
   number = digit {digit}.
   registerNum = "$" [firstDigit] digit.
 
@@ -31,6 +31,10 @@ DCasm
   | "module" (. gen.Type = FileTypeEnum.Module; .)
 ) 
 { 
+  "import" moduleName<out string name> 
+  (.if(gen.Type == FileTypeEnum.Program) gen.ImportModule(name); else throw new ArgumentException("you cannot import a module into another"); .) 
+}
+{ 
   (
     arithm<out INode exp> (. gen.rootNodes.Add(exp); .)
     |
@@ -47,6 +51,7 @@ DCasm
 } 
 EOF.
 
+moduleName<out string name> = ident (. name = t.val; .).
 
 register<out Register node> 
 = registerNum (. node = new Register(); node.Value = t.val; .).

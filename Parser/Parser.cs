@@ -10,7 +10,7 @@ public class Parser {
 	public const int _ident = 1;
 	public const int _number = 2;
 	public const int _registerNum = 3;
-	public const int maxT = 28;
+	public const int maxT = 29;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -92,35 +92,40 @@ public CodeGenerator gen;
 		} else if (la.kind == 5) {
 			Get();
 			gen.Type = FileTypeEnum.Module; 
-		} else SynErr(29);
+		} else SynErr(30);
+		while (la.kind == 6) {
+			Get();
+			moduleName(out string name);
+			if(gen.Type == FileTypeEnum.Program) gen.ImportModule(name); else throw new ArgumentException("you cannot nest module import"); 
+		}
 		while (StartOf(1)) {
 			switch (la.kind) {
-			case 8: case 9: case 10: case 11: {
+			case 9: case 10: case 11: case 12: {
 				arithm(out INode exp);
 				gen.rootNodes.Add(exp); 
 				break;
 			}
-			case 6: case 7: {
+			case 7: case 8: {
 				immediateLoad(out INode exp);
 				gen.rootNodes.Add(exp); 
 				break;
 			}
-			case 12: case 13: case 14: case 15: case 16: {
+			case 13: case 14: case 15: case 16: case 17: {
 				data(out INode exp);
 				gen.rootNodes.Add(exp); 
 				break;
 			}
-			case 17: {
+			case 18: {
 				function(out Function exp);
 				gen.rootNodes.Add(exp); 
 				break;
 			}
-			case 19: {
+			case 20: {
 				call(out Call exp);
 				gen.rootNodes.Add(exp); 
 				break;
 			}
-			case 20: {
+			case 21: {
 				Condition(out Condition exp);
 				gen.rootNodes.Add(exp); 
 				break;
@@ -128,6 +133,11 @@ public CodeGenerator gen;
 			}
 		}
 		Expect(0);
+	}
+
+	void moduleName(out string name) {
+		Expect(1);
+		name = t.val; 
 	}
 
 	void arithm(out INode exp) {
@@ -141,18 +151,18 @@ public CodeGenerator gen;
 		} else if (la.kind == 2) {
 			constant(out Const src2);
 			exp = ArithmFactory.Create(op, dest, src1, src2); 
-		} else SynErr(30);
+		} else SynErr(31);
 	}
 
 	void immediateLoad(out INode exp) {
 		exp = new Error(); 
-		if (la.kind == 6) {
+		if (la.kind == 7) {
 			Get();
 			exp = new ImmediateLoad(false); 
-		} else if (la.kind == 7) {
+		} else if (la.kind == 8) {
 			Get();
 			exp = new ImmediateLoad(true); 
-		} else SynErr(31);
+		} else SynErr(32);
 		register(out Register dest);
 		constant(out Const val);
 		exp.Childrens.Add(dest); exp.Childrens.Add(val); 
@@ -160,12 +170,12 @@ public CodeGenerator gen;
 
 	void data(out INode exp) {
 		exp = new Error(); 
-		if (la.kind == 12) {
+		if (la.kind == 13) {
 			Get();
 			register(out Register dest);
 			register(out Register source);
 			exp = new Move(source, dest); 
-		} else if (la.kind == 13) {
+		} else if (la.kind == 14) {
 			Get();
 			register(out Register OutputSelection);
 			if (la.kind == 3) {
@@ -174,42 +184,42 @@ public CodeGenerator gen;
 			} else if (la.kind == 2) {
 				constant(out Const val);
 				exp = new Write(OutputSelection, val); 
-			} else SynErr(32);
-		} else if (la.kind == 14) {
+			} else SynErr(33);
+		} else if (la.kind == 15) {
 			Get();
 			register(out Register inputSelection);
 			register(out Register dest);
 			exp = new Read(inputSelection, dest); 
-		} else if (la.kind == 15) {
+		} else if (la.kind == 16) {
 			Get();
 			register(out Register dest);
 			register(out Register baseReg);
 			constant(out Const offset);
 			exp = new Load(dest, baseReg, offset); 
-		} else if (la.kind == 16) {
+		} else if (la.kind == 17) {
 			Get();
 			register(out Register value);
 			register(out Register baseReg);
 			constant(out Const offset);
 			exp = new Store(baseReg, offset, value); 
-		} else SynErr(33);
+		} else SynErr(34);
 	}
 
 	void function(out Function function) {
-		Expect(17);
+		Expect(18);
 		functionName(out string name);
 		function = new Function(name); 
 		while (StartOf(2)) {
 			if (StartOf(3)) {
 				arithm(out INode exp);
 				function.Childrens.Add(exp); 
-			} else if (la.kind == 6 || la.kind == 7) {
+			} else if (la.kind == 7 || la.kind == 8) {
 				immediateLoad(out INode exp);
 				function.Childrens.Add(exp); 
 			} else if (StartOf(4)) {
 				data(out INode exp);
 				function.Childrens.Add(exp); 
-			} else if (la.kind == 19) {
+			} else if (la.kind == 20) {
 				call(out Call exp);
 				function.Childrens.Add(exp); 
 			} else {
@@ -217,25 +227,25 @@ public CodeGenerator gen;
 				function.Childrens.Add(exp); 
 			}
 		}
-		Expect(18);
+		Expect(19);
 		function.Value = name; gen.Functions.Add(name, function); 
 	}
 
 	void call(out Call exp) {
-		Expect(19);
+		Expect(20);
 		functionName(out string name);
 		exp = new Call(name); 
 	}
 
 	void Condition(out Condition node) {
-		Expect(20);
+		Expect(21);
 		register(out Register reg1);
 		ConditionOp(out string op);
 		register(out Register reg2);
-		Expect(21);
+		Expect(22);
 		call(out Call thenCall);
 		node = new Condition(reg1, op, reg2, thenCall); 
-		if (la.kind == 22) {
+		if (la.kind == 23) {
 			Get();
 			call(out Call elseCall);
 			node = new Condition(reg1, op, reg2, thenCall, elseCall); 
@@ -254,15 +264,15 @@ public CodeGenerator gen;
 
 	void arithmOp(out string op) {
 		op = "";
-		if (la.kind == 8) {
-			Get();
-		} else if (la.kind == 9) {
+		if (la.kind == 9) {
 			Get();
 		} else if (la.kind == 10) {
 			Get();
 		} else if (la.kind == 11) {
 			Get();
-		} else SynErr(34);
+		} else if (la.kind == 12) {
+			Get();
+		} else SynErr(35);
 		op = t.val; 
 	}
 
@@ -272,9 +282,7 @@ public CodeGenerator gen;
 	}
 
 	void ConditionOp(out string op) {
-		if (la.kind == 23) {
-			Get();
-		} else if (la.kind == 24) {
+		if (la.kind == 24) {
 			Get();
 		} else if (la.kind == 25) {
 			Get();
@@ -282,7 +290,9 @@ public CodeGenerator gen;
 			Get();
 		} else if (la.kind == 27) {
 			Get();
-		} else SynErr(35);
+		} else if (la.kind == 28) {
+			Get();
+		} else SynErr(36);
 		op = t.val; 
 	}
 
@@ -298,11 +308,11 @@ public CodeGenerator gen;
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x}
 
 	};
 } // end Parser
@@ -322,36 +332,37 @@ public class Errors {
 			case 3: s = "registerNum expected"; break;
 			case 4: s = "\"program\" expected"; break;
 			case 5: s = "\"module\" expected"; break;
-			case 6: s = "\"li\" expected"; break;
-			case 7: s = "\"lui\" expected"; break;
-			case 8: s = "\"add\" expected"; break;
-			case 9: s = "\"sub\" expected"; break;
-			case 10: s = "\"div\" expected"; break;
-			case 11: s = "\"mul\" expected"; break;
-			case 12: s = "\"mov\" expected"; break;
-			case 13: s = "\"out\" expected"; break;
-			case 14: s = "\"in\" expected"; break;
-			case 15: s = "\"lw\" expected"; break;
-			case 16: s = "\"sw\" expected"; break;
-			case 17: s = "\"function\" expected"; break;
-			case 18: s = "\"end\" expected"; break;
-			case 19: s = "\"call\" expected"; break;
-			case 20: s = "\"if\" expected"; break;
-			case 21: s = "\"then\" expected"; break;
-			case 22: s = "\"else\" expected"; break;
-			case 23: s = "\">\" expected"; break;
-			case 24: s = "\"<\" expected"; break;
-			case 25: s = "\"==\" expected"; break;
-			case 26: s = "\">=\" expected"; break;
-			case 27: s = "\"<=\" expected"; break;
-			case 28: s = "??? expected"; break;
-			case 29: s = "invalid DCasm"; break;
-			case 30: s = "invalid arithm"; break;
-			case 31: s = "invalid immediateLoad"; break;
-			case 32: s = "invalid data"; break;
+			case 6: s = "\"import\" expected"; break;
+			case 7: s = "\"li\" expected"; break;
+			case 8: s = "\"lui\" expected"; break;
+			case 9: s = "\"add\" expected"; break;
+			case 10: s = "\"sub\" expected"; break;
+			case 11: s = "\"div\" expected"; break;
+			case 12: s = "\"mul\" expected"; break;
+			case 13: s = "\"mov\" expected"; break;
+			case 14: s = "\"out\" expected"; break;
+			case 15: s = "\"in\" expected"; break;
+			case 16: s = "\"lw\" expected"; break;
+			case 17: s = "\"sw\" expected"; break;
+			case 18: s = "\"function\" expected"; break;
+			case 19: s = "\"end\" expected"; break;
+			case 20: s = "\"call\" expected"; break;
+			case 21: s = "\"if\" expected"; break;
+			case 22: s = "\"then\" expected"; break;
+			case 23: s = "\"else\" expected"; break;
+			case 24: s = "\">\" expected"; break;
+			case 25: s = "\"<\" expected"; break;
+			case 26: s = "\"==\" expected"; break;
+			case 27: s = "\">=\" expected"; break;
+			case 28: s = "\"<=\" expected"; break;
+			case 29: s = "??? expected"; break;
+			case 30: s = "invalid DCasm"; break;
+			case 31: s = "invalid arithm"; break;
+			case 32: s = "invalid immediateLoad"; break;
 			case 33: s = "invalid data"; break;
-			case 34: s = "invalid arithmOp"; break;
-			case 35: s = "invalid ConditionOp"; break;
+			case 34: s = "invalid data"; break;
+			case 35: s = "invalid arithmOp"; break;
+			case 36: s = "invalid ConditionOp"; break;
 
 			default: s = "error " + n; break;
 		}

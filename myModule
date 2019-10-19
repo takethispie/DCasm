@@ -1,0 +1,5 @@
+module
+
+function moduleFunction
+li $2 123
+end

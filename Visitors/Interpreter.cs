@@ -84,15 +84,11 @@ namespace DCasm
         public void Visit(Call n)
         {
             ConsoleWriteLine("calling " + n.Value);
-            if (Functions.ContainsKey(n.Value)) Functions[n.Value].Childrens.ForEach(x => x.Accept(this));
-            else
-            {
-                ConsoleWriteLine("function was not found in dictionnary");
-                var fun = root.Childrens.Find(x => x.GetType() == typeof(Function) && x.Value == n.Value);
-                if (fun == null) throw new Exception("function is not defined !");
-                else fun.Childrens.ForEach(x => x.Accept(this));
+            if (Functions.ContainsKey(n.Value)) {
+                Functions[n.Value].Childrens.ForEach(x => x.Accept(this));
+                ConsoleWriteLine("return from " + n.Value);
             }
-            ConsoleWriteLine("return from " + n.Value);
+            else ConsoleWriteLine("function was not found in dictionnary");
         }
 
         public void Visit(Load n)
@@ -286,11 +282,6 @@ namespace DCasm
                     else ExecuteElse();
                     break;
             }
-        }
-
-        public void Visit(Module n)
-        {
-            throw new NotImplementedException();
         }
     }
 }
