@@ -26,7 +26,10 @@ PRODUCTIONS
 /*------------------------------------------------------------------------*/
 DCasm
 = 
-"program" 
+(
+  "program" (. gen.Type = FileTypeEnum.Program; .)
+  | "module" (. gen.Type = FileTypeEnum.Module; .)
+) 
 { 
   (
     arithm<out INode exp> (. gen.rootNodes.Add(exp); .)

@@ -94,5 +94,10 @@ namespace DCasm
         public void Visit(Condition n)
         {
         }
+
+        public void Visit(Module n)
+        {
+            Console.WriteLine("Importe module " + n.Value);
+        }
     }
 }

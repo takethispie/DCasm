@@ -287,5 +287,10 @@ namespace DCasm
                     break;
             }
         }
+
+        public void Visit(Module n)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

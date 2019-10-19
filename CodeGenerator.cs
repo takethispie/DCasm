@@ -8,6 +8,7 @@ namespace DCasm
 	{
         public List<INode> rootNodes;
 		public Dictionary<string, INode> Functions;
+		public FileTypeEnum Type { get; set; }
 
 		public CodeGenerator()
 		{
