@@ -10,7 +10,7 @@ public class Parser {
 	public const int _ident = 1;
 	public const int _number = 2;
 	public const int _registerNum = 3;
-	public const int maxT = 26;
+	public const int maxT = 27;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -135,7 +135,7 @@ public CodeGenerator gen;
 		} else if (la.kind == 2) {
 			constant(out Const src2);
 			exp = ArithmFactory.Create(op, dest, src1, src2); 
-		} else SynErr(27);
+		} else SynErr(28);
 	}
 
 	void immediateLoad(out INode exp) {
@@ -146,7 +146,7 @@ public CodeGenerator gen;
 		} else if (la.kind == 6) {
 			Get();
 			exp = new ImmediateLoad(true); 
-		} else SynErr(28);
+		} else SynErr(29);
 		register(out Register dest);
 		constant(out Const val);
 		exp.Childrens.Add(dest); exp.Childrens.Add(val); 
@@ -168,7 +168,7 @@ public CodeGenerator gen;
 			} else if (la.kind == 2) {
 				constant(out Const val);
 				exp = new Write(OutputSelection, val); 
-			} else SynErr(29);
+			} else SynErr(30);
 		} else if (la.kind == 13) {
 			Get();
 			register(out Register inputSelection);
@@ -186,7 +186,7 @@ public CodeGenerator gen;
 			register(out Register baseReg);
 			constant(out Const offset);
 			exp = new Store(baseReg, offset, value); 
-		} else SynErr(30);
+		} else SynErr(31);
 	}
 
 	void function(out Function function) {
@@ -227,8 +227,13 @@ public CodeGenerator gen;
 		ConditionOp(out string op);
 		register(out Register reg2);
 		Expect(20);
-		call(out Call exp);
-		node = new Condition(reg1, op, reg2, exp); 
+		call(out Call thenCall);
+		node = new Condition(reg1, op, reg2, thenCall); 
+		if (la.kind == 21) {
+			Get();
+			call(out Call elseCall);
+			node = new Condition(reg1, op, reg2, thenCall, elseCall); 
+		}
 	}
 
 	void register(out Register node) {
@@ -251,7 +256,7 @@ public CodeGenerator gen;
 			Get();
 		} else if (la.kind == 10) {
 			Get();
-		} else SynErr(31);
+		} else SynErr(32);
 		op = t.val; 
 	}
 
@@ -261,9 +266,7 @@ public CodeGenerator gen;
 	}
 
 	void ConditionOp(out string op) {
-		if (la.kind == 21) {
-			Get();
-		} else if (la.kind == 22) {
+		if (la.kind == 22) {
 			Get();
 		} else if (la.kind == 23) {
 			Get();
@@ -271,7 +274,9 @@ public CodeGenerator gen;
 			Get();
 		} else if (la.kind == 25) {
 			Get();
-		} else SynErr(32);
+		} else if (la.kind == 26) {
+			Get();
+		} else SynErr(33);
 		op = t.val; 
 	}
 
@@ -287,11 +292,11 @@ public CodeGenerator gen;
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x}
 
 	};
 } // end Parser
@@ -326,18 +331,19 @@ public class Errors {
 			case 18: s = "\"call\" expected"; break;
 			case 19: s = "\"if\" expected"; break;
 			case 20: s = "\"then\" expected"; break;
-			case 21: s = "\">\" expected"; break;
-			case 22: s = "\"<\" expected"; break;
-			case 23: s = "\"==\" expected"; break;
-			case 24: s = "\">=\" expected"; break;
-			case 25: s = "\"<=\" expected"; break;
-			case 26: s = "??? expected"; break;
-			case 27: s = "invalid arithm"; break;
-			case 28: s = "invalid immediateLoad"; break;
-			case 29: s = "invalid data"; break;
+			case 21: s = "\"else\" expected"; break;
+			case 22: s = "\">\" expected"; break;
+			case 23: s = "\"<\" expected"; break;
+			case 24: s = "\"==\" expected"; break;
+			case 25: s = "\">=\" expected"; break;
+			case 26: s = "\"<=\" expected"; break;
+			case 27: s = "??? expected"; break;
+			case 28: s = "invalid arithm"; break;
+			case 29: s = "invalid immediateLoad"; break;
 			case 30: s = "invalid data"; break;
-			case 31: s = "invalid arithmOp"; break;
-			case 32: s = "invalid ConditionOp"; break;
+			case 31: s = "invalid data"; break;
+			case 32: s = "invalid arithmOp"; break;
+			case 33: s = "invalid ConditionOp"; break;
 
 			default: s = "error " + n; break;
 		}
