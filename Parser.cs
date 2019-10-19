@@ -91,32 +91,32 @@ public CodeGenerator gen;
 			switch (la.kind) {
 			case 7: case 8: case 9: case 10: {
 				arithm(out INode exp);
-				gen.treeRoot.Childrens.Add(exp); 
+				gen.rootNodes.Add(exp); 
 				break;
 			}
 			case 5: case 6: {
 				immediateLoad(out INode exp);
-				gen.treeRoot.Childrens.Add(exp); 
+				gen.rootNodes.Add(exp); 
 				break;
 			}
 			case 11: case 12: case 13: case 14: case 15: {
 				data(out INode exp);
-				gen.treeRoot.Childrens.Add(exp); 
+				gen.rootNodes.Add(exp); 
 				break;
 			}
 			case 16: {
 				function(out Function exp);
-				gen.treeRoot.Childrens.Add(exp); 
+				gen.rootNodes.Add(exp); 
 				break;
 			}
 			case 18: {
 				call(out Call exp);
-				gen.treeRoot.Childrens.Add(exp); 
+				gen.rootNodes.Add(exp); 
 				break;
 			}
 			case 19: {
 				Condition(out Condition exp);
-				gen.treeRoot.Childrens.Add(exp); 
+				gen.rootNodes.Add(exp); 
 				break;
 			}
 			}

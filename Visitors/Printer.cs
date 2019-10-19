@@ -29,11 +29,6 @@ namespace DCasm
             Console.WriteLine("");
         }
 
-        public void Visit(Root n)
-        {
-            n.Childrens.ForEach(x => x.Accept(this));
-        }
-
         public void Visit(Function n)
         {
             Console.Write(n.Value + ":");

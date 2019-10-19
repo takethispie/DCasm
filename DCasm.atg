@@ -29,17 +29,17 @@ DCasm
 "program" 
 { 
   (
-    arithm<out INode exp> (. gen.treeRoot.Childrens.Add(exp); .)
+    arithm<out INode exp> (. gen.rootNodes.Add(exp); .)
     |
-    immediateLoad<out INode exp>   (. gen.treeRoot.Childrens.Add(exp); .)
+    immediateLoad<out INode exp>   (. gen.rootNodes.Add(exp); .)
     |
-    data<out INode exp>  (. gen.treeRoot.Childrens.Add(exp); .)
+    data<out INode exp>  (. gen.rootNodes.Add(exp); .)
     |
-    function<out Function exp>  (. gen.treeRoot.Childrens.Add(exp); .)
+    function<out Function exp>  (. gen.rootNodes.Add(exp); .)
     |
-    call<out Call exp>  (. gen.treeRoot.Childrens.Add(exp); .)
+    call<out Call exp>  (. gen.rootNodes.Add(exp); .)
     |
-    Condition<out Condition exp>  (. gen.treeRoot.Childrens.Add(exp); .)
+    Condition<out Condition exp>  (. gen.rootNodes.Add(exp); .)
   )
 } 
 EOF.

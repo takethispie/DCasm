@@ -46,11 +46,6 @@ namespace DCasm
             if(correctReg)  return regNumber;
             else throw new Exception("cannot parse register number !");
         }
-
-        public void Visit(Root n) {
-            root = n;
-            n.Childrens.ForEach(x => x.Accept(this));
-        }
         
         public void Visit(Store n)
         {

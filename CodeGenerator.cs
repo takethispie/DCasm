@@ -6,19 +6,19 @@ namespace DCasm
 {
 	public class CodeGenerator
 	{
-        public INode treeRoot;
+        public List<INode> rootNodes;
 		public Dictionary<string, INode> Functions;
 
 		public CodeGenerator()
 		{
-			treeRoot = new Root();
+			rootNodes = new List<INode>();
 			Functions = new Dictionary<string, INode>();
 		}
 
 		public void Compile()
 		{
 			IVisitor v = new Interpreter(Functions);
-			treeRoot.Accept(v);
+			rootNodes.ForEach(n => n.Accept(v));
 		}
 	}
 }

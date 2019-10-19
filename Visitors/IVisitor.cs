@@ -5,7 +5,6 @@ namespace DCasm
 {
     public interface IVisitor
     {
-        void Visit(Root n);
         void Visit(Store n);
         void Visit(Const n);
         void Visit(Function n);
