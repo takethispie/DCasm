@@ -1,20 +1,14 @@
 using System;
-using System.Collections.Generic;
 
 namespace DCasm
 {
     public class Printer : IVisitor
     {
-        public Printer()
-        {
-        }
-
         public void Visit(Add n)
         {
             Console.Write(n.Value + ":");
             n.Childrens.ForEach(x => Console.Write(x.Value + " "));
             Console.WriteLine("");
-
         }
 
         public void Visit(Const n)
@@ -34,8 +28,8 @@ namespace DCasm
             Console.Write(n.Value + ":");
         }
 
-        public void Visit(Call n) {
-            
+        public void Visit(Call n)
+        {
         }
 
         public void Visit(Load n)
@@ -64,7 +58,8 @@ namespace DCasm
             Console.WriteLine("");
         }
 
-        public void Visit(Register n) {
+        public void Visit(Register n)
+        {
             Console.Write(n.Value + ":");
         }
 
@@ -86,9 +81,9 @@ namespace DCasm
             Console.Write("out ");
             Console.WriteLine("");
         }
-        
-        public void Visit(Move n) {
 
+        public void Visit(Move n)
+        {
         }
 
         public void Visit(Condition n)

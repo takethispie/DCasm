@@ -4,13 +4,8 @@ namespace DCasm
 {
     public class Condition : INode
     {
-        public string Value { get; set; }
-        public List<INode> Childrens { get; set; }
-        public string Op { get; set; }
-
-        public bool HasElseCall { get; set; }
-
-        public Condition(Register left, string op, Register right, INode functionCall) {
+        public Condition(Register left, string op, Register right, INode functionCall)
+        {
             Childrens = new List<INode>();
             Childrens.Add(left);
             Childrens.Add(right);
@@ -19,7 +14,8 @@ namespace DCasm
             Op = op;
         }
 
-        public Condition(Register left, string op, Register right, INode functionCall, INode elseFunctionCall) {
+        public Condition(Register left, string op, Register right, INode functionCall, INode elseFunctionCall)
+        {
             Childrens = new List<INode>();
             Childrens.Add(left);
             Childrens.Add(right);
@@ -29,6 +25,15 @@ namespace DCasm
             Op = op;
         }
 
-        public void Accept(IVisitor v) => v.Visit(this);
+        public string Op { get; set; }
+
+        public bool HasElseCall { get; set; }
+        public string Value { get; set; }
+        public List<INode> Childrens { get; set; }
+
+        public void Accept(IVisitor v)
+        {
+            v.Visit(this);
+        }
     }
 }

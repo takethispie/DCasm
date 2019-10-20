@@ -3,14 +3,14 @@ using System.IO;
 
 namespace DCasm
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            Program.Interpret("test");
+            Interpret("test");
         }
 
-        static void Interpret(string filePath)
+        private static void Interpret(string filePath)
         {
             if (File.Exists(filePath))
             {
@@ -18,13 +18,16 @@ namespace DCasm
                 gen.Parse();
                 if (gen.ErrorCount == 0) gen.Compile();
             }
-            else Console.WriteLine("File does not exists !");
+            else
+            {
+                Console.WriteLine("File does not exists !");
+            }
         }
 
-        static void RunCli()
+        private static void RunCli()
         {
             const string version = "0.5";
-            string command = "";
+            var command = "";
             //load DCASM8 Instruction Set Architecture
 
             Console.Write("DustCat asm " + version + Environment.NewLine);
@@ -32,7 +35,7 @@ namespace DCasm
             {
                 Console.Write(">");
                 command = Console.ReadLine();
-                string[] cmdSplit = command.Split(' ');
+                var cmdSplit = command.Split(' ');
                 if (cmdSplit.Length < 2) throw new Exception("missing command argument !");
                 if (cmdSplit[0].ToUpper() != "DO") continue;
                 if (File.Exists(cmdSplit[1]))
@@ -41,7 +44,10 @@ namespace DCasm
                     gen.Parse();
                     if (gen.ErrorCount == 0) gen.Compile();
                 }
-                else Console.WriteLine("File does not exists !");
+                else
+                {
+                    Console.WriteLine("File does not exists !");
+                }
             }
         }
     }

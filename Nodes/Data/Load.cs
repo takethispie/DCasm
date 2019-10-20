@@ -1,14 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace DCasm
 {
-    public class Load : INode {
-        public string Value { get; set; }
-        public List<INode> Childrens { get; set; }
-
-        public Load(Register dest, Register baseReg, Const offset) {
+    public class Load : INode
+    {
+        public Load(Register dest, Register baseReg, Const offset)
+        {
             Value = "lw";
             Childrens = new List<INode>();
             Childrens.Add(dest);
@@ -16,6 +13,12 @@ namespace DCasm
             Childrens.Add(offset);
         }
 
-        public void Accept(IVisitor v) { v.Visit(this); }
+        public string Value { get; set; }
+        public List<INode> Childrens { get; set; }
+
+        public void Accept(IVisitor v)
+        {
+            v.Visit(this);
+        }
     }
 }

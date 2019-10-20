@@ -2,16 +2,19 @@ using System.Collections.Generic;
 
 namespace DCasm
 {
-    public class Call : INode 
+    public class Call : INode
     {
+        public Call(string name)
+        {
+            Value = name;
+        }
+
         public string Value { get; set; }
         public List<INode> Childrens { get; set; }
 
-        public Call(string name)
+        public void Accept(IVisitor v)
         {
-            this.Value = name;
+            v.Visit(this);
         }
-        
-        public void Accept(IVisitor v) => v.Visit(this);
     }
 }

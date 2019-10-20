@@ -1,17 +1,17 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace DCasm
 {
     public class Interpreter : IVisitor
     {
-        private int pc;
-        private bool gt, eq, lt;
-        private Dictionary<int, int> ram;
-        private int[] registers;
-        private Stack<int> stack;
         public Dictionary<string, INode> Functions;
+        private bool gt, eq, lt;
+        private int pc;
+        private readonly Dictionary<int, int> ram;
+        private readonly int[] registers;
         public INode root;
+        private readonly Stack<int> stack;
 
         public bool verbose;
 
@@ -28,42 +28,19 @@ namespace DCasm
             verbose = true;
         }
 
-        private void ConsoleWrite(string str)
-        {
-            if (verbose) Console.Write(str);
-        }
-
-        private void ConsoleWriteLine(string str)
-        {
-            if (verbose) Console.WriteLine(str);
-        }
-
-        private int GetRegisterValue(INode n)
-        {
-            var index = GetRegisterIndex(n);
-            return registers[index];
-        }
-
-        private int GetRegisterIndex(INode n)
-        {
-            var reg = n.Value.Remove(0, 1);
-            var correctReg = int.TryParse(reg, out int regNumber);
-            if (correctReg) return regNumber;
-            else throw new Exception("cannot parse register number !");
-        }
-
         public void Visit(Store n)
         {
-            string valueReg = n.Childrens[0].Value.Remove(0, 1);
-            var correctValueReg = int.TryParse(valueReg, out int valueNum);
+            var valueReg = n.Childrens[0].Value.Remove(0, 1);
+            var correctValueReg = int.TryParse(valueReg, out var valueNum);
 
             var baseReg = n.Childrens[1].Value.Remove(0, 1);
-            var correctBaseReg = int.TryParse(baseReg, out int baseNum);
+            var correctBaseReg = int.TryParse(baseReg, out var baseNum);
 
             var offset = n.Childrens[2].Value;
-            var correctOffset = int.TryParse(offset, out int parsedOffset);
+            var correctOffset = int.TryParse(offset, out var parsedOffset);
 
-            if (!correctOffset || !correctValueReg || !correctBaseReg) throw new Exception("one or more arguments could not be parsed to integer !");
+            if (!correctOffset || !correctValueReg || !correctBaseReg)
+                throw new Exception("one or more arguments could not be parsed to integer !");
 
             var valueToStore = registers[valueNum];
             var adress = registers[baseNum];
@@ -74,7 +51,10 @@ namespace DCasm
             ConsoleWriteLine("stored " + valueToStore + " to adress " + storeAddress);
         }
 
-        public void Visit(Const n) => stack.Push(n.ToInt());
+        public void Visit(Const n)
+        {
+            stack.Push(n.ToInt());
+        }
 
         public void Visit(Function n)
         {
@@ -84,25 +64,30 @@ namespace DCasm
         public void Visit(Call n)
         {
             ConsoleWriteLine("calling " + n.Value);
-            if (Functions.ContainsKey(n.Value)) {
+            if (Functions.ContainsKey(n.Value))
+            {
                 Functions[n.Value].Childrens.ForEach(x => x.Accept(this));
                 ConsoleWriteLine("return from " + n.Value);
             }
-            else ConsoleWriteLine("function was not found in dictionnary");
+            else
+            {
+                ConsoleWriteLine("function was not found in dictionnary");
+            }
         }
 
         public void Visit(Load n)
         {
-            string destReg = n.Childrens[0].Value.Remove(0, 1);
-            var correctDestReg = int.TryParse(destReg, out int destNum);
+            var destReg = n.Childrens[0].Value.Remove(0, 1);
+            var correctDestReg = int.TryParse(destReg, out var destNum);
 
             var baseReg = n.Childrens[1].Value.Remove(0, 1);
-            var correctBaseReg = int.TryParse(baseReg, out int baseNum);
+            var correctBaseReg = int.TryParse(baseReg, out var baseNum);
 
             var offset = n.Childrens[2].Value;
-            var correctOffset = int.TryParse(offset, out int parsedOffset);
+            var correctOffset = int.TryParse(offset, out var parsedOffset);
 
-            if (!correctOffset || !correctDestReg || !correctBaseReg) throw new Exception("one or more arguments could not be parsed to integer !");
+            if (!correctOffset || !correctDestReg || !correctBaseReg)
+                throw new Exception("one or more arguments could not be parsed to integer !");
 
             var destRegister = registers[destNum];
             var adress = registers[baseNum];
@@ -111,7 +96,6 @@ namespace DCasm
             if (!ram.ContainsKey(loadAddress)) registers[destRegister] = 0;
             else registers[destRegister] = ram[loadAddress];
             ConsoleWriteLine("Loaded value " + registers[destRegister] + " from adress " + loadAddress);
-
         }
 
         public void Visit(Add n)
@@ -163,13 +147,16 @@ namespace DCasm
             ConsoleWriteLine("$" + regNumber + " = " + registers[regNumber]);
         }
 
-        public void Visit(Register n) => stack.Push(GetRegisterValue(n));
+        public void Visit(Register n)
+        {
+            stack.Push(GetRegisterValue(n));
+        }
 
         public void Visit(ImmediateLoad n)
         {
             var reg = n.Childrens[0].Value.Remove(0, 1);
-            var correctReg = int.TryParse(reg, out int regNumber);
-            var correctValue = int.TryParse(n.Childrens[1].Value, out int value);
+            var correctReg = int.TryParse(reg, out var regNumber);
+            var correctValue = int.TryParse(n.Childrens[1].Value, out var value);
             if (correctReg && correctValue) registers[regNumber] = value;
             else throw new Exception("cannot parse immediate load parameters !");
             ConsoleWriteLine("stored " + value + " in $" + regNumber);
@@ -178,12 +165,13 @@ namespace DCasm
         public void Visit(Read n)
         {
             var inSel = n.Childrens[0].Value.Remove(0, 1);
-            var correctInSel = int.TryParse(inSel, out int parsedInSel);
+            var correctInSel = int.TryParse(inSel, out var parsedInSel);
 
             var destReg = n.Childrens[1].Value.Remove(0, 1);
-            var correctDestReg = int.TryParse(destReg, out int parsedDestReg);
+            var correctDestReg = int.TryParse(destReg, out var parsedDestReg);
 
-            if (!correctDestReg || !correctInSel) throw new Exception("one or more argument could not be parsed to integer !");
+            if (!correctDestReg || !correctInSel)
+                throw new Exception("one or more argument could not be parsed to integer !");
 
             switch (parsedInSel)
             {
@@ -208,12 +196,13 @@ namespace DCasm
         public void Visit(Write n)
         {
             var outSel = n.Childrens[0].Value.Remove(0, 1);
-            var correctOutSel = int.TryParse(outSel, out int parsedOutSel);
+            var correctOutSel = int.TryParse(outSel, out var parsedOutSel);
 
             var sourceReg = n.Childrens[1].Value.Remove(0, 1);
-            var correctSourceReg = int.TryParse(sourceReg, out int parsedSourceReg);
+            var correctSourceReg = int.TryParse(sourceReg, out var parsedSourceReg);
 
-            if (!correctOutSel || !correctSourceReg) throw new Exception("one or more arguments could not be parsed to integer !");
+            if (!correctOutSel || !correctSourceReg)
+                throw new Exception("one or more arguments could not be parsed to integer !");
 
             switch (parsedOutSel)
             {
@@ -238,14 +227,17 @@ namespace DCasm
             var source = stack.Pop();
             var destination = stack.Pop();
             registers[destination] = registers[source];
-            ConsoleWriteLine("$" + source + "(" + registers[source] + ") => $" + destination + "(" + registers[destination] + ")");
+            ConsoleWriteLine("$" + source + "(" + registers[source] + ") => $" + destination + "(" +
+                             registers[destination] + ")");
         }
 
         public void Visit(Condition n)
         {
-            void ExecuteElse() {
-                if(n.HasElseCall) {
-                    if(n.Childrens.Count < 3) throw new ArgumentException("should have 3 arguments !");
+            void ExecuteElse()
+            {
+                if (n.HasElseCall)
+                {
+                    if (n.Childrens.Count < 3) throw new ArgumentException("should have 3 arguments !");
                     n.Childrens[3].Accept(this);
                 }
             }
@@ -282,6 +274,30 @@ namespace DCasm
                     else ExecuteElse();
                     break;
             }
+        }
+
+        private void ConsoleWrite(string str)
+        {
+            if (verbose) Console.Write(str);
+        }
+
+        private void ConsoleWriteLine(string str)
+        {
+            if (verbose) Console.WriteLine(str);
+        }
+
+        private int GetRegisterValue(INode n)
+        {
+            var index = GetRegisterIndex(n);
+            return registers[index];
+        }
+
+        private int GetRegisterIndex(INode n)
+        {
+            var reg = n.Value.Remove(0, 1);
+            var correctReg = int.TryParse(reg, out var regNumber);
+            if (correctReg) return regNumber;
+            throw new Exception("cannot parse register number !");
         }
     }
 }
