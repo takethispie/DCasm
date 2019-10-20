@@ -24,15 +24,12 @@ namespace DCasm
 
         public void Compile()
         {
-            IVisitor v = new Interpreter(Functions);
+            IVisitor v = new Interpreter(Functions) { verbose = false };
             rootNodes.ForEach(n => n.Accept(v));
         }
 
 
-        public void Parse()
-        {
-            parser.Parse();
-        }
+        public void Parse() => parser.Parse();
 
         public void ImportModule(string name)
         {

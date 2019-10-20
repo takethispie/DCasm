@@ -69,10 +69,7 @@ namespace DCasm
                 Functions[n.Value].Childrens.ForEach(x => x.Accept(this));
                 ConsoleWriteLine("return from " + n.Value);
             }
-            else
-            {
-                ConsoleWriteLine("function was not found in dictionnary");
-            }
+            else throw new ArgumentException("Function not found !");
         }
 
         public void Visit(Load n)
@@ -185,18 +182,11 @@ namespace DCasm
 
             switch (parsedInSel)
             {
-                case 0:
-                    Console.Write("IN " + destReg + " >");
-                    var key = Console.Read();
-                    registers[parsedDestReg] = key;
-                    ConsoleWrite(Environment.NewLine);
-                    ConsoleWriteLine("read " + key + " from terminal and stored it in " + parsedDestReg);
-                    break;
-
                 //fully code handled input, no new lines or prefix
-                case 1:
-                    key = Console.Read();
-                    registers[parsedDestReg] = key;
+                case 0:
+                    var key = Console.ReadLine();
+                    Console.WriteLine(key);
+                    registers[parsedDestReg] = key[0];
                     ConsoleWrite(Environment.NewLine);
                     ConsoleWriteLine("read " + key + " from terminal and stored it in " + parsedDestReg);
                     break;
@@ -216,20 +206,13 @@ namespace DCasm
 
             switch (registers[parsedOutSel])
             {
-                case 0:
-                    Console.Write("OUT>");
-                    var val = registers[parsedSourceReg];
-                    var convVal = Convert.ToChar((short)val);
-                    Console.WriteLine(convVal);
-                    break;
-
                 //transparent writing (no new lines and prefix)
-                case 1:
-                    val = registers[parsedSourceReg];
+                case 0:
+                    var val = registers[parsedSourceReg];
                     Console.Write(Convert.ToChar((short)val));
                     break;
                 
-                case 2:
+                case 1:
                     val = registers[parsedSourceReg];
                     Console.Write(val);
                     break;

@@ -57,7 +57,10 @@ register<out Register node>
 = registerNum (. node = new Register(); node.Value = t.val; .).
 
 constant<out Const val>
-= number (.val = new Const(t.val); .).
+= (. val = null; .)
+(
+  number (.val = new Const(t.val); .)
+).
 
 
 arithm<out INode exp>
