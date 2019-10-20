@@ -157,7 +157,17 @@ namespace DCasm
             var reg = n.Childrens[0].Value.Remove(0, 1);
             var correctReg = int.TryParse(reg, out var regNumber);
             var correctValue = int.TryParse(n.Childrens[1].Value, out var value);
-            if (correctReg && correctValue) registers[regNumber] = value;
+            if (correctReg && correctValue)
+            {
+                if (!n.Upper) registers[regNumber] = value;
+                else
+                {
+                    var lowerHex = registers[regNumber].ToString("X4");
+                    var upperhex = value.ToString("X4");
+                    var hex = upperhex + lowerHex;
+                    registers[regNumber] = (int) Convert.ToUInt32(hex, 16);
+                }
+            }
             else throw new Exception("cannot parse immediate load parameters !");
             ConsoleWriteLine("stored " + value + " in $" + regNumber);
         }
@@ -204,20 +214,24 @@ namespace DCasm
             if (!correctOutSel || !correctSourceReg)
                 throw new Exception("one or more arguments could not be parsed to integer !");
 
-            switch (parsedOutSel)
+            switch (registers[parsedOutSel])
             {
                 case 0:
                     Console.Write("OUT>");
                     var val = registers[parsedSourceReg];
-                    var convVal = char.ConvertFromUtf32(val);
+                    var convVal = Convert.ToChar((short)val);
                     Console.WriteLine(convVal);
                     break;
 
                 //transparent writing (no new lines and prefix)
                 case 1:
                     val = registers[parsedSourceReg];
-                    convVal = char.ConvertFromUtf32(val);
-                    Console.Write(convVal);
+                    Console.Write(Convert.ToChar((short)val));
+                    break;
+                
+                case 2:
+                    val = registers[parsedSourceReg];
+                    Console.Write(val);
                     break;
             }
         }
@@ -235,11 +249,9 @@ namespace DCasm
         {
             void ExecuteElse()
             {
-                if (n.HasElseCall)
-                {
-                    if (n.Childrens.Count < 3) throw new ArgumentException("should have 3 arguments !");
-                    n.Childrens[3].Accept(this);
-                }
+                if (!n.HasElseCall) return;
+                if (n.Childrens.Count < 3) throw new ArgumentException("should have 3 arguments !");
+                n.Childrens[3].Accept(this);
             }
 
             n.Childrens[0].Accept(this);

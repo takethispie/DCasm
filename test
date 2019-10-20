@@ -1,11 +1,14 @@
-module
+program
 import myModule
 li $2 5
 li $3 10
 li $8 10
 li $19 10
+lui $19 10
 add $1    $2 $3
 sub $4 $8 $19
+li $10 2
+out $10 $19
 
 function foobar
 li $2 123
