@@ -34,22 +34,41 @@ DCasm
   "import" moduleName<out string name> 
   (.if(gen.Type == FileTypeEnum.Program) gen.ImportModule(name); else throw new ArgumentException("you cannot import a module into another"); .) 
 }
+block<out Block node> (. node.Childrens.ForEach(c => gen.RootNodes.Add(c)); .)
+EOF.
+
+block<out Block node> = 
+(. node = new Block(); .)
+(
+    arithm<out INode exp> (. node.Childrens.Add(exp); .)
+    |
+    immediateLoad<out INode exp>   (. node.Childrens.Add(exp); .)
+    |
+    data<out INode exp>  (. node.Childrens.Add(exp); .)
+    |
+    function<out Function exp>  (. node.Childrens.Add(exp); .)
+    |
+    call<out Call exp>  (. node.Childrens.Add(exp); .)
+    |
+    Condition<out Condition exp>  (. node.Childrens.Add(exp); .)
+)
 { 
   (
-    arithm<out INode exp> (. gen.rootNodes.Add(exp); .)
+    arithm<out INode exp> (. node.Childrens.Add(exp); .)
     |
-    immediateLoad<out INode exp>   (. gen.rootNodes.Add(exp); .)
+    immediateLoad<out INode exp>   (. node.Childrens.Add(exp); .)
     |
-    data<out INode exp>  (. gen.rootNodes.Add(exp); .)
+    data<out INode exp>  (. node.Childrens.Add(exp); .)
     |
-    function<out Function exp>  (. gen.rootNodes.Add(exp); .)
+    function<out Function exp>  (. node.Childrens.Add(exp); .)
     |
-    call<out Call exp>  (. gen.rootNodes.Add(exp); .)
+    call<out Call exp>  (. node.Childrens.Add(exp); .)
     |
-    Condition<out Condition exp>  (. gen.rootNodes.Add(exp); .)
+    Condition<out Condition exp>  (. node.Childrens.Add(exp); .)
   )
-} 
-EOF.
+}.
+
+
 
 moduleName<out string name> = ident (. name = t.val; .).
 

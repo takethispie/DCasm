@@ -17,5 +17,6 @@ namespace DCasm
         void Visit(Write n);
         void Visit(Move n);
         void Visit(Condition n);
+        void Visit(Block n);
     }
 }

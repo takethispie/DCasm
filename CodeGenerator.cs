@@ -8,14 +8,14 @@ namespace DCasm
     {
         private readonly Parser parser;
         public Dictionary<string, INode> Functions;
-        public List<INode> rootNodes;
+        public List<INode> RootNodes;
         private readonly Scanner scanner;
 
         public CodeGenerator(string fileName)
         {
             scanner = new Scanner(fileName);
             parser = new Parser(scanner) {gen = this};
-            rootNodes = new List<INode>();
+            RootNodes = new List<INode>();
             Functions = new Dictionary<string, INode>();
         }
 
@@ -25,7 +25,7 @@ namespace DCasm
         public void Compile()
         {
             IVisitor v = new Interpreter(Functions) { verbose = false };
-            rootNodes.ForEach(n => n.Accept(v));
+            RootNodes.ForEach(n => n.Accept(v));
         }
 
 

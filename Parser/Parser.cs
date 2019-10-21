@@ -98,46 +98,85 @@ public CodeGenerator gen;
 			moduleName(out string name);
 			if(gen.Type == FileTypeEnum.Program) gen.ImportModule(name); else throw new ArgumentException("you cannot import a module into another"); 
 		}
-		while (StartOf(1)) {
-			switch (la.kind) {
-			case 9: case 10: case 11: case 12: {
-				arithm(out INode exp);
-				gen.rootNodes.Add(exp); 
-				break;
-			}
-			case 7: case 8: {
-				immediateLoad(out INode exp);
-				gen.rootNodes.Add(exp); 
-				break;
-			}
-			case 13: case 14: case 15: case 16: case 17: {
-				data(out INode exp);
-				gen.rootNodes.Add(exp); 
-				break;
-			}
-			case 18: {
-				function(out Function exp);
-				gen.rootNodes.Add(exp); 
-				break;
-			}
-			case 20: {
-				call(out Call exp);
-				gen.rootNodes.Add(exp); 
-				break;
-			}
-			case 21: {
-				Condition(out Condition exp);
-				gen.rootNodes.Add(exp); 
-				break;
-			}
-			}
-		}
+		block(out Block node);
+		node.Childrens.ForEach(c => gen.RootNodes.Add(c)); 
 		Expect(0);
 	}
 
 	void moduleName(out string name) {
 		Expect(1);
 		name = t.val; 
+	}
+
+	void block(out Block node) {
+		node = new Block(); 
+		switch (la.kind) {
+		case 9: case 10: case 11: case 12: {
+			arithm(out INode exp);
+			node.Childrens.Add(exp); 
+			break;
+		}
+		case 7: case 8: {
+			immediateLoad(out INode exp);
+			node.Childrens.Add(exp); 
+			break;
+		}
+		case 13: case 14: case 15: case 16: case 17: {
+			data(out INode exp);
+			node.Childrens.Add(exp); 
+			break;
+		}
+		case 18: {
+			function(out Function exp);
+			node.Childrens.Add(exp); 
+			break;
+		}
+		case 20: {
+			call(out Call exp);
+			node.Childrens.Add(exp); 
+			break;
+		}
+		case 21: {
+			Condition(out Condition exp);
+			node.Childrens.Add(exp); 
+			break;
+		}
+		default: SynErr(31); break;
+		}
+		while (StartOf(1)) {
+			switch (la.kind) {
+			case 9: case 10: case 11: case 12: {
+				arithm(out INode exp);
+				node.Childrens.Add(exp); 
+				break;
+			}
+			case 7: case 8: {
+				immediateLoad(out INode exp);
+				node.Childrens.Add(exp); 
+				break;
+			}
+			case 13: case 14: case 15: case 16: case 17: {
+				data(out INode exp);
+				node.Childrens.Add(exp); 
+				break;
+			}
+			case 18: {
+				function(out Function exp);
+				node.Childrens.Add(exp); 
+				break;
+			}
+			case 20: {
+				call(out Call exp);
+				node.Childrens.Add(exp); 
+				break;
+			}
+			case 21: {
+				Condition(out Condition exp);
+				node.Childrens.Add(exp); 
+				break;
+			}
+			}
+		}
 	}
 
 	void arithm(out INode exp) {
@@ -151,7 +190,7 @@ public CodeGenerator gen;
 		} else if (la.kind == 2) {
 			constant(out Const src2);
 			exp = ArithmFactory.Create(op, dest, src1, src2); 
-		} else SynErr(31);
+		} else SynErr(32);
 	}
 
 	void immediateLoad(out INode exp) {
@@ -162,7 +201,7 @@ public CodeGenerator gen;
 		} else if (la.kind == 8) {
 			Get();
 			exp = new ImmediateLoad(true); 
-		} else SynErr(32);
+		} else SynErr(33);
 		register(out Register dest);
 		constant(out Const val);
 		exp.Childrens.Add(dest); exp.Childrens.Add(val); 
@@ -184,7 +223,7 @@ public CodeGenerator gen;
 			} else if (la.kind == 2) {
 				constant(out Const val);
 				exp = new Write(OutputSelection, val); 
-			} else SynErr(33);
+			} else SynErr(34);
 		} else if (la.kind == 15) {
 			Get();
 			register(out Register inputSelection);
@@ -202,7 +241,7 @@ public CodeGenerator gen;
 			register(out Register baseReg);
 			constant(out Const offset);
 			exp = new Store(baseReg, offset, value); 
-		} else SynErr(34);
+		} else SynErr(35);
 	}
 
 	void function(out Function function) {
@@ -273,7 +312,7 @@ public CodeGenerator gen;
 			Get();
 		} else if (la.kind == 12) {
 			Get();
-		} else SynErr(35);
+		} else SynErr(36);
 		op = t.val; 
 	}
 
@@ -293,7 +332,7 @@ public CodeGenerator gen;
 			Get();
 		} else if (la.kind == 28) {
 			Get();
-		} else SynErr(36);
+		} else SynErr(37);
 		op = t.val; 
 	}
 
@@ -358,12 +397,13 @@ public class Errors {
 			case 28: s = "\"<=\" expected"; break;
 			case 29: s = "??? expected"; break;
 			case 30: s = "invalid DCasm"; break;
-			case 31: s = "invalid arithm"; break;
-			case 32: s = "invalid immediateLoad"; break;
-			case 33: s = "invalid data"; break;
+			case 31: s = "invalid block"; break;
+			case 32: s = "invalid arithm"; break;
+			case 33: s = "invalid immediateLoad"; break;
 			case 34: s = "invalid data"; break;
-			case 35: s = "invalid arithmOp"; break;
-			case 36: s = "invalid ConditionOp"; break;
+			case 35: s = "invalid data"; break;
+			case 36: s = "invalid arithmOp"; break;
+			case 37: s = "invalid ConditionOp"; break;
 
 			default: s = "error " + n; break;
 		}
