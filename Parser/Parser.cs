@@ -282,12 +282,12 @@ public CodeGenerator gen;
 		ConditionOp(out string op);
 		register(out Register reg2);
 		Expect(22);
-		call(out Call thenCall);
-		node = new Condition(reg1, op, reg2, thenCall); 
+		block(out Block thenblock);
+		node = new Condition(reg1, op, reg2, thenblock); 
 		if (la.kind == 23) {
 			Get();
-			call(out Call elseCall);
-			node = new Condition(reg1, op, reg2, thenCall, elseCall); 
+			block(out Block elseBlock);
+			node = new Condition(reg1, op, reg2, thenblock, elseBlock); 
 		}
 	}
 

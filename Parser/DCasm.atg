@@ -170,10 +170,8 @@ Condition<out Condition node>
 register<out Register reg1> 
 ConditionOp<out string op> 
 register<out Register reg2>
-"then"
-call<out Call thenCall>
-(. node = new Condition(reg1, op, reg2, thenCall); .)
-["else" call<out Call elseCall> (. node = new Condition(reg1, op, reg2, thenCall, elseCall); .)]
+"then" block<out Block thenblock> (. node = new Condition(reg1, op, reg2, thenblock); .)
+["else" block<out Block elseBlock> (. node = new Condition(reg1, op, reg2, thenblock, elseBlock); .)]
 .
 
 ConditionOp<out string op> = (">" | "<" | "==" | ">=" | "<=") (. op = t.val; .).

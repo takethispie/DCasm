@@ -31,6 +31,17 @@ namespace DCasm
             Childrens.Add(left);
             Childrens.Add(right);
             Childrens.AddRange(thenInstructions);
+            HasElseCall = false;
+            Op = op;
+        }
+
+        public Condition(Register left, string op, Register right, Block thenInstructions, Block elseInstructions)
+        {
+            Childrens = new List<INode>();
+            Childrens.Add(left);
+            Childrens.Add(right);
+            Childrens.Add(thenInstructions);
+            Childrens.Add(elseInstructions);
             HasElseCall = true;
             Op = op;
         }
