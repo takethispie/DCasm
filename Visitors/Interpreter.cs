@@ -17,10 +17,6 @@ namespace DCasm
 
         public Interpreter(Dictionary<string, INode> functions)
         {
-            pc = 0;
-            gt = false;
-            eq = false;
-            lt = false;
             registers = new int[32];
             stack = new Stack<int>();
             ram = new Dictionary<int, int>();
