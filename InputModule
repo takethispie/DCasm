@@ -1,42 +1,43 @@
 module
+{
+    function WriteOutPrefix
+    li $8 79
+    li $9 85
+    li $10 84
+    li $11 62
+    out $0 $8
+    out $0 $9
+    out $0 $10
+    out $0 $11
+    end
 
-function WriteOutPrefix
-li $8 79
-li $9 85
-li $10 84
-li $11 62
-out $0 $8
-out $0 $9
-out $0 $10
-out $0 $11
-end
-
-//$4 is starting memory adress position
-function ReadChar
-li $9 0
-li $10 0
-//set current position
-mov $4 $8
-in $9 $11
-sw $11 $8 0
-add $8 $8 1
-out $10 $11
-end
+    //$4 is starting memory adress position
+    function ReadChar
+    li $9 0
+    li $10 0
+    //set current position
+    mov $4 $8
+    in $9 $11
+    sw $11 $8 0
+    add $8 $8 1
+    out $10 $11
+    end
 
 
-//$4 is string adress
-function WriteLine
-mov $4 $8
+    //$4 is string adress
+    function WriteLine
+    mov $4 $8
 
-end
+    end
 
-//$8 is adress of string cursor
-function EndString
-sw $0 $8 0
-end
+    //$8 is adress of string cursor
+    function EndString
+    sw $0 $8 0
+    end
 
-//$8 is adress of string cursor 
-function NewLine
-li $9 10
-sw $9 $8 0
-end
+    //$8 is adress of string cursor 
+    function NewLine
+    li $9 10
+    sw $9 $8 0
+    end
+}

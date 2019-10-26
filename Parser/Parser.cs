@@ -10,7 +10,7 @@ public class Parser {
 	public const int _ident = 1;
 	public const int _number = 2;
 	public const int _registerNum = 3;
-	public const int maxT = 29;
+	public const int maxT = 32;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -92,14 +92,14 @@ public CodeGenerator gen;
 		} else if (la.kind == 5) {
 			Get();
 			gen.Type = FileTypeEnum.Module; 
-		} else SynErr(30);
+		} else SynErr(33);
 		while (la.kind == 6) {
 			Get();
 			moduleName(out string name);
 			if(gen.Type == FileTypeEnum.Program) gen.ImportModule(name); else throw new ArgumentException("you cannot import a module into another"); 
 		}
 		block(out Block node);
-		node.Childrens.ForEach(c => gen.RootNodes.Add(c)); 
+		node.Children.ForEach(c => gen.RootNodes.Add(c)); 
 		Expect(0);
 	}
 
@@ -110,72 +110,48 @@ public CodeGenerator gen;
 
 	void block(out Block node) {
 		node = new Block(); 
+		Expect(7);
+		BlockUnit(out INode exp);
+		node.Children.Add(exp); 
+		while (StartOf(1)) {
+			BlockUnit(out INode exp2);
+			node.Children.Add(exp2); 
+		}
+		Expect(8);
+	}
+
+	void BlockUnit(out INode exp) {
+		exp = new Error(); 
 		switch (la.kind) {
-		case 9: case 10: case 11: case 12: {
-			arithm(out INode exp);
-			node.Childrens.Add(exp); 
+		case 11: case 12: case 13: case 14: {
+			arithm(out exp);
 			break;
 		}
-		case 7: case 8: {
-			immediateLoad(out INode exp);
-			node.Childrens.Add(exp); 
+		case 9: case 10: {
+			immediateLoad(out exp);
 			break;
 		}
-		case 13: case 14: case 15: case 16: case 17: {
-			data(out INode exp);
-			node.Childrens.Add(exp); 
-			break;
-		}
-		case 18: {
-			function(out Function exp);
-			node.Childrens.Add(exp); 
+		case 15: case 16: case 17: case 18: case 19: {
+			data(out exp);
 			break;
 		}
 		case 20: {
-			call(out Call exp);
-			node.Childrens.Add(exp); 
+			function(out exp);
 			break;
 		}
-		case 21: {
-			Condition(out Condition exp);
-			node.Childrens.Add(exp); 
+		case 22: {
+			Call(out exp);
 			break;
 		}
-		default: SynErr(31); break;
+		case 23: {
+			Condition(out exp);
+			break;
 		}
-		while (StartOf(1)) {
-			switch (la.kind) {
-			case 9: case 10: case 11: case 12: {
-				arithm(out INode exp);
-				node.Childrens.Add(exp); 
-				break;
-			}
-			case 7: case 8: {
-				immediateLoad(out INode exp);
-				node.Childrens.Add(exp); 
-				break;
-			}
-			case 13: case 14: case 15: case 16: case 17: {
-				data(out INode exp);
-				node.Childrens.Add(exp); 
-				break;
-			}
-			case 18: {
-				function(out Function exp);
-				node.Childrens.Add(exp); 
-				break;
-			}
-			case 20: {
-				call(out Call exp);
-				node.Childrens.Add(exp); 
-				break;
-			}
-			case 21: {
-				Condition(out Condition exp);
-				node.Childrens.Add(exp); 
-				break;
-			}
-			}
+		case 31: {
+			While(out exp);
+			break;
+		}
+		default: SynErr(34); break;
 		}
 	}
 
@@ -190,31 +166,31 @@ public CodeGenerator gen;
 		} else if (la.kind == 2) {
 			constant(out Const src2);
 			exp = ArithmFactory.Create(op, dest, src1, src2); 
-		} else SynErr(32);
+		} else SynErr(35);
 	}
 
 	void immediateLoad(out INode exp) {
 		exp = new Error(); 
-		if (la.kind == 7) {
+		if (la.kind == 9) {
 			Get();
 			exp = new ImmediateLoad(false); 
-		} else if (la.kind == 8) {
+		} else if (la.kind == 10) {
 			Get();
 			exp = new ImmediateLoad(true); 
-		} else SynErr(33);
+		} else SynErr(36);
 		register(out Register dest);
 		constant(out Const val);
-		exp.Childrens.Add(dest); exp.Childrens.Add(val); 
+		exp.Children.Add(dest); exp.Children.Add(val); 
 	}
 
 	void data(out INode exp) {
 		exp = new Error(); 
-		if (la.kind == 13) {
+		if (la.kind == 15) {
 			Get();
 			register(out Register dest);
 			register(out Register source);
 			exp = new Move(source, dest); 
-		} else if (la.kind == 14) {
+		} else if (la.kind == 16) {
 			Get();
 			register(out Register OutputSelection);
 			if (la.kind == 3) {
@@ -223,72 +199,79 @@ public CodeGenerator gen;
 			} else if (la.kind == 2) {
 				constant(out Const val);
 				exp = new Write(OutputSelection, val); 
-			} else SynErr(34);
-		} else if (la.kind == 15) {
+			} else SynErr(37);
+		} else if (la.kind == 17) {
 			Get();
 			register(out Register inputSelection);
 			register(out Register dest);
 			exp = new Read(inputSelection, dest); 
-		} else if (la.kind == 16) {
+		} else if (la.kind == 18) {
 			Get();
 			register(out Register dest);
 			register(out Register baseReg);
 			constant(out Const offset);
 			exp = new Load(dest, baseReg, offset); 
-		} else if (la.kind == 17) {
+		} else if (la.kind == 19) {
 			Get();
 			register(out Register value);
 			register(out Register baseReg);
 			constant(out Const offset);
 			exp = new Store(baseReg, offset, value); 
-		} else SynErr(35);
+		} else SynErr(38);
 	}
 
-	void function(out Function function) {
-		Expect(18);
+	void function(out INode function) {
+		Expect(20);
 		functionName(out string name);
 		function = new Function(name); 
 		while (StartOf(2)) {
 			if (StartOf(3)) {
 				arithm(out INode exp);
-				function.Childrens.Add(exp); 
-			} else if (la.kind == 7 || la.kind == 8) {
+				function.Children.Add(exp); 
+			} else if (la.kind == 9 || la.kind == 10) {
 				immediateLoad(out INode exp);
-				function.Childrens.Add(exp); 
+				function.Children.Add(exp); 
 			} else if (StartOf(4)) {
 				data(out INode exp);
-				function.Childrens.Add(exp); 
-			} else if (la.kind == 20) {
-				call(out Call exp);
-				function.Childrens.Add(exp); 
+				function.Children.Add(exp); 
+			} else if (la.kind == 22) {
+				Call(out INode exp);
+				function.Children.Add(exp); 
 			} else {
-				Condition(out Condition exp);
-				function.Childrens.Add(exp); 
+				Condition(out INode exp);
+				function.Children.Add(exp); 
 			}
 		}
-		Expect(19);
+		Expect(21);
 		function.Value = name; gen.Functions.Add(name, function); 
 	}
 
-	void call(out Call exp) {
-		Expect(20);
+	void Call(out Call exp) {
+		Expect(22);
 		functionName(out string name);
 		exp = new Call(name); 
 	}
 
 	void Condition(out Condition node) {
-		Expect(21);
+		Expect(23);
 		register(out Register reg1);
 		ConditionOp(out string op);
 		register(out Register reg2);
-		Expect(22);
+		Expect(24);
 		block(out Block thenblock);
 		node = new Condition(reg1, op, reg2, thenblock); 
-		if (la.kind == 23) {
+		if (la.kind == 25) {
 			Get();
 			block(out Block elseBlock);
 			node = new Condition(reg1, op, reg2, thenblock, elseBlock); 
 		}
+	}
+
+	void While(out INode Node) {
+		Expect(31);
+		Condition(out Condition condition);
+		Call(out INode exp);
+		Node = new While(exp, condition.Op); 
 	}
 
 	void register(out Register node) {
@@ -304,15 +287,15 @@ public CodeGenerator gen;
 
 	void arithmOp(out string op) {
 		op = "";
-		if (la.kind == 9) {
-			Get();
-		} else if (la.kind == 10) {
-			Get();
-		} else if (la.kind == 11) {
+		if (la.kind == 11) {
 			Get();
 		} else if (la.kind == 12) {
 			Get();
-		} else SynErr(36);
+		} else if (la.kind == 13) {
+			Get();
+		} else if (la.kind == 14) {
+			Get();
+		} else SynErr(39);
 		op = t.val; 
 	}
 
@@ -322,17 +305,17 @@ public CodeGenerator gen;
 	}
 
 	void ConditionOp(out string op) {
-		if (la.kind == 24) {
-			Get();
-		} else if (la.kind == 25) {
-			Get();
-		} else if (la.kind == 26) {
+		if (la.kind == 26) {
 			Get();
 		} else if (la.kind == 27) {
 			Get();
 		} else if (la.kind == 28) {
 			Get();
-		} else SynErr(37);
+		} else if (la.kind == 29) {
+			Get();
+		} else if (la.kind == 30) {
+			Get();
+		} else SynErr(40);
 		op = t.val; 
 	}
 
@@ -348,11 +331,11 @@ public CodeGenerator gen;
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
 
 	};
 } // end Parser
@@ -373,37 +356,40 @@ public class Errors {
 			case 4: s = "\"program\" expected"; break;
 			case 5: s = "\"module\" expected"; break;
 			case 6: s = "\"import\" expected"; break;
-			case 7: s = "\"li\" expected"; break;
-			case 8: s = "\"lui\" expected"; break;
-			case 9: s = "\"add\" expected"; break;
-			case 10: s = "\"sub\" expected"; break;
-			case 11: s = "\"div\" expected"; break;
-			case 12: s = "\"mul\" expected"; break;
-			case 13: s = "\"mov\" expected"; break;
-			case 14: s = "\"out\" expected"; break;
-			case 15: s = "\"in\" expected"; break;
-			case 16: s = "\"lw\" expected"; break;
-			case 17: s = "\"sw\" expected"; break;
-			case 18: s = "\"function\" expected"; break;
-			case 19: s = "\"end\" expected"; break;
-			case 20: s = "\"call\" expected"; break;
-			case 21: s = "\"if\" expected"; break;
-			case 22: s = "\"then\" expected"; break;
-			case 23: s = "\"else\" expected"; break;
-			case 24: s = "\">\" expected"; break;
-			case 25: s = "\"<\" expected"; break;
-			case 26: s = "\"==\" expected"; break;
-			case 27: s = "\">=\" expected"; break;
-			case 28: s = "\"<=\" expected"; break;
-			case 29: s = "??? expected"; break;
-			case 30: s = "invalid DCasm"; break;
-			case 31: s = "invalid block"; break;
-			case 32: s = "invalid arithm"; break;
-			case 33: s = "invalid immediateLoad"; break;
-			case 34: s = "invalid data"; break;
-			case 35: s = "invalid data"; break;
-			case 36: s = "invalid arithmOp"; break;
-			case 37: s = "invalid ConditionOp"; break;
+			case 7: s = "\"{\" expected"; break;
+			case 8: s = "\"}\" expected"; break;
+			case 9: s = "\"li\" expected"; break;
+			case 10: s = "\"lui\" expected"; break;
+			case 11: s = "\"add\" expected"; break;
+			case 12: s = "\"sub\" expected"; break;
+			case 13: s = "\"div\" expected"; break;
+			case 14: s = "\"mul\" expected"; break;
+			case 15: s = "\"mov\" expected"; break;
+			case 16: s = "\"out\" expected"; break;
+			case 17: s = "\"in\" expected"; break;
+			case 18: s = "\"lw\" expected"; break;
+			case 19: s = "\"sw\" expected"; break;
+			case 20: s = "\"function\" expected"; break;
+			case 21: s = "\"end\" expected"; break;
+			case 22: s = "\"call\" expected"; break;
+			case 23: s = "\"if\" expected"; break;
+			case 24: s = "\"then\" expected"; break;
+			case 25: s = "\"else\" expected"; break;
+			case 26: s = "\">\" expected"; break;
+			case 27: s = "\"<\" expected"; break;
+			case 28: s = "\"==\" expected"; break;
+			case 29: s = "\">=\" expected"; break;
+			case 30: s = "\"<=\" expected"; break;
+			case 31: s = "\"while\" expected"; break;
+			case 32: s = "??? expected"; break;
+			case 33: s = "invalid DCasm"; break;
+			case 34: s = "invalid BlockUnit"; break;
+			case 35: s = "invalid arithm"; break;
+			case 36: s = "invalid immediateLoad"; break;
+			case 37: s = "invalid data"; break;
+			case 38: s = "invalid data"; break;
+			case 39: s = "invalid arithmOp"; break;
+			case 40: s = "invalid ConditionOp"; break;
 
 			default: s = "error " + n; break;
 		}

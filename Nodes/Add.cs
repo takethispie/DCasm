@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DCasm.Visitors;
 
 namespace DCasm
 {
@@ -7,13 +8,13 @@ namespace DCasm
     {
         public Add(string op)
         {
-            Childrens = new List<INode>();
+            Children = new List<INode>();
             Value = op;
         }
 
         public bool Unsigned { get; set; }
         public string Value { get; set; }
-        public List<INode> Childrens { get; set; }
+        public List<INode> Children { get; set; }
 
         public void Accept(IVisitor v)
         {
@@ -23,8 +24,8 @@ namespace DCasm
         public void Reduce()
         {
             var op = Value;
-            if (Childrens.Count < 3)
-                throw new Exception("missing args ! only" + Childrens.Count + " arguments specified");
+            if (Children.Count < 3)
+                throw new Exception("missing args ! only" + Children.Count + " arguments specified");
         }
     }
 }

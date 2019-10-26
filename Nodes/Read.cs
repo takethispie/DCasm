@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DCasm.Visitors;
 
 namespace DCasm
 {
@@ -6,14 +7,14 @@ namespace DCasm
     {
         public Read(Register inputSelection, INode value)
         {
-            Childrens = new List<INode>();
-            Childrens.Add(inputSelection);
-            Childrens.Add(value);
+            Children = new List<INode>();
+            Children.Add(inputSelection);
+            Children.Add(value);
             Value = "in";
         }
 
         public string Value { get; set; }
-        public List<INode> Childrens { get; set; }
+        public List<INode> Children { get; set; }
 
         public void Accept(IVisitor v)
         {

@@ -1,17 +1,18 @@
 using System.Collections.Generic;
+using DCasm.Visitors;
 
 namespace DCasm
 {
-    public class Div : INode
+    public class Sub : INode
     {
-        public Div(string op)
+        public Sub(string op)
         {
-            Childrens = new List<INode>();
+            Children = new List<INode>();
             Value = op;
         }
 
         public string Value { get; set; }
-        public List<INode> Childrens { get; set; }
+        public List<INode> Children { get; set; }
 
         public void Accept(IVisitor v)
         {

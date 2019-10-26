@@ -5,18 +5,18 @@ namespace DCasm
         public static INode Create(string op, Register dest, Register src1, Register src2)
         {
             var node = GetOperand(op, false);
-            node.Childrens.Add(dest);
-            node.Childrens.Add(src1);
-            node.Childrens.Add(src2);
+            node.Children.Add(dest);
+            node.Children.Add(src1);
+            node.Children.Add(src2);
             return node;
         }
 
         public static INode Create(string op, Register dest, Register src1, Const src2)
         {
             var node = GetOperand(op, true);
-            node.Childrens.Add(dest);
-            node.Childrens.Add(src1);
-            node.Childrens.Add(src2);
+            node.Children.Add(dest);
+            node.Children.Add(src1);
+            node.Children.Add(src2);
             return node;
         }
 

@@ -1,4 +1,5 @@
-namespace DCasm
+
+namespace DCasm.Visitors
 {
     public interface IVisitor
     {
@@ -18,5 +19,7 @@ namespace DCasm
         void Visit(Move n);
         void Visit(Condition n);
         void Visit(Block n);
+        void Visit(While @while);
+
     }
 }

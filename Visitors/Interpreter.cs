@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace DCasm
+namespace DCasm.Visitors
 {
     public class Interpreter : IVisitor
     {
@@ -26,9 +26,9 @@ namespace DCasm
 
         public void Visit(Store n)
         {
-            var valueReg = GetRegisterIndex(n.Childrens[0]);
-            var baseReg = GetRegisterIndex(n.Childrens[1]);
-            var offset = n.Childrens[2].Value;
+            var valueReg = GetRegisterIndex(n.Children[0]);
+            var baseReg = GetRegisterIndex(n.Children[1]);
+            var offset = n.Children[2].Value;
             var correctOffset = int.TryParse(offset, out var parsedOffset);
 
             if (!correctOffset) throw new Exception("one or more arguments could not be parsed to integer !");
@@ -57,7 +57,7 @@ namespace DCasm
             ConsoleWriteLine("calling " + n.Value);
             if (Functions.ContainsKey(n.Value))
             {
-                Functions[n.Value].Childrens.ForEach(x => x.Accept(this));
+                Functions[n.Value].Children.ForEach(x => x.Accept(this));
                 ConsoleWriteLine("return from " + n.Value);
             }
             else throw new ArgumentException("Function not found !");
@@ -65,9 +65,9 @@ namespace DCasm
 
         public void Visit(Load n)
         {
-            var destReg = GetRegisterIndex(n.Childrens[0]);
-            var baseReg = GetRegisterIndex(n.Childrens[1]);
-            var offset = GetRegisterIndex(n.Childrens[2]);
+            var destReg = GetRegisterIndex(n.Children[0]);
+            var baseReg = GetRegisterIndex(n.Children[1]);
+            var offset = GetRegisterIndex(n.Children[2]);
 
             var destRegister = registers[destReg];
             var adress = registers[baseReg];
@@ -80,11 +80,11 @@ namespace DCasm
 
         public void Visit(Add n)
         {
-            n.Childrens.ForEach(x => x.Accept(this));
+            n.Children.ForEach(x => x.Accept(this));
             var src2 = stack.Pop();
             var src1 = stack.Pop();
             stack.Pop();
-            var destReg = GetRegisterIndex(n.Childrens[0]);
+            var destReg = GetRegisterIndex(n.Children[0]);
             registers[destReg] = src1 + src2;
             ConsoleWriteLine(src1 + " + " + src2 + " => $" + destReg);
             ConsoleWriteLine("$" + destReg + " = " + registers[destReg]);
@@ -92,11 +92,11 @@ namespace DCasm
 
         public void Visit(Sub n)
         {
-            n.Childrens.ForEach(x => x.Accept(this));
+            n.Children.ForEach(x => x.Accept(this));
             var src2 = stack.Pop();
             var src1 = stack.Pop();
             stack.Pop();
-            var destReg = GetRegisterIndex(n.Childrens[0]);
+            var destReg = GetRegisterIndex(n.Children[0]);
             registers[destReg] = src1 - src2;
             ConsoleWriteLine(src1 + " - " + src2 + " => $" + destReg);
             ConsoleWriteLine("$" + destReg + " = " + registers[destReg]);
@@ -104,11 +104,11 @@ namespace DCasm
 
         public void Visit(Mul n)
         {
-            n.Childrens.ForEach(x => x.Accept(this));
+            n.Children.ForEach(x => x.Accept(this));
             var src2 = stack.Pop();
             var src1 = stack.Pop();
             stack.Pop();
-            var destReg = GetRegisterIndex(n.Childrens[0]);
+            var destReg = GetRegisterIndex(n.Children[0]);
             registers[destReg] = src1 * src2;
             ConsoleWriteLine(src1 + " * " + src2 + " => $" + destReg);
             ConsoleWriteLine("$" + destReg + " = " + registers[destReg]);
@@ -116,11 +116,11 @@ namespace DCasm
 
         public void Visit(Div n)
         {
-            n.Childrens.ForEach(x => x.Accept(this));
+            n.Children.ForEach(x => x.Accept(this));
             var src2 = stack.Pop();
             var src1 = stack.Pop();
             stack.Pop();
-            var destReg = GetRegisterIndex(n.Childrens[0]);
+            var destReg = GetRegisterIndex(n.Children[0]);
             if (src2 == 0) throw new DivideByZeroException();
             registers[destReg] = src1 / src2;
             ConsoleWriteLine(src1 + " - " + src2 + " => $" + destReg);
@@ -134,8 +134,8 @@ namespace DCasm
 
         public void Visit(ImmediateLoad n)
         {
-            var destReg = GetRegisterIndex(n.Childrens[0]);
-            var correctValue = int.TryParse(n.Childrens[1].Value, out var value);
+            var destReg = GetRegisterIndex(n.Children[0]);
+            var correctValue = int.TryParse(n.Children[1].Value, out var value);
             if (correctValue)
             {
                 if (!n.Upper) registers[destReg] = value;
@@ -153,8 +153,8 @@ namespace DCasm
 
         public void Visit(Read n)
         {
-            var inSel = GetRegisterIndex(n.Childrens[0]);
-            var destReg = GetRegisterIndex(n.Childrens[1]);
+            var inSel = GetRegisterIndex(n.Children[0]);
+            var destReg = GetRegisterIndex(n.Children[1]);
 
             switch (registers[inSel])
             {
@@ -170,8 +170,8 @@ namespace DCasm
 
         public void Visit(Write n)
         {
-            var outSel = GetRegisterIndex(n.Childrens[0]);
-            var sourceReg = GetRegisterIndex(n.Childrens[1]);
+            var outSel = GetRegisterIndex(n.Children[0]);
+            var sourceReg = GetRegisterIndex(n.Children[1]);
 
             switch (registers[outSel])
             {
@@ -190,8 +190,8 @@ namespace DCasm
 
         public void Visit(Move n)
         {
-            var source = GetRegisterIndex(n.Childrens[0]);
-            var destination = GetRegisterIndex(n.Childrens[1]);
+            var source = GetRegisterIndex(n.Children[0]);
+            var destination = GetRegisterIndex(n.Children[1]);
             registers[destination] = registers[source];
             ConsoleWriteLine("$" + source + "(" + registers[source] + ") => $" + destination + "(" +
                              registers[destination] + ")");
@@ -202,39 +202,39 @@ namespace DCasm
             void ExecuteElse()
             {
                 if (!n.HasElseCall) return;
-                if (n.Childrens.Count < 3) throw new ArgumentException("should have 3 arguments !");
-                n.Childrens[3].Accept(this);
+                if (n.Children.Count < 3) throw new ArgumentException("should have 3 arguments !");
+                n.Children[3].Accept(this);
             }
 
-            n.Childrens[0].Accept(this);
-            n.Childrens[1].Accept(this);
+            n.Children[0].Accept(this);
+            n.Children[1].Accept(this);
             var right = stack.Pop();
             var left = stack.Pop();
             ConsoleWriteLine(left + " " + n.Op + " " + right);
             switch (n.Op)
             {
                 case ">":
-                    if (left > right) n.Childrens[2].Accept(this);
+                    if (left > right) n.Children[2].Accept(this);
                     else ExecuteElse();
                     break;
 
                 case "==":
-                    if (left == right) n.Childrens[2].Accept(this);
+                    if (left == right) n.Children[2].Accept(this);
                     else ExecuteElse();
                     break;
 
                 case "<":
-                    if (left < right) n.Childrens[2].Accept(this);
+                    if (left < right) n.Children[2].Accept(this);
                     else ExecuteElse();
                     break;
 
                 case ">=":
-                    if (left >= right) n.Childrens[2].Accept(this);
+                    if (left >= right) n.Children[2].Accept(this);
                     else ExecuteElse();
                     break;
 
                 case "<=":
-                    if (left <= right) n.Childrens[2].Accept(this);
+                    if (left <= right) n.Children[2].Accept(this);
                     else ExecuteElse();
                     break;
             }
@@ -264,6 +264,11 @@ namespace DCasm
             throw new Exception("cannot parse register number !");
         }
 
-        public void Visit(Block n) => n.Childrens.ForEach(l => l.Accept(this));
+        public void Visit(Block n) => n.Children.ForEach(l => l.Accept(this));
+        
+        public void Visit(While @while) {
+            throw new NotImplementedException();
+        }
+
     }
 }

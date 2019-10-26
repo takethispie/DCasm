@@ -1,10 +1,7 @@
 program
 import InputModule
-call InputModule.WriteOutPrefix
-call InputModule.ReadChar
-li $2 1
-if $0 < $2 then 
-    call InputModule.WriteOutPrefix 
-else 
-    call InputModule.WriteOutPrefix 
-    call InputModule.WriteOutPrefix 
+{
+
+    call InputModule.WriteOutPrefix
+    call InputModule.ReadChar
+}

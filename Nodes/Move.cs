@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DCasm.Visitors;
 
 namespace DCasm
 {
@@ -6,14 +7,14 @@ namespace DCasm
     {
         public Move(Register source, Register destination)
         {
-            Childrens = new List<INode>();
+            Children = new List<INode>();
             Value = "mov";
-            Childrens.Add(destination);
-            Childrens.Add(source);
+            Children.Add(destination);
+            Children.Add(source);
         }
 
         public string Value { get; set; }
-        public List<INode> Childrens { get; set; }
+        public List<INode> Children { get; set; }
 
         public void Accept(IVisitor v)
         {
