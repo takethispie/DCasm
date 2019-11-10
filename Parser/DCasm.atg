@@ -160,25 +160,33 @@ function<out INode function>
 
 functionName<out string name> = ident (. name = t.val; .).
 
-Call<out Call exp> = "call" functionName<out string name> (. exp = new Call(name); .).
+Call<out INode exp> = "call" functionName<out string name> (. exp = new Call(name); .).
 
 
-Condition<out Condition node>
+Condition<out INode node>
 =
 "if" 
-register<out Register reg1> 
-ConditionOp<out string op> 
-register<out Register reg2>
-"then" block<out Block thenblock> (. node = new Condition(reg1, op, reg2, thenblock); .)
-["else" block<out Block elseBlock> (. node = new Condition(reg1, op, reg2, thenblock, elseBlock); .)]
+Comparaison<out Register reg1, out string op, out Register reg2>
+"then" block<out Block thenblock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock); .)
+["else" block<out Block elseBlock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); .)]
 .
 
 ConditionOp<out string op> = (">" | "<" | "==" | ">=" | "<=") (. op = t.val; .).
 
+Comparaison<out Register reg1, out string op, out Register reg2>
+=
+register<out reg1> 
+ConditionOp<out op> 
+register<out reg2>
+.
+
 While<out INode Node> 
 =
-"while" Condition<out Condition condition> Call<out INode exp>
-(. Node = new While(exp, condition.Op); .)
+"while" Comparaison<out Register reg1, out string op, out Register reg2> 
+"{" 
+ Call<out INode exp>
+"}"
+(. Node = new While(exp, new Comparaison(op, reg1, reg2)); .)
 .
 
 END DCasm.

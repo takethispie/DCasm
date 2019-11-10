@@ -1,7 +1,14 @@
 program
 import InputModule
 {
+    function WhileTest
+    add $2 $2 1
+    end
 
-    call InputModule.WriteOutPrefix
-    call InputModule.ReadChar
+    li $2 1
+    li $3 10
+    
+    while $2 <= $3 {
+        call WhileTest
+    }
 }

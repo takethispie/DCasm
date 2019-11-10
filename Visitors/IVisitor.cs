@@ -19,7 +19,8 @@ namespace DCasm.Visitors
         void Visit(Move n);
         void Visit(Condition n);
         void Visit(Block n);
-        void Visit(While @while);
+        void Visit(While n);
+        void Visit(Comparaison comparaison);
 
     }
 }

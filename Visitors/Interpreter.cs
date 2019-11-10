@@ -12,7 +12,6 @@ namespace DCasm.Visitors
         private readonly int[] registers;
         public INode root;
         private readonly Stack<int> stack;
-
         public bool verbose;
 
         public Interpreter(Dictionary<string, INode> functions)
@@ -21,7 +20,6 @@ namespace DCasm.Visitors
             stack = new Stack<int>();
             ram = new Dictionary<int, int>();
             Functions = functions;
-            verbose = true;
         }
 
         public void Visit(Store n)
@@ -205,39 +203,10 @@ namespace DCasm.Visitors
                 if (n.Children.Count < 3) throw new ArgumentException("should have 3 arguments !");
                 n.Children[3].Accept(this);
             }
-
+            //visit comparaison
             n.Children[0].Accept(this);
-            n.Children[1].Accept(this);
-            var right = stack.Pop();
-            var left = stack.Pop();
-            ConsoleWriteLine(left + " " + n.Op + " " + right);
-            switch (n.Op)
-            {
-                case ">":
-                    if (left > right) n.Children[2].Accept(this);
-                    else ExecuteElse();
-                    break;
-
-                case "==":
-                    if (left == right) n.Children[2].Accept(this);
-                    else ExecuteElse();
-                    break;
-
-                case "<":
-                    if (left < right) n.Children[2].Accept(this);
-                    else ExecuteElse();
-                    break;
-
-                case ">=":
-                    if (left >= right) n.Children[2].Accept(this);
-                    else ExecuteElse();
-                    break;
-
-                case "<=":
-                    if (left <= right) n.Children[2].Accept(this);
-                    else ExecuteElse();
-                    break;
-            }
+            if(stack.Pop() == 1) n.Children[1].Accept(this);
+            else ExecuteElse();
         }
 
         private void ConsoleWrite(string str)
@@ -266,8 +235,50 @@ namespace DCasm.Visitors
 
         public void Visit(Block n) => n.Children.ForEach(l => l.Accept(this));
         
-        public void Visit(While @while) {
-            throw new NotImplementedException();
+        public void Visit(While n) {
+            ConsoleWriteLine("entering while");
+            n.Children[0].Accept(this);
+            var condition = stack.Pop() == 1;
+            ConsoleWriteLine("initial condition is: " + condition);
+            while (condition) {
+                n.Children[1].Accept(this);
+                n.Children[0].Accept(this);
+                condition = stack.Pop() == 1;
+                ConsoleWriteLine("condition is: " + condition);
+            }
+            
+        }
+
+        public void Visit(Comparaison n) {
+            n.Children[0].Accept(this);
+            n.Children[1].Accept(this);
+            var right = stack.Pop();
+            var left = stack.Pop();
+            ConsoleWriteLine(left + " " + n.Value + " " + right);
+            switch (n.Value)
+            {
+                case ">":
+                    stack.Push(left > right ? 1 : 0);
+                    break;
+
+                case "==":
+                    stack.Push(left == right ? 1 : 0);
+                    break;
+
+                case "<":
+                    stack.Push(left < right ? 1 : 0);
+                    break;
+
+                case ">=":
+                    stack.Push(left >= right ? 1 : 0);
+                    break;
+
+                case "<=":
+                    stack.Push(left <= right ? 1 : 0);
+                    break;
+                
+                default: throw new ArgumentException("incorrect comparaison operator");
+            }
         }
 
     }

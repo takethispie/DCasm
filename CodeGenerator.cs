@@ -25,7 +25,7 @@ namespace DCasm
 
         public void Compile()
         {
-            IVisitor v = new Interpreter(Functions) { verbose = false };
+            IVisitor v = new Interpreter(Functions) { verbose = true };
             RootNodes.ForEach(n => n.Accept(v));
         }
 

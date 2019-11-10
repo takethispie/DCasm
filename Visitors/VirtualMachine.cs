@@ -107,5 +107,11 @@ namespace DCasm.Visitors
         public void Visit(While @while) {
             throw new NotImplementedException();
         }
+
+
+        public void Visit(Comparaison comparaison) {
+            throw new NotImplementedException();
+        }
+
     }
 }

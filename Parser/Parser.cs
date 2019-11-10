@@ -246,32 +246,32 @@ public CodeGenerator gen;
 		function.Value = name; gen.Functions.Add(name, function); 
 	}
 
-	void Call(out Call exp) {
+	void Call(out INode exp) {
 		Expect(22);
 		functionName(out string name);
 		exp = new Call(name); 
 	}
 
-	void Condition(out Condition node) {
+	void Condition(out INode node) {
 		Expect(23);
-		register(out Register reg1);
-		ConditionOp(out string op);
-		register(out Register reg2);
+		Comparaison(out Register reg1, out string op, out Register reg2);
 		Expect(24);
 		block(out Block thenblock);
-		node = new Condition(reg1, op, reg2, thenblock); 
+		node = new Condition(new Comparaison(op, reg1, reg2), thenblock); 
 		if (la.kind == 25) {
 			Get();
 			block(out Block elseBlock);
-			node = new Condition(reg1, op, reg2, thenblock, elseBlock); 
+			node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); 
 		}
 	}
 
 	void While(out INode Node) {
 		Expect(31);
-		Condition(out Condition condition);
+		Comparaison(out Register reg1, out string op, out Register reg2);
+		Expect(7);
 		Call(out INode exp);
-		Node = new While(exp, condition.Op); 
+		Expect(8);
+		Node = new While(exp, new Comparaison(op, reg1, reg2)); 
 	}
 
 	void register(out Register node) {
@@ -302,6 +302,12 @@ public CodeGenerator gen;
 	void functionName(out string name) {
 		Expect(1);
 		name = t.val; 
+	}
+
+	void Comparaison(out Register reg1, out string op, out Register reg2) {
+		register(out reg1);
+		ConditionOp(out op);
+		register(out reg2);
 	}
 
 	void ConditionOp(out string op) {
