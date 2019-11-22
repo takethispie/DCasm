@@ -20,6 +20,14 @@ namespace DCasm
             Functions = new Dictionary<string, INode>();
         }
 
+        public CodeGenerator(Stream stream)
+        {
+            scanner = new Scanner(stream);
+            parser = new Parser(scanner) {gen = this};
+            RootNodes = new List<INode>();
+            Functions = new Dictionary<string, INode>();
+        }
+
         public FileTypeEnum Type { get; set; }
         public int ErrorCount => parser.errors.count;
 
