@@ -8,7 +8,7 @@ import InputModule
     li $2 1
     li $3 10
     
-    while $2 <= $3 {
-        call WhileTest
+    while $2 <= 10 {
+        add $2 $2 1
     }
 }

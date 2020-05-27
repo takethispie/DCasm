@@ -242,6 +242,7 @@ namespace DCasm.Visitors
             ConsoleWriteLine("initial condition is: " + condition);
             while (condition) {
                 n.Children[1].Accept(this);
+                //we do the comparison at the end 
                 n.Children[0].Accept(this);
                 condition = stack.Pop() == 1;
                 ConsoleWriteLine("condition is: " + condition);

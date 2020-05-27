@@ -98,7 +98,7 @@ public CodeGenerator gen;
 			moduleName(out string name);
 			if(gen.Type == FileTypeEnum.Program) gen.ImportModule(name); else throw new ArgumentException("you cannot import a module into another"); 
 		}
-		block(out Block node);
+		Block(out INode node);
 		node.Children.ForEach(c => gen.RootNodes.Add(c)); 
 		Expect(0);
 	}
@@ -108,7 +108,7 @@ public CodeGenerator gen;
 		name = t.val; 
 	}
 
-	void block(out Block node) {
+	void Block(out INode node) {
 		node = new Block(); 
 		Expect(7);
 		BlockUnit(out INode exp);
@@ -256,11 +256,11 @@ public CodeGenerator gen;
 		Expect(23);
 		Comparaison(out INode reg1, out string op, out INode reg2);
 		Expect(24);
-		block(out Block thenblock);
+		Block(out INode thenblock);
 		node = new Condition(new Comparaison(op, reg1, reg2), thenblock); 
 		if (la.kind == 25) {
 			Get();
-			block(out Block elseBlock);
+			Block(out INode elseBlock);
 			node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); 
 		}
 	}
@@ -268,9 +268,7 @@ public CodeGenerator gen;
 	void While(out INode Node) {
 		Expect(31);
 		Comparaison(out INode reg1, out string op, out INode reg2);
-		Expect(7);
-		Call(out INode exp);
-		Expect(8);
+		Block(out INode exp);
 		Node = new While(exp, new Comparaison(op, reg1, reg2)); 
 	}
 

@@ -34,7 +34,7 @@ DCasm
   "import" moduleName<out string name> 
   (.if(gen.Type == FileTypeEnum.Program) gen.ImportModule(name); else throw new ArgumentException("you cannot import a module into another"); .) 
 }
-block<out Block node> (. node.Children.ForEach(c => gen.RootNodes.Add(c)); .)
+Block<out INode node> (. node.Children.ForEach(c => gen.RootNodes.Add(c)); .)
 EOF.
 
 BlockUnit<out INode exp>
@@ -57,7 +57,7 @@ BlockUnit<out INode exp>
 )
 .
 
-block<out Block node> = 
+Block<out INode node> = 
 (. node = new Block(); .)
 "{"
 BlockUnit<out INode exp> (. node.Children.Add(exp); .)
@@ -166,8 +166,8 @@ Call<out INode exp> = "call" functionName<out string name> (. exp = new Call(nam
 Condition<out INode node>
 =
 "if" Comparaison<out INode reg1, out string op, out INode reg2>
-"then" block<out Block thenblock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock); .)
-["else" block<out Block elseBlock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); .)]
+"then" Block<out INode thenblock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock); .)
+["else" Block<out INode elseBlock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); .)]
 .
 
 ConditionOp<out string op> = (">" | "<" | "==" | ">=" | "<=") (. op = t.val; .).
@@ -183,9 +183,7 @@ ConditionOp<out op>
 While<out INode Node> 
 =
 "while" Comparaison<out INode reg1, out string op, out INode reg2> 
-"{" 
- Call<out INode exp>
-"}"
+Block<out INode exp>
 (. Node = new While(exp, new Comparaison(op, reg1, reg2)); .)
 .
 
