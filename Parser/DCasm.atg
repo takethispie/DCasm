@@ -165,8 +165,7 @@ Call<out INode exp> = "call" functionName<out string name> (. exp = new Call(nam
 
 Condition<out INode node>
 =
-"if" 
-Comparaison<out INode reg1, out string op, out INode reg2>
+"if" Comparaison<out INode reg1, out string op, out INode reg2>
 "then" block<out Block thenblock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock); .)
 ["else" block<out Block elseBlock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); .)]
 .

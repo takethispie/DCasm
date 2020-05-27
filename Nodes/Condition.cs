@@ -8,18 +8,6 @@ namespace DCasm
         public bool HasElseCall { get; set; }
         public string Value { get; set; }
         public List<INode> Children { get; set; }
-        
-        public Condition(Comparaison comp, INode functionCall)
-        {
-            Children = new List<INode> {comp, functionCall};
-            HasElseCall = false;
-        }
-
-        public Condition(Comparaison comp, INode functionCall, INode elseFunctionCall)
-        {
-            Children = new List<INode> {comp, functionCall, elseFunctionCall};
-            HasElseCall = true;
-        }
 
         public Condition(Comparaison comp, Block thenInstructions)
         {
