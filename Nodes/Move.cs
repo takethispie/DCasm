@@ -5,7 +5,7 @@ namespace DCasm
 {
     public class Move : INode
     {
-        public Move(Register source, Register destination)
+        public Move(INode source, INode destination)
         {
             Children = new List<INode>();
             Value = "mov";
@@ -16,9 +16,6 @@ namespace DCasm
         public string Value { get; set; }
         public List<INode> Children { get; set; }
 
-        public void Accept(IVisitor v)
-        {
-            v.Visit(this);
-        }
+        public void Accept(IVisitor v) => v.Visit(this);
     }
 }

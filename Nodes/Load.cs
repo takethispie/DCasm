@@ -5,7 +5,7 @@ namespace DCasm
 {
     public class Load : INode
     {
-        public Load(Register dest, Register baseReg, Const offset)
+        public Load(INode dest, INode baseReg, INode offset)
         {
             Value = "lw";
             Children = new List<INode>();
@@ -17,9 +17,6 @@ namespace DCasm
         public string Value { get; set; }
         public List<INode> Children { get; set; }
 
-        public void Accept(IVisitor v)
-        {
-            v.Visit(this);
-        }
+        public void Accept(IVisitor v) => v.Visit(this);
     }
 }

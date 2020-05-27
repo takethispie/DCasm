@@ -56,7 +56,7 @@ namespace DCasm.Visitors
             if (Functions.ContainsKey(n.Value))
             {
                 Functions[n.Value].Children.ForEach(x => x.Accept(this));
-                ConsoleWriteLine("return from " + n.Value);
+                ConsoleWriteLine("return from " + n.Value + Environment.NewLine);
             }
             else throw new ArgumentException("Function not found !");
         }

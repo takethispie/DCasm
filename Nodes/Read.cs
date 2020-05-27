@@ -5,7 +5,7 @@ namespace DCasm
 {
     public class Read : INode
     {
-        public Read(Register inputSelection, INode value)
+        public Read(INode inputSelection, INode value)
         {
             Children = new List<INode>();
             Children.Add(inputSelection);
@@ -16,9 +16,6 @@ namespace DCasm
         public string Value { get; set; }
         public List<INode> Children { get; set; }
 
-        public void Accept(IVisitor v)
-        {
-            v.Visit(this);
-        }
+        public void Accept(IVisitor v) => v.Visit(this);
     }
 }

@@ -10,16 +10,12 @@ namespace DCasm
         public List<INode> Children { get; set; }
 
 
-        public While(INode callOnConditionSuccess, Comparaison comp) {
-            Children = new List<INode>();
-            switch (callOnConditionSuccess) {
-                case Call call:
-                    Children.Add(comp);
-                    Children.Add(call);
-                    break;
-                default: throw new ArgumentException();
-            }
-        }
+        public While(INode callOnConditionSuccess, Comparaison comp) => init(callOnConditionSuccess, comp);
+
+        private List<INode> init(INode callOnConditionSuccess, Comparaison comp) => callOnConditionSuccess switch {
+            Call call => new List<INode> { comp, call},
+            _ => throw new ArgumentException()
+        };
 
         public void Accept(IVisitor v) => v.Visit(this);
     }

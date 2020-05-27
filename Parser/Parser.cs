@@ -158,13 +158,13 @@ public CodeGenerator gen;
 	void arithm(out INode exp) {
 		exp = new Error();
 		arithmOp(out string op);
-		register(out Register dest);
-		register(out Register src1);
+		register(out INode dest);
+		register(out INode src1);
 		if (la.kind == 3) {
-			register(out Register src2);
+			register(out INode src2);
 			exp = ArithmFactory.Create(op, dest, src1, src2); 
 		} else if (la.kind == 2) {
-			constant(out Const src2);
+			constant(out INode src2);
 			exp = ArithmFactory.Create(op, dest, src1, src2); 
 		} else SynErr(35);
 	}
@@ -178,8 +178,8 @@ public CodeGenerator gen;
 			Get();
 			exp = new ImmediateLoad(true); 
 		} else SynErr(36);
-		register(out Register dest);
-		constant(out Const val);
+		register(out INode dest);
+		constant(out INode val);
 		exp.Children.Add(dest); exp.Children.Add(val); 
 	}
 
@@ -187,35 +187,35 @@ public CodeGenerator gen;
 		exp = new Error(); 
 		if (la.kind == 15) {
 			Get();
-			register(out Register dest);
-			register(out Register source);
+			register(out INode dest);
+			register(out INode source);
 			exp = new Move(source, dest); 
 		} else if (la.kind == 16) {
 			Get();
-			register(out Register OutputSelection);
+			register(out INode OutputSelection);
 			if (la.kind == 3) {
-				register(out Register val);
+				register(out INode val);
 				exp = new Write(OutputSelection, val); 
 			} else if (la.kind == 2) {
-				constant(out Const val);
+				constant(out INode val);
 				exp = new Write(OutputSelection, val); 
 			} else SynErr(37);
 		} else if (la.kind == 17) {
 			Get();
-			register(out Register inputSelection);
-			register(out Register dest);
+			register(out INode inputSelection);
+			register(out INode dest);
 			exp = new Read(inputSelection, dest); 
 		} else if (la.kind == 18) {
 			Get();
-			register(out Register dest);
-			register(out Register baseReg);
-			constant(out Const offset);
+			register(out INode dest);
+			register(out INode baseReg);
+			constant(out INode offset);
 			exp = new Load(dest, baseReg, offset); 
 		} else if (la.kind == 19) {
 			Get();
-			register(out Register value);
-			register(out Register baseReg);
-			constant(out Const offset);
+			register(out INode value);
+			register(out INode baseReg);
+			constant(out INode offset);
 			exp = new Store(baseReg, offset, value); 
 		} else SynErr(38);
 	}
@@ -254,7 +254,7 @@ public CodeGenerator gen;
 
 	void Condition(out INode node) {
 		Expect(23);
-		Comparaison(out Register reg1, out string op, out Register reg2);
+		Comparaison(out INode reg1, out string op, out INode reg2);
 		Expect(24);
 		block(out Block thenblock);
 		node = new Condition(new Comparaison(op, reg1, reg2), thenblock); 
@@ -267,19 +267,19 @@ public CodeGenerator gen;
 
 	void While(out INode Node) {
 		Expect(31);
-		Comparaison(out Register reg1, out string op, out Register reg2);
+		Comparaison(out INode reg1, out string op, out INode reg2);
 		Expect(7);
 		Call(out INode exp);
 		Expect(8);
 		Node = new While(exp, new Comparaison(op, reg1, reg2)); 
 	}
 
-	void register(out Register node) {
+	void register(out INode node) {
 		Expect(3);
 		node = new Register(); node.Value = t.val; 
 	}
 
-	void constant(out Const val) {
+	void constant(out INode val) {
 		val = null; 
 		Expect(2);
 		val = new Const(t.val); 
@@ -304,10 +304,19 @@ public CodeGenerator gen;
 		name = t.val; 
 	}
 
-	void Comparaison(out Register reg1, out string op, out Register reg2) {
-		register(out reg1);
+	void Comparaison(out INode reg1, out string op, out INode reg2) {
+		reg1 = new Const("-1"); reg2 = new Const("-1"); 
+		if (la.kind == 3) {
+			register(out reg1);
+		} else if (la.kind == 2) {
+			constant(out reg1);
+		} else SynErr(40);
 		ConditionOp(out op);
-		register(out reg2);
+		if (la.kind == 3) {
+			register(out reg2);
+		} else if (la.kind == 2) {
+			constant(out reg2);
+		} else SynErr(41);
 	}
 
 	void ConditionOp(out string op) {
@@ -321,7 +330,7 @@ public CodeGenerator gen;
 			Get();
 		} else if (la.kind == 30) {
 			Get();
-		} else SynErr(40);
+		} else SynErr(42);
 		op = t.val; 
 	}
 
@@ -395,7 +404,9 @@ public class Errors {
 			case 37: s = "invalid data"; break;
 			case 38: s = "invalid data"; break;
 			case 39: s = "invalid arithmOp"; break;
-			case 40: s = "invalid ConditionOp"; break;
+			case 40: s = "invalid Comparaison"; break;
+			case 41: s = "invalid Comparaison"; break;
+			case 42: s = "invalid ConditionOp"; break;
 
 			default: s = "error " + n; break;
 		}

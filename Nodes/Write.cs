@@ -5,7 +5,7 @@ namespace DCasm
 {
     public class Write : INode
     {
-        public Write(Register outputSelection, INode value)
+        public Write(INode outputSelection, INode value)
         {
             Children = new List<INode>();
             Children.Add(outputSelection);
@@ -16,9 +16,6 @@ namespace DCasm
         public string Value { get; set; }
         public List<INode> Children { get; set; }
 
-        public void Accept(IVisitor v)
-        {
-            v.Visit(this);
-        }
+        public void Accept(IVisitor v) => v.Visit(this);
     }
 }

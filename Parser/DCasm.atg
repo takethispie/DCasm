@@ -71,10 +71,10 @@ BlockUnit<out INode exp> (. node.Children.Add(exp); .)
 
 moduleName<out string name> = ident (. name = t.val; .).
 
-register<out Register node> 
+register<out INode node> 
 = registerNum (. node = new Register(); node.Value = t.val; .).
 
-constant<out Const val>
+constant<out INode val>
 = (. val = null; .)
 (
   number (.val = new Const(t.val); .)
@@ -85,13 +85,13 @@ arithm<out INode exp>
 = (. exp = new Error();.)
   (
     arithmOp<out string op> 
-    register<out Register dest> 
-    register<out Register src1> 
+    register<out INode dest> 
+    register<out INode src1> 
     (
-      register<out Register src2> 
+      register<out INode src2> 
       (.exp = ArithmFactory.Create(op, dest, src1, src2); .)
       |
-      constant<out Const src2> 
+      constant<out INode src2> 
       (.exp = ArithmFactory.Create(op, dest, src1, src2); .)
     )
   )
@@ -106,7 +106,7 @@ immediateLoad<out INode exp>
   |
   "lui" (. exp = new ImmediateLoad(true); .)
 )
-register<out Register dest> constant<out Const val> (. exp.Children.Add(dest); exp.Children.Add(val); .)
+register<out INode dest> constant<out INode val> (. exp.Children.Add(dest); exp.Children.Add(val); .)
 .
 
 
@@ -120,20 +120,20 @@ data<out INode exp>
 =
 (. exp = new Error(); .)
 (
-  "mov" register<out Register dest> register<out Register source> (. exp = new Move(source, dest); .)
+  "mov" register<out INode dest> register<out INode source> (. exp = new Move(source, dest); .)
   |
-  "out" register<out Register OutputSelection> 
+  "out" register<out INode OutputSelection> 
     (
-      register<out Register val> (. exp = new Write(OutputSelection, val); .)
+      register<out INode val> (. exp = new Write(OutputSelection, val); .)
       | 
-      constant<out Const val> (. exp = new Write(OutputSelection, val); .)
+      constant<out INode val> (. exp = new Write(OutputSelection, val); .)
     ) 
   |
-  "in" register<out Register inputSelection> register<out Register dest> (. exp = new Read(inputSelection, dest); .)
+  "in" register<out INode inputSelection> register<out INode dest> (. exp = new Read(inputSelection, dest); .)
   |
-  "lw" register<out Register dest> register<out Register baseReg> constant<out Const offset> (. exp = new Load(dest, baseReg, offset); .)
+  "lw" register<out INode dest> register<out INode baseReg> constant<out INode offset> (. exp = new Load(dest, baseReg, offset); .)
   |
-  "sw" register<out Register value> register<out Register baseReg> constant<out Const offset> (. exp = new Store(baseReg, offset, value); .) 
+  "sw" register<out INode value> register<out INode baseReg> constant<out INode offset> (. exp = new Store(baseReg, offset, value); .) 
 )
 .
 
@@ -166,27 +166,29 @@ Call<out INode exp> = "call" functionName<out string name> (. exp = new Call(nam
 Condition<out INode node>
 =
 "if" 
-Comparaison<out Register reg1, out string op, out Register reg2>
+Comparaison<out INode reg1, out string op, out INode reg2>
 "then" block<out Block thenblock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock); .)
 ["else" block<out Block elseBlock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); .)]
 .
 
 ConditionOp<out string op> = (">" | "<" | "==" | ">=" | "<=") (. op = t.val; .).
 
-Comparaison<out Register reg1, out string op, out Register reg2>
+Comparaison<out INode reg1, out string op, out INode reg2>
 =
-register<out reg1> 
+(. reg1 = new Const("-1"); reg2 = new Const("-1"); .)
+(register<out reg1> | constant<out reg1>)
 ConditionOp<out op> 
-register<out reg2>
+(register<out reg2> | constant<out reg2>)
 .
 
 While<out INode Node> 
 =
-"while" Comparaison<out Register reg1, out string op, out Register reg2> 
+"while" Comparaison<out INode reg1, out string op, out INode reg2> 
 "{" 
  Call<out INode exp>
 "}"
 (. Node = new While(exp, new Comparaison(op, reg1, reg2)); .)
 .
+
 
 END DCasm.
