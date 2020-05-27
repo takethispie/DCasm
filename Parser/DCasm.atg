@@ -1,0 +1,193 @@
+COMPILER DCasm
+
+	public CodeGenerator gen;
+  
+/*--------------------------------------------------------------------------*/
+CHARACTERS
+  letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
+  digit = "0123456789".
+  firstDigit = "0123".
+  cr  = '\r'.
+  lf  = '\n'.
+  tab = '\t'.
+
+TOKENS
+  ident  = letter {letter | digit} ['.' letter {letter | digit}].
+  number = digit {digit}.
+  registerNum = "$" [firstDigit] digit.
+
+COMMENTS FROM "/*" TO "*/" NESTED
+COMMENTS FROM "//" TO lf
+
+IGNORE cr + lf + tab
+
+
+PRODUCTIONS
+/*------------------------------------------------------------------------*/
+DCasm
+= 
+(
+  "program" (. gen.Type = FileTypeEnum.Program; .)
+  | "module" (. gen.Type = FileTypeEnum.Module; .)
+) 
+{ 
+  "import" moduleName<out string name> 
+  (.if(gen.Type == FileTypeEnum.Program) gen.ImportModule(name); else throw new ArgumentException("you cannot import a module into another"); .) 
+}
+block<out Block node> (. node.Children.ForEach(c => gen.RootNodes.Add(c)); .)
+EOF.
+
+BlockUnit<out INode exp>
+=
+(. exp = new Error(); .)
+(
+    arithm<out exp> 
+    |
+    immediateLoad<out exp>
+    |
+    data<out exp>
+    |
+    function<out exp>
+    |
+    Call<out exp>
+    |
+    Condition<out exp>
+    |
+    While<out exp>
+)
+.
+
+block<out Block node> = 
+(. node = new Block(); .)
+"{"
+BlockUnit<out INode exp> (. node.Children.Add(exp); .)
+{ 
+  BlockUnit<out INode exp2> (. node.Children.Add(exp2); .)
+}
+"}"
+.
+
+
+
+moduleName<out string name> = ident (. name = t.val; .).
+
+register<out INode node> 
+= registerNum (. node = new Register(); node.Value = t.val; .).
+
+constant<out INode val>
+= (. val = null; .)
+(
+  number (.val = new Const(t.val); .)
+).
+
+
+arithm<out INode exp>
+= (. exp = new Error();.)
+  (
+    arithmOp<out string op> 
+    register<out INode dest> 
+    register<out INode src1> 
+    (
+      register<out INode src2> 
+      (.exp = ArithmFactory.Create(op, dest, src1, src2); .)
+      |
+      constant<out INode src2> 
+      (.exp = ArithmFactory.Create(op, dest, src1, src2); .)
+    )
+  )
+.
+
+
+immediateLoad<out INode exp>
+= 
+(. exp = new Error(); .)
+(
+  "li" (. exp = new ImmediateLoad(false); .)
+  |
+  "lui" (. exp = new ImmediateLoad(true); .)
+)
+register<out INode dest> constant<out INode val> (. exp.Children.Add(dest); exp.Children.Add(val); .)
+.
+
+
+arithmOp<out string op>
+= (. op = "";.)
+  ("add" | "sub" | "div" | "mul" ) (. op = t.val; .)
+.
+
+
+data<out INode exp>
+=
+(. exp = new Error(); .)
+(
+  "mov" register<out INode dest> register<out INode source> (. exp = new Move(source, dest); .)
+  |
+  "out" register<out INode OutputSelection> 
+    (
+      register<out INode val> (. exp = new Write(OutputSelection, val); .)
+      | 
+      constant<out INode val> (. exp = new Write(OutputSelection, val); .)
+    ) 
+  |
+  "in" register<out INode inputSelection> register<out INode dest> (. exp = new Read(inputSelection, dest); .)
+  |
+  "lw" register<out INode dest> register<out INode baseReg> constant<out INode offset> (. exp = new Load(dest, baseReg, offset); .)
+  |
+  "sw" register<out INode value> register<out INode baseReg> constant<out INode offset> (. exp = new Store(baseReg, offset, value); .) 
+)
+.
+
+
+function<out INode function>
+=
+"function" functionName<out string name>
+(. function = new Function(name); .)
+{
+  (
+    arithm<out INode exp> (. function.Children.Add(exp); .)
+    |
+    immediateLoad<out INode exp>   (. function.Children.Add(exp); .)
+    |
+    data<out INode exp>  (. function.Children.Add(exp); .)
+    |
+    Call<out INode exp>  (. function.Children.Add(exp); .)
+    |
+    Condition<out INode exp>  (. function.Children.Add(exp); .)
+  )
+}
+"end" (. function.Value = name; gen.Functions.Add(name, function); .)
+.
+
+functionName<out string name> = ident (. name = t.val; .).
+
+Call<out INode exp> = "call" functionName<out string name> (. exp = new Call(name); .).
+
+
+Condition<out INode node>
+=
+"if" Comparaison<out INode reg1, out string op, out INode reg2>
+"then" block<out Block thenblock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock); .)
+["else" block<out Block elseBlock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); .)]
+.
+
+ConditionOp<out string op> = (">" | "<" | "==" | ">=" | "<=") (. op = t.val; .).
+
+Comparaison<out INode reg1, out string op, out INode reg2>
+=
+(. reg1 = new Const("-1"); reg2 = new Const("-1"); .)
+(register<out reg1> | constant<out reg1>)
+ConditionOp<out op> 
+(register<out reg2> | constant<out reg2>)
+.
+
+While<out INode Node> 
+=
+"while" Comparaison<out INode reg1, out string op, out INode reg2> 
+"{" 
+ Call<out INode exp>
+"}"
+(. Node = new While(exp, new Comparaison(op, reg1, reg2)); .)
+.
+
+
+END DCasm.

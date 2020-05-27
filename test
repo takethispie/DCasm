@@ -1,18 +1,14 @@
 program
-li $2 5
-li $3 10
-li $8 10
-li $19 10
-add $1    $2 $3
-sub $4 $8 $19
+import InputModule
+{
+    function WhileTest
+    add $2 $2 1
+    end
 
-function foobar
-li $2 123
-end
-
-function myfunction
-add $3 $2 $1
-li $1 255
-end
-
-if $3 < $2 then call foobar else call myfunction
+    li $2 1
+    li $3 10
+    
+    while $2 <= $3 {
+        call WhileTest
+    }
+}

@@ -3,15 +3,14 @@ using DCasm.Visitors;
 
 namespace DCasm
 {
-    public class Call : INode
+    public class Block : INode
     {
-        public Call(string name)
-        {
-            Value = name;
-        }
-
         public string Value { get; set; }
         public List<INode> Children { get; set; }
+
+        public Block() {
+            Children = new List<INode>(); 
+        }
 
         public void Accept(IVisitor v) => v.Visit(this);
     }

@@ -3,12 +3,15 @@ using DCasm.Visitors;
 
 namespace DCasm
 {
-    public class Function : INode
+    public class Store : INode
     {
-        public Function(string name)
+        public Store(INode baseReg, INode offset, INode value)
         {
-            Value = name;
             Children = new List<INode>();
+            Value = "sw";
+            Children.Add(value);
+            Children.Add(baseReg);
+            Children.Add(offset);
         }
 
         public string Value { get; set; }

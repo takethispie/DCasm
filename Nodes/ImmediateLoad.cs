@@ -3,13 +3,16 @@ using DCasm.Visitors;
 
 namespace DCasm
 {
-    public class Call : INode
+    public class ImmediateLoad : INode
     {
-        public Call(string name)
+        public ImmediateLoad(bool upper)
         {
-            Value = name;
+            Value = upper ? "lui" : "li";
+            Children = new List<INode>();
+            Upper = upper;
         }
 
+        public bool Upper { get; set; }
         public string Value { get; set; }
         public List<INode> Children { get; set; }
 

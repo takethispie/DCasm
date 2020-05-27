@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
 
-namespace DCasm
+namespace DCasm.Visitors
 {
     public interface IVisitor
     {
@@ -20,5 +18,9 @@ namespace DCasm
         void Visit(Write n);
         void Visit(Move n);
         void Visit(Condition n);
+        void Visit(Block n);
+        void Visit(While n);
+        void Visit(Comparaison comparaison);
+
     }
 }
