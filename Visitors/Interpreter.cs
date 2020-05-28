@@ -256,30 +256,15 @@ namespace DCasm.Visitors
             var right = stack.Pop();
             var left = stack.Pop();
             ConsoleWriteLine(left + " " + n.Value + " " + right);
-            switch (n.Value)
-            {
-                case ">":
-                    stack.Push(left > right ? 1 : 0);
-                    break;
-
-                case "==":
-                    stack.Push(left == right ? 1 : 0);
-                    break;
-
-                case "<":
-                    stack.Push(left < right ? 1 : 0);
-                    break;
-
-                case ">=":
-                    stack.Push(left >= right ? 1 : 0);
-                    break;
-
-                case "<=":
-                    stack.Push(left <= right ? 1 : 0);
-                    break;
-                
-                default: throw new ArgumentException("incorrect comparaison operator");
-            }
+            var compResult = n.Value switch {
+                ">" => left > right,
+                "==" => left == right,
+                "<" => left < right,
+                ">=" => left >= right,
+                "<=" => left <= right,
+                _ => throw new ArgumentException("incorrect comparaison operator")
+            };
+            stack.Push(compResult ? 1 : 0);
         }
 
     }
