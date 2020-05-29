@@ -24,14 +24,13 @@ namespace DCasm.Visitors
         {
             var valueReg = Utils.GetRegisterIndex(n.Children[0]);
             var baseReg = Utils.GetRegisterIndex(n.Children[1]);
-            var offset = n.Children[2].Value;
-            var correctOffset = int.TryParse(offset, out var parsedOffset);
+            var offsetReg = Utils.GetRegisterIndex(n.Children[2]);
 
-            if (!correctOffset) throw new Exception("one or more arguments could not be parsed to integer !");
 
             var valueToStore = registers[valueReg];
             var adress = registers[baseReg];
-            var storeAddress = adress + parsedOffset;
+            var offset = registers[offsetReg];
+            var storeAddress = adress + offset;
 
             if (!ram.ContainsKey(storeAddress)) ram.Add(storeAddress, valueToStore);
             else ram[storeAddress] = valueToStore;
@@ -67,10 +66,11 @@ namespace DCasm.Visitors
         {
             var destReg = Utils.GetRegisterIndex(n.Children[0]);
             var baseReg = Utils.GetRegisterIndex(n.Children[1]);
-            var offset = Utils.GetRegisterIndex(n.Children[2]);
+            var offsetReg = Utils.GetRegisterIndex(n.Children[2]);
 
             var destRegister = registers[destReg];
             var adress = registers[baseReg];
+            var offset = registers[offsetReg];
             var loadAddress = adress + offset;
 
             if (!ram.ContainsKey(loadAddress)) registers[destRegister] = 0;

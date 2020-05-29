@@ -132,9 +132,9 @@ data<out INode exp>
   |
   "in" register<out INode inputSelection> register<out INode dest> (. exp = new Read(inputSelection, dest); .)
   |
-  "load" register<out INode dest> register<out INode baseReg> constant<out INode offset> (. exp = new Load(dest, baseReg, offset); .)
+  "load" register<out INode dest> register<out INode baseReg> register<out INode offset> (. exp = new Load(dest, baseReg, offset); .)
   |
-  "store" register<out INode value> register<out INode baseReg> constant<out INode offset> (. exp = new Store(baseReg, offset, value); .) 
+  "store" register<out INode value> register<out INode baseReg> register<out INode offset> (. exp = new Store(baseReg, offset, value); .) 
 )
 .
 

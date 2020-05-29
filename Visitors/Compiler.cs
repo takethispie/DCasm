@@ -43,8 +43,8 @@ namespace DCasm.Visitors
 
         public void Visit(Call n)
         {
-            var adress = functionsAdress[n.Value];
-            var setInst = OpCodes.OpToBinary("set") + "00111" + "00000" + ConstConverter.ConstantToBinary(adress.ToString());
+            var address = functionsAdress[n.Value];
+            var setInst = OpCodes.OpToBinary("set") + "00111" + "00000" + ConstConverter.ConstantToBinary(address.ToString());
             Program.Add(setInst);
             PC++;
             ConsoleWriteLine(setInst);
@@ -55,7 +55,10 @@ namespace DCasm.Visitors
         }
 
         public void Visit(Return ret) {
-
+            var inst = OpCodes.OpToBinary("ret").PadRight(32, '0');
+            Program.Add(inst);
+            ConsoleWriteLine(inst);
+            PC++;
         }
 
         public void Visit(Load n)
@@ -106,9 +109,7 @@ namespace DCasm.Visitors
             PC++;
         }
 
-        public void Visit(Register n)
-        {
-        }
+        public void Visit(Register n) { }
 
         public void Visit(ImmediateLoad n)
         {

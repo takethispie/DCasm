@@ -209,13 +209,13 @@ public CodeGenerator gen;
 			Get();
 			register(out INode dest);
 			register(out INode baseReg);
-			constant(out INode offset);
+			register(out INode offset);
 			exp = new Load(dest, baseReg, offset); 
 		} else if (la.kind == 19) {
 			Get();
 			register(out INode value);
 			register(out INode baseReg);
-			constant(out INode offset);
+			register(out INode offset);
 			exp = new Store(baseReg, offset, value); 
 		} else SynErr(38);
 	}
