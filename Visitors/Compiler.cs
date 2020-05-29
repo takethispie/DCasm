@@ -31,7 +31,8 @@ namespace DCasm.Visitors
         public void Visit(Store n)
         {
             var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.Children[1]) 
-            + RegisterConverter.RegisterToBinary(n.Children[0]) + ConstConverter.ConstantToBinary(n.Children[2].Value);
+            + RegisterConverter.RegisterToBinary(n.Children[0]) + RegisterConverter.RegisterToBinary(n.Children[2])
+            + "00000000000" ;
             Program.Add(inst);
             ConsoleWriteLine(inst);
             PC++;
@@ -63,6 +64,11 @@ namespace DCasm.Visitors
 
         public void Visit(Load n)
         {
+            var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.Children[1]) 
+            + RegisterConverter.RegisterToBinary(n.Children[0]) + RegisterConverter.RegisterToBinary(n.Children[2])
+            + "00000000000" ;
+            Program.Add(inst);
+            ConsoleWriteLine(inst);
             PC++;
         }
 
@@ -120,18 +126,31 @@ namespace DCasm.Visitors
             PC++;
         }
 
-        public void Visit(Read n)
-        {
+        public void Visit(Read n) {
+            var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.Children[0])
+            + RegisterConverter.RegisterToBinary(n.Children[1]);
+            inst = inst.PadRight(32, '0');
+            Program.Add(inst);
+            ConsoleWriteLine(inst);
             PC++;
         }
 
         public void Visit(Write n)
         {
+            var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.Children[0])
+            + RegisterConverter.RegisterToBinary(n.Children[1]);
+            inst = inst.PadRight(32, '0');
+            Program.Add(inst);
+            ConsoleWriteLine(inst);
             PC++;
         }
 
-        public void Visit(Move n)
-        {
+        public void Visit(Move n) {
+            var inst = OpCodes.OpToBinary("mov") + RegisterConverter.RegisterToBinary(n.Children[0])
+            + RegisterConverter.RegisterToBinary(n.Children[1]);
+            inst = inst.PadRight(32, '0');
+            Program.Add(inst);
+            ConsoleWriteLine(inst);
             PC++;
         }
 

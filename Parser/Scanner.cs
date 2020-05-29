@@ -412,6 +412,7 @@ public class Scanner {
 				else {t.kind = 2; break;}
 			case 5:
 				if (ch >= '1' && ch <= '2') {AddCh(); goto case 6;}
+				else if (ch == '0') {AddCh(); goto case 7;}
 				else {goto case 0;}
 			case 6:
 				if (ch >= '0' && ch <= '9') {AddCh(); goto case 7;}

@@ -15,7 +15,7 @@ TOKENS
   ident  = letter {letter | digit} ['.' letter {letter | digit}].
   number = digit {digit}.
   //29 registers are adressable, 30, 31 are reserved
-  registerNum = "$" firstDigit digit.
+  registerNum = "$" ('0' | firstDigit digit).
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
