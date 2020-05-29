@@ -371,8 +371,8 @@ public class Errors {
 			case 6: s = "\"import\" expected"; break;
 			case 7: s = "\"{\" expected"; break;
 			case 8: s = "\"}\" expected"; break;
-			case 9: s = "\"li\" expected"; break;
-			case 10: s = "\"lui\" expected"; break;
+			case 9: s = "\"set\" expected"; break;
+			case 10: s = "\"setupper\" expected"; break;
 			case 11: s = "\"add\" expected"; break;
 			case 12: s = "\"sub\" expected"; break;
 			case 13: s = "\"div\" expected"; break;
@@ -380,8 +380,8 @@ public class Errors {
 			case 15: s = "\"mov\" expected"; break;
 			case 16: s = "\"out\" expected"; break;
 			case 17: s = "\"in\" expected"; break;
-			case 18: s = "\"lw\" expected"; break;
-			case 19: s = "\"sw\" expected"; break;
+			case 18: s = "\"load\" expected"; break;
+			case 19: s = "\"store\" expected"; break;
 			case 20: s = "\"function\" expected"; break;
 			case 21: s = "\"end\" expected"; break;
 			case 22: s = "\"call\" expected"; break;

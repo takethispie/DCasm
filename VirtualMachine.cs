@@ -19,14 +19,9 @@ namespace DCasm.Visitors
             stack = new Stack<int>();
             ram = new Dictionary<int, int>();
             verbose = true;
+            pc = 0;
+            rom = new List<string>();
+            gt = eq = lt = false;
         }
-
-        private string HexStringTobinaryString(string hexstring) => Convert.ToString(Convert.ToInt32(hexstring, 16), 2);
-
-        private string DecimalToHex(int decValue) => string.Format("{0:x}", decValue);
-
-        private string HexToDecimal(string hex) => Convert.ToInt32(hex, 16).ToString();
-
-
     }
 }

@@ -7,7 +7,7 @@ namespace DCasm
     {
         public ImmediateLoad(bool upper)
         {
-            Value = upper ? "lui" : "li";
+            Value = upper ? "setu" : "set";
             Children = new List<INode>();
             Upper = upper;
         }

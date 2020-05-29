@@ -5,13 +5,13 @@ namespace DCasm
 {
     public class Store : INode
     {
-        public Store(INode baseReg, INode offset, INode value)
+        public Store(INode baseReg, INode offsetReg, INode value)
         {
             Children = new List<INode>();
-            Value = "sw";
+            Value = "store";
             Children.Add(value);
             Children.Add(baseReg);
-            Children.Add(offset);
+            Children.Add(offsetReg);
         }
 
         public string Value { get; set; }

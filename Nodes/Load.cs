@@ -7,7 +7,7 @@ namespace DCasm
     {
         public Load(INode dest, INode baseReg, INode offset)
         {
-            Value = "lw";
+            Value = "load";
             Children = new List<INode>();
             Children.Add(dest);
             Children.Add(baseReg);

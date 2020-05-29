@@ -33,6 +33,11 @@ namespace DCasm
 
         public void Compile()
         {
+            IVisitor v = new Compiler(false) { Verbose = true };
+            RootNodes.ForEach(n => n.Accept(v));
+        }
+
+        public void Interpret() {
             IVisitor v = new Interpreter(Functions) { verbose = true };
             RootNodes.ForEach(n => n.Accept(v));
         }

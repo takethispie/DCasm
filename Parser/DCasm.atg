@@ -6,7 +6,7 @@ COMPILER DCasm
 CHARACTERS
   letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   digit = "0123456789".
-  firstDigit = "012".
+  firstDigit = "12".
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
@@ -15,7 +15,7 @@ TOKENS
   ident  = letter {letter | digit} ['.' letter {letter | digit}].
   number = digit {digit}.
   //29 registers are adressable, 30, 31 are reserved
-  registerNum = "$" [firstDigit] digit.
+  registerNum = "$" firstDigit digit.
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -103,9 +103,9 @@ immediateLoad<out INode exp>
 = 
 (. exp = new Error(); .)
 (
-  "li" (. exp = new ImmediateLoad(false); .)
+  "set" (. exp = new ImmediateLoad(false); .)
   |
-  "lui" (. exp = new ImmediateLoad(true); .)
+  "setupper" (. exp = new ImmediateLoad(true); .)
 )
 register<out INode dest> constant<out INode val> (. exp.Children.Add(dest); exp.Children.Add(val); .)
 .
@@ -132,9 +132,9 @@ data<out INode exp>
   |
   "in" register<out INode inputSelection> register<out INode dest> (. exp = new Read(inputSelection, dest); .)
   |
-  "lw" register<out INode dest> register<out INode baseReg> constant<out INode offset> (. exp = new Load(dest, baseReg, offset); .)
+  "load" register<out INode dest> register<out INode baseReg> constant<out INode offset> (. exp = new Load(dest, baseReg, offset); .)
   |
-  "sw" register<out INode value> register<out INode baseReg> constant<out INode offset> (. exp = new Store(baseReg, offset, value); .) 
+  "store" register<out INode value> register<out INode baseReg> constant<out INode offset> (. exp = new Store(baseReg, offset, value); .) 
 )
 .
 

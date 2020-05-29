@@ -7,10 +7,24 @@ namespace DCasm
     {
         private static void Main(string[] args)
         {
-            Interpret("test");
+            Compile("test");
         }
 
         private static void Interpret(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                var gen = new CodeGenerator(filePath);
+                gen.Parse();
+                if (gen.ErrorCount == 0) gen.Interpret();
+            }
+            else
+            {
+                Console.WriteLine("File does not exists !");
+            }
+        }
+
+        private static void Compile(string filePath)
         {
             if (File.Exists(filePath))
             {
@@ -42,7 +56,11 @@ namespace DCasm
                 {
                     var gen = new CodeGenerator(cmdSplit[1]);
                     gen.Parse();
-                    if (gen.ErrorCount == 0) gen.Compile();
+                    if(gen.ErrorCount == 0) throw new Exception("Error during compilation");
+                    if(cmdSplit.Length > 2 && cmdSplit[2] == "-i") {
+                        gen.Interpret();
+                    } else gen.Compile();
+                    
                 }
                 else
                 {

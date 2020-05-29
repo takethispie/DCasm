@@ -350,8 +350,8 @@ public class Scanner {
 			case "program": t.kind = 4; break;
 			case "module": t.kind = 5; break;
 			case "import": t.kind = 6; break;
-			case "li": t.kind = 9; break;
-			case "lui": t.kind = 10; break;
+			case "set": t.kind = 9; break;
+			case "setupper": t.kind = 10; break;
 			case "add": t.kind = 11; break;
 			case "sub": t.kind = 12; break;
 			case "div": t.kind = 13; break;
@@ -359,8 +359,8 @@ public class Scanner {
 			case "mov": t.kind = 15; break;
 			case "out": t.kind = 16; break;
 			case "in": t.kind = 17; break;
-			case "lw": t.kind = 18; break;
-			case "sw": t.kind = 19; break;
+			case "load": t.kind = 18; break;
+			case "store": t.kind = 19; break;
 			case "function": t.kind = 20; break;
 			case "end": t.kind = 21; break;
 			case "call": t.kind = 22; break;
@@ -411,15 +411,13 @@ public class Scanner {
 				if (ch >= '0' && ch <= '9') {AddCh(); goto case 4;}
 				else {t.kind = 2; break;}
 			case 5:
-				if (ch >= '4' && ch <= '9') {AddCh(); goto case 6;}
-				else if (ch >= '0' && ch <= '3') {AddCh(); goto case 7;}
+				if (ch >= '1' && ch <= '2') {AddCh(); goto case 6;}
 				else {goto case 0;}
 			case 6:
-				{t.kind = 3; break;}
+				if (ch >= '0' && ch <= '9') {AddCh(); goto case 7;}
+				else {goto case 0;}
 			case 7:
-				recEnd = pos; recKind = 3;
-				if (ch >= '0' && ch <= '9') {AddCh(); goto case 6;}
-				else {t.kind = 3; break;}
+				{t.kind = 3; break;}
 			case 8:
 				{t.kind = 7; break;}
 			case 9:

@@ -22,8 +22,8 @@ namespace DCasm.Visitors
 
         public void Visit(Store n)
         {
-            var valueReg = GetRegisterIndex(n.Children[0]);
-            var baseReg = GetRegisterIndex(n.Children[1]);
+            var valueReg = Utils.GetRegisterIndex(n.Children[0]);
+            var baseReg = Utils.GetRegisterIndex(n.Children[1]);
             var offset = n.Children[2].Value;
             var correctOffset = int.TryParse(offset, out var parsedOffset);
 
@@ -61,9 +61,9 @@ namespace DCasm.Visitors
 
         public void Visit(Load n)
         {
-            var destReg = GetRegisterIndex(n.Children[0]);
-            var baseReg = GetRegisterIndex(n.Children[1]);
-            var offset = GetRegisterIndex(n.Children[2]);
+            var destReg = Utils.GetRegisterIndex(n.Children[0]);
+            var baseReg = Utils.GetRegisterIndex(n.Children[1]);
+            var offset = Utils.GetRegisterIndex(n.Children[2]);
 
             var destRegister = registers[destReg];
             var adress = registers[baseReg];
@@ -80,7 +80,7 @@ namespace DCasm.Visitors
             var src2 = stack.Pop();
             var src1 = stack.Pop();
             stack.Pop();
-            var destReg = GetRegisterIndex(n.Children[0]);
+            var destReg = Utils.GetRegisterIndex(n.Children[0]);
             registers[destReg] = src1 + src2;
             ConsoleWriteLine(src1 + " + " + src2 + " => $" + destReg);
             ConsoleWriteLine("$" + destReg + " = " + registers[destReg]);
@@ -92,7 +92,7 @@ namespace DCasm.Visitors
             var src2 = stack.Pop();
             var src1 = stack.Pop();
             stack.Pop();
-            var destReg = GetRegisterIndex(n.Children[0]);
+            var destReg = Utils.GetRegisterIndex(n.Children[0]);
             registers[destReg] = src1 - src2;
             ConsoleWriteLine(src1 + " - " + src2 + " => $" + destReg);
             ConsoleWriteLine("$" + destReg + " = " + registers[destReg]);
@@ -104,7 +104,7 @@ namespace DCasm.Visitors
             var src2 = stack.Pop();
             var src1 = stack.Pop();
             stack.Pop();
-            var destReg = GetRegisterIndex(n.Children[0]);
+            var destReg = Utils.GetRegisterIndex(n.Children[0]);
             registers[destReg] = src1 * src2;
             ConsoleWriteLine(src1 + " * " + src2 + " => $" + destReg);
             ConsoleWriteLine("$" + destReg + " = " + registers[destReg]);
@@ -116,7 +116,7 @@ namespace DCasm.Visitors
             var src2 = stack.Pop();
             var src1 = stack.Pop();
             stack.Pop();
-            var destReg = GetRegisterIndex(n.Children[0]);
+            var destReg = Utils.GetRegisterIndex(n.Children[0]);
             if (src2 == 0) throw new DivideByZeroException();
             registers[destReg] = src1 / src2;
             ConsoleWriteLine(src1 + " - " + src2 + " => $" + destReg);
@@ -130,7 +130,7 @@ namespace DCasm.Visitors
 
         public void Visit(ImmediateLoad n)
         {
-            var destReg = GetRegisterIndex(n.Children[0]);
+            var destReg = Utils.GetRegisterIndex(n.Children[0]);
             var correctValue = int.TryParse(n.Children[1].Value, out var value);
             if (correctValue)
             {
@@ -149,8 +149,8 @@ namespace DCasm.Visitors
 
         public void Visit(Read n)
         {
-            var inSel = GetRegisterIndex(n.Children[0]);
-            var destReg = GetRegisterIndex(n.Children[1]);
+            var inSel = Utils.GetRegisterIndex(n.Children[0]);
+            var destReg = Utils.GetRegisterIndex(n.Children[1]);
 
             switch (registers[inSel])
             {
@@ -166,8 +166,8 @@ namespace DCasm.Visitors
 
         public void Visit(Write n)
         {
-            var outSel = GetRegisterIndex(n.Children[0]);
-            var sourceReg = GetRegisterIndex(n.Children[1]);
+            var outSel = Utils.GetRegisterIndex(n.Children[0]);
+            var sourceReg = Utils.GetRegisterIndex(n.Children[1]);
 
             switch (registers[outSel])
             {
@@ -186,8 +186,8 @@ namespace DCasm.Visitors
 
         public void Visit(Move n)
         {
-            var source = GetRegisterIndex(n.Children[0]);
-            var destination = GetRegisterIndex(n.Children[1]);
+            var source = Utils.GetRegisterIndex(n.Children[0]);
+            var destination = Utils.GetRegisterIndex(n.Children[1]);
             registers[destination] = registers[source];
             ConsoleWriteLine("$" + source + "(" + registers[source] + ") => $" + destination + "(" +
                              registers[destination] + ")");
@@ -219,16 +219,8 @@ namespace DCasm.Visitors
 
         private int GetRegisterValue(INode n)
         {
-            var index = GetRegisterIndex(n);
+            var index = Utils.GetRegisterIndex(n);
             return registers[index];
-        }
-
-        private int GetRegisterIndex(INode n)
-        {
-            var reg = n.Value.Remove(0, 1);
-            var correctReg = int.TryParse(reg, out var regNumber);
-            if (correctReg) return regNumber;
-            throw new Exception("cannot parse register number !");
         }
 
         public void Visit(Block n) => n.Children.ForEach(l => l.Accept(this));
