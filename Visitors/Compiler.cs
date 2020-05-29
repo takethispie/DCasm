@@ -25,6 +25,7 @@ namespace DCasm.Visitors
                 functionsAdress.Add(key, PC);
                 value.Children.ForEach(child => child.Accept(this));
             }
+            ConsoleWriteLine("start of program: " + PC);
         }
 
 

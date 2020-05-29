@@ -30,7 +30,9 @@ namespace DCasm
             {
                 var gen = new CodeGenerator(filePath);
                 gen.Parse();
-                if (gen.ErrorCount == 0) gen.Compile();
+                if (gen.ErrorCount != 0) return;
+                var result = gen.Compile();
+                File.WriteAllLines(filePath + ".txt", result);
             }
             else
             {

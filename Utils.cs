@@ -11,6 +11,8 @@ namespace DCasm
         public static string HexToDecimal(string hex) => Convert.ToInt32(hex, 16).ToString();
 
         public static string DecimalToBinary(int decValue) => HexStringTobinaryString(DecimalToHex(decValue));
+        
+        public static string BinaryToHex(string binary) => Convert.ToInt32(binary, 2).ToString("X");
 
         public static int GetRegisterIndex(INode n)
         {
