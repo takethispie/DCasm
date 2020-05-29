@@ -243,7 +243,7 @@ public CodeGenerator gen;
 			}
 		}
 		Expect(21);
-		function.Value = name; gen.Functions.Add(name, function); 
+		function.Value = name; function.Children.Add(new Return(name)); gen.Functions.Add(name, function); 
 	}
 
 	void Call(out INode exp) {

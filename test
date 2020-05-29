@@ -8,8 +8,10 @@ import InputModule
     set $10 1
     set $11 10
     add $12 $10 1
+
+    call WhileTest
     
-    while $10 <= 10 {
-        add $10 $10 1
-    }
+    //while $10 <= 10 {
+        //add $10 $10 1
+    //}
 }

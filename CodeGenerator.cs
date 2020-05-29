@@ -31,9 +31,8 @@ namespace DCasm
         public FileTypeEnum Type { get; set; }
         public int ErrorCount => parser.errors.count;
 
-        public void Compile()
-        {
-            IVisitor v = new Compiler(false) { Verbose = true };
+        public void Compile() {
+            IVisitor v = new Compiler(Functions, false, true);
             RootNodes.ForEach(n => n.Accept(v));
         }
 

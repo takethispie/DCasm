@@ -7,18 +7,24 @@ namespace DCasm.Visitors
     public class Compiler : IVisitor
     {
 
-        private Dictionary<int, int> blockSizeCache;
+        private readonly Dictionary<string, int> functionsAdress;
         private int currentTempRegister;
         public int PC;
         public bool Verbose;
-        public INode Root;
+        public INode root;
         public List<string> Program;
 
-        public Compiler(bool dumpIntermediate) {
-            Verbose = false;
-            blockSizeCache = new Dictionary<int, int>();
+        public Compiler(Dictionary<string, INode> functions, bool dumpIntermediate, bool verbose = false) {
+            Verbose = verbose;
+            functionsAdress = new Dictionary<string, int>();
             currentTempRegister = 0;
-            PC = 0;
+            Program = new List<string>();
+            PC = 2;
+            ConsoleWriteLine(functions.Count.ToString());
+            foreach(var (key, value) in functions) {
+                functionsAdress.Add(key, PC);
+                value.Children.ForEach(child => child.Accept(this));
+            }
         }
 
 
@@ -33,12 +39,23 @@ namespace DCasm.Visitors
 
         public void Visit(Const n){}
 
-        public void Visit(Function n)
-        {
-        }
+        public void Visit(Function n){}
 
         public void Visit(Call n)
         {
+            var adress = functionsAdress[n.Value];
+            var setInst = OpCodes.OpToBinary("set") + "00111" + "00000" + ConstConverter.ConstantToBinary(adress.ToString());
+            Program.Add(setInst);
+            PC++;
+            ConsoleWriteLine(setInst);
+            var inst = OpCodes.OpToBinary("call") + "00111" + "00000" + ConstConverter.ConstantToBinary("0");
+            Program.Add(inst);
+            PC++;
+            ConsoleWriteLine(inst);
+        }
+
+        public void Visit(Return ret) {
+
         }
 
         public void Visit(Load n)
@@ -46,32 +63,46 @@ namespace DCasm.Visitors
             PC++;
         }
 
-        public void Visit(Add n)
-        {
+        private string arithmeticInstructionBuilder(INode n) {
             var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.Children[0]) 
             + RegisterConverter.RegisterToBinary(n.Children[1]) 
             + n.Children[2] switch {
                 Const c => ConstConverter.ConstantToBinary(c.Value),
                 Register r => RegisterConverter.RegisterToBinary(r) + "00000000000",
                 _ => throw new ArgumentException("wrong argument type must be constant or register")
-            }
-            ; 
+            }; 
+            return inst;
+        }
+
+        public void Visit(Add n)
+        {
+            var inst = arithmeticInstructionBuilder(n);
+            Program.Add(inst);
             ConsoleWriteLine(inst);
             PC++;
         }
 
         public void Visit(Sub n)
         {
+            var inst = arithmeticInstructionBuilder(n);
+            Program.Add(inst);
+            ConsoleWriteLine(inst);
             PC++;
         }
 
         public void Visit(Mul n)
         {
+            var inst = arithmeticInstructionBuilder(n);
+            Program.Add(inst);
+            ConsoleWriteLine(inst);
             PC++;
         }
 
         public void Visit(Div n)
         {
+            var inst = arithmeticInstructionBuilder(n);
+            Program.Add(inst);
+            ConsoleWriteLine(inst);
             PC++;
         }
 
@@ -83,6 +114,7 @@ namespace DCasm.Visitors
         {
             var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.Children[0]) + "00000" 
             + ConstConverter.ConstantToBinary(n.Children[1].Value);
+            Program.Add(inst);
             ConsoleWriteLine(inst);
             PC++;
         }

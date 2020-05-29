@@ -21,6 +21,7 @@ namespace DCasm.Visitors
         void Visit(Block n);
         void Visit(While n);
         void Visit(Comparaison comparaison);
+        void Visit(Return ret);
 
     }
 }

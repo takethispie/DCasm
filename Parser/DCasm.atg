@@ -156,7 +156,7 @@ function<out INode function>
     Condition<out INode exp>  (. function.Children.Add(exp); .)
   )
 }
-"end" (. function.Value = name; gen.Functions.Add(name, function); .)
+"end" (. function.Value = name; function.Children.Add(new Return(name)); gen.Functions.Add(name, function); .)
 .
 
 functionName<out string name> = ident (. name = t.val; .).

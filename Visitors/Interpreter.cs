@@ -59,6 +59,10 @@ namespace DCasm.Visitors
             else throw new ArgumentException("Function not found !");
         }
 
+        public void Visit(Return ret) {
+            ConsoleWriteLine("return from " + ret.Value + Environment.NewLine);
+        }
+
         public void Visit(Load n)
         {
             var destReg = Utils.GetRegisterIndex(n.Children[0]);
