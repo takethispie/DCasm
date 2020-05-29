@@ -6,7 +6,7 @@ COMPILER DCasm
 CHARACTERS
   letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   digit = "0123456789".
-  firstDigit = "0123".
+  firstDigit = "012".
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
@@ -14,6 +14,7 @@ CHARACTERS
 TOKENS
   ident  = letter {letter | digit} ['.' letter {letter | digit}].
   number = digit {digit}.
+  //29 registers are adressable, 30, 31 are reserved
   registerNum = "$" [firstDigit] digit.
 
 COMMENTS FROM "/*" TO "*/" NESTED

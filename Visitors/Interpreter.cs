@@ -6,8 +6,6 @@ namespace DCasm.Visitors
     public class Interpreter : IVisitor
     {
         public Dictionary<string, INode> Functions;
-        private bool gt, eq, lt;
-        private int pc;
         private readonly Dictionary<int, int> ram;
         private readonly int[] registers;
         public INode root;
@@ -262,7 +260,7 @@ namespace DCasm.Visitors
                 "<" => left < right,
                 ">=" => left >= right,
                 "<=" => left <= right,
-                _ => throw new ArgumentException("incorrect comparaison operator")
+                _ => throw new ArgumentException("incorrect comparison operator")
             };
             stack.Push(compResult ? 1 : 0);
         }

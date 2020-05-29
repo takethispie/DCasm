@@ -7,6 +7,7 @@ namespace DCasm.Visitors
     {
         private bool gt, eq, lt;
         private int pc;
+        private List<string> rom;
         private readonly Dictionary<int, int> ram;
         private readonly int[] registers;
         private readonly Stack<int> stack;
@@ -21,6 +22,10 @@ namespace DCasm.Visitors
         }
 
         private string HexStringTobinaryString(string hexstring) => Convert.ToString(Convert.ToInt32(hexstring, 16), 2);
+
+        private string DecimalToHex(int decValue) => string.Format("{0:x}", decValue);
+
+        private string HexToDecimal(string hex) => Convert.ToInt32(hex, 16).ToString();
 
 
     }
