@@ -23,11 +23,12 @@ namespace DCasm.InstructionSet
             "out" => "101101",
             "call" => "101110",
             "ret" => "101111",
-            "jlt" => "110000",
-            "jeq" => "110001",
-            "jgt" => "110010",
-            "jne" => "110011",
-            "jmp" => "110100",
+            "comp" => "110001",
+            "jlt" => "110010",
+            "jeq" => "110011",
+            "jgt" => "110100",
+            "jne" => "110101",
+            "jmp" => "110110",
             "mov" => "111100",
             _ => throw new Exception("Op does not exists !")
         };

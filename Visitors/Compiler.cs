@@ -20,11 +20,19 @@ namespace DCasm.Visitors
             currentTempRegister = 0;
             Program = new List<string>();
             PC = 2;
+            var adressInst = OpCodes.OpToBinary("set") + "00001" + "00000" + "{0}";
+            Program.Add(adressInst);
+            var inst = OpCodes.OpToBinary("jmp") + "00000" + "00001" + ConstConverter.ConstantToBinary("0");
+            Program.Add(inst);
             ConsoleWriteLine(functions.Count.ToString());
             foreach(var (key, value) in functions) {
                 functionsAdress.Add(key, PC);
                 value.Children.ForEach(child => child.Accept(this));
             }
+            // update init jump to resolved adress
+            var item = Program[0];
+            item = string.Format(item, ConstConverter.ConstantToBinary(PC.ToString()));
+            Program[0] = item;
             ConsoleWriteLine("start of program: " + PC);
         }
 
@@ -50,7 +58,7 @@ namespace DCasm.Visitors
             Program.Add(setInst);
             PC++;
             ConsoleWriteLine(setInst);
-            var inst = OpCodes.OpToBinary("call") + "00111" + "00000" + ConstConverter.ConstantToBinary("0");
+            var inst = OpCodes.OpToBinary("call") + "00000" + "00111" + ConstConverter.ConstantToBinary("0");
             Program.Add(inst);
             PC++;
             ConsoleWriteLine(inst);

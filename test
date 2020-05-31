@@ -1,5 +1,5 @@
 program
-import InputModule
+//import InputModule
 {
     function WhileTest
     add $10 $10 1
