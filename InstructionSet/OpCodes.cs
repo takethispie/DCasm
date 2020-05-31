@@ -9,6 +9,8 @@ namespace DCasm.InstructionSet
             "sub" => "000010",
             "mul" => "000011",
             "div" => "000100",
+            "lsh" => "000101",
+            "rsh" => "000110",
             "addi" => "001001",
             "subi" => "001010",
             "muli" => "001011",
@@ -25,6 +27,7 @@ namespace DCasm.InstructionSet
             "jeq" => "110001",
             "jgt" => "110010",
             "jne" => "110011",
+            "jmp" => "110100",
             "mov" => "111100",
             _ => throw new Exception("Op does not exists !")
         };

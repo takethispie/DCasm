@@ -34,7 +34,7 @@ namespace DCasm
         public IEnumerable<string> Compile() {
             var v = new Compiler(Functions, false, true);
             RootNodes.ForEach(n => n.Accept(v));
-            var hexProgram = new List<string>();
+            var hexProgram = new List<string> {"v2.0 raw"};
             foreach (var binary in v.Program) {
                 var hex = Utils.BinaryToHex(binary);
                 if(true) Console.WriteLine(hex);
