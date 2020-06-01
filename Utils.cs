@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DCasm
 {
@@ -13,6 +15,13 @@ namespace DCasm
         public static string DecimalToBinary(int decValue) => HexStringTobinaryString(DecimalToHex(decValue));
         
         public static string BinaryToHex(string binary) => Convert.ToInt32(binary, 2).ToString("X");
+
+        public static byte[] HexStringToByte(string hex) => Enumerable.Range(0, hex.Length / 2) .Select(x => Convert.ToByte(hex.Substring(x * 2, 2), 16)) .ToArray();
+
+        public static byte[] HexStringToByte(IEnumerable<string> hexArray) {
+            var hex = hexArray.Aggregate((string acc, string next) => acc += next);
+            return Enumerable.Range(0, hex.Length / 2) .Select(x => Convert.ToByte(hex.Substring(x * 2, 2), 16)) .ToArray();
+        }
 
         public static int GetRegisterIndex(INode n)
         {

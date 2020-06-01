@@ -1,20 +1,8 @@
 program
 {
-    set $20 1
-
-    function PrintCou
-    set $11 99
-    out $20 $11
-    set $11 111
-    out $20 $11
-    set $11 117
-    out $20 $11
-    end
-
-    call PrintCou
-    call PrintCou
+    set $10 1
     
-    //while $10 <= 10 {
-        //add $10 $10 1
-    //}
+    while $10 <= 10 {
+        add $10 $10 1
+    }
 }

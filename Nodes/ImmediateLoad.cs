@@ -11,6 +11,16 @@ namespace DCasm
             Children = new List<INode>();
             Upper = upper;
         }
+        
+        public ImmediateLoad(bool upper, string dest, string value)
+        {
+            Value = upper ? "setu" : "set";
+            Children = new List<INode> {
+                new Register { Value = dest},
+                new Const(value)
+            };
+            Upper = upper;
+        }
 
         public bool Upper { get; set; }
         public string Value { get; set; }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using DCasm.InstructionSet;
 
 namespace DCasm.Visitors
@@ -8,17 +9,17 @@ namespace DCasm.Visitors
     {
 
         private readonly Dictionary<string, int> functionsAdress;
-        private int currentTempRegister;
+        private int tempOffset;
         public int PC;
-        public bool Verbose;
+        private bool Verbose;
         public INode root;
-        public List<string> Program;
+        public readonly List<string> Program;
 
         public Compiler(Dictionary<string, INode> functions, bool dumpIntermediate, bool verbose = false) {
             Verbose = verbose;
             functionsAdress = new Dictionary<string, int>();
-            currentTempRegister = 0;
             Program = new List<string>();
+            tempOffset = 0;
             PC = 2;
             var adressInst = OpCodes.OpToBinary("set") + "00001" + "00000" + "{0}";
             Program.Add(adressInst);
@@ -167,16 +168,89 @@ namespace DCasm.Visitors
         {
         }
 
-        public void Visit(Block n)
-        {
-        }
+        public void Visit(Block n) => n.Children.ForEach(child => child.Accept(this));
 
         public void Visit(While n)
         {
+            var startAddress = PC;
+
+            var comp = n.Children[0];
+            comp.Accept(this);            
+            
+            var block = n.Children[1];
+            block.Accept(this);
+
+            var setJmpAdress = new ImmediateLoad(false, "$3", startAddress.ToString());
+            setJmpAdress.Accept(this);
+            
+            var loopInst = OpCodes.OpToBinary("jmp") + "00000" + "00011"
+            + ConstConverter.ConstantToBinary("0");
+            Program.Add(loopInst);
+            PC++;
+
+            //patches the jump out of while address
+            var jumpOutInst = Program[startAddress + tempOffset + 1];
+            jumpOutInst = string.Format(jumpOutInst, ConstConverter.ConstantToBinary(PC.ToString()));
+            Program[startAddress + tempOffset + 1] = jumpOutInst;
         }
 
         public void Visit(Comparaison comparaison)
         {
+            switch (comparaison.Children[1]) {
+                case Const c:
+                    var reg = new ImmediateLoad(false, "$1", c.Value);
+                    reg.Accept(this);
+                    comparaison.Children[1] = new Register { Value = "$1"};
+                    tempOffset++;
+                    break;
+            }
+            
+            switch (comparaison.Children[0]) {
+                case Const c:
+                    var reg = new ImmediateLoad(false, "$2", c.Value);
+                    reg.Accept(this);
+                    comparaison.Children[0] = new Register { Value = "$2"};
+                    tempOffset++;
+                    break;
+            }
+            
+            var comp = OpCodes.OpToBinary("comp") 
+            + "00000" 
+            + RegisterConverter.RegisterToBinary(comparaison.Children[0]) 
+            + RegisterConverter.RegisterToBinary(comparaison.Children[1])
+            + "00000000000";
+            Program.Add(comp);
+            ConsoleWriteLine(comp);
+            PC++;
+
+            var setEndJumpAddressInst = OpCodes.OpToBinary("set") 
+            + "01001" + "00000" + "{0}";
+            Program.Add(setEndJumpAddressInst);
+            ConsoleWriteLine(setEndJumpAddressInst);
+            PC++;
+            
+            var initInst = new ImmediateLoad(false, "$8", (PC + 3).ToString());
+            initInst.Accept(this);
+
+            var op = comparaison.Value switch {
+                ">" => "jgt",
+                "<" => "jlt",
+                "==" => "jeq",
+                "<=" => "jle",
+                ">=" => "jge",
+                "!=" => "jne"
+            };
+            var conditionInst = OpCodes.OpToBinary(op) + "00000" + "01000" 
+            + ConstConverter.ConstantToBinary("0");
+            Program.Add(conditionInst);
+            ConsoleWriteLine(conditionInst);
+            PC++;
+
+            var jumpOutInst = OpCodes.OpToBinary("jmp") + "00000" + "01001" 
+            + ConstConverter.ConstantToBinary("0");
+            Program.Add(jumpOutInst);
+            ConsoleWriteLine(jumpOutInst);
+            PC++;
         }
 
         private void ConsoleWrite(string str)

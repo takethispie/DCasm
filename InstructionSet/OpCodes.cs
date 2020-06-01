@@ -29,6 +29,8 @@ namespace DCasm.InstructionSet
             "jgt" => "110100",
             "jne" => "110101",
             "jmp" => "110110",
+            "jle" => "110111",
+            "jge" => "111000",
             "mov" => "111100",
             _ => throw new Exception("Op does not exists !")
         };

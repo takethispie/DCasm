@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace DCasm
@@ -32,7 +33,10 @@ namespace DCasm
                 gen.Parse();
                 if (gen.ErrorCount != 0) return;
                 var result = gen.Compile();
-                File.WriteAllLines(filePath + ".txt", result);
+                var resultWithHeader = new List<String> {"v2.0 raw"};
+                resultWithHeader.AddRange(result);
+                File.WriteAllLines(filePath + ".txt", resultWithHeader);
+                //File.WriteAllBytes(filePath + ".h", Utils.HexStringToByte(result));
             }
             else
             {
