@@ -12,7 +12,7 @@ CHARACTERS
   tab = '\t'.
 
 TOKENS
-  ident  = letter {letter | digit} ['.' letter {letter | digit}].
+  ident  = letter {letter | digit}.
   number = digit {digit}.
   //29 registers are adressable, 30, 31 are reserved
   registerNum = "$" ('0' | firstDigit digit).
@@ -78,7 +78,7 @@ register<out INode node>
 constant<out INode val>
 = (. val = null; .)
 (
-  number (.val = new Const(t.val); .)
+    number (.val = new Const(t.val); .)
 ).
 
 
