@@ -166,6 +166,44 @@ namespace DCasm.Visitors
 
         public void Visit(Condition n)
         {
+            int startAddress = PC;
+            int jmpOutEndIfAddress = 0;
+
+            var comp = n.Children[0];
+            comp.Accept(this); 
+            
+            
+            //if
+            var block = n.Children[1];
+            block.Accept(this);
+
+            if(n.HasElseCall) {
+                //add jump out of if after if execution
+                var loadAddress = OpCodes.OpToBinary("set") + "00001" + "00000" + "{0}";
+                Program.Add(loadAddress);
+                PC++;
+                var jumpOutIfInst = OpCodes.OpToBinary("jmp") + "00000" + "00001" + ConstConverter.ConstantToBinary("0"); 
+                jmpOutEndIfAddress = PC - 1;    
+                Program.Add(jumpOutIfInst);
+                PC++;      
+
+                 //patches the jump to else
+                var jumpOutInst = Program[startAddress + tempOffset + 1];
+                jumpOutInst = string.Format(jumpOutInst, ConstConverter.ConstantToBinary(PC.ToString()));
+                Program[startAddress + tempOffset + 1] = jumpOutInst;
+
+                var thenBlock = n.Children[2];
+                thenBlock.Accept(this);
+
+                var endIfJmp = Program[jmpOutEndIfAddress];
+                endIfJmp = string.Format(endIfJmp, ConstConverter.ConstantToBinary(PC.ToString()));
+                Program[jmpOutEndIfAddress] = endIfJmp;
+            } else {
+                //patches the jump out of if address
+                var jumpOutInst = Program[startAddress + tempOffset + 1];
+                jumpOutInst = string.Format(jumpOutInst, ConstConverter.ConstantToBinary(PC.ToString()));
+                Program[startAddress + tempOffset + 1] = jumpOutInst;
+            }
         }
 
         public void Visit(Block n) => n.Children.ForEach(child => child.Accept(this));
@@ -238,7 +276,8 @@ namespace DCasm.Visitors
                 "==" => "jeq",
                 "<=" => "jle",
                 ">=" => "jge",
-                "!=" => "jne"
+                "!=" => "jne",
+                _ => throw new ArgumentException("invalid comparison operator")
             };
             var conditionInst = OpCodes.OpToBinary(op) + "00000" + "01000" 
             + ConstConverter.ConstantToBinary("0");
