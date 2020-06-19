@@ -7,15 +7,13 @@ namespace DCasm
     {
         public Read(INode inputSelection, INode value)
         {
-            Children = new List<INode>();
-            Children.Add(inputSelection);
-            Children.Add(value);
             Value = "in";
+            InputSelection = inputSelection;
+            DataValue = value;
         }
 
         public string Value { get; set; }
-        public List<INode> Children { get; set; }
-
-        public void Accept(IVisitor v) => v.Visit(this);
+        public INode InputSelection { get; set; }
+        public INode DataValue { get; set; }
     }
 }

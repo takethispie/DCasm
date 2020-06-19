@@ -7,13 +7,13 @@ namespace DCasm
     {
         public Sub(string op)
         {
-            Children = new List<INode>();
             Value = op;
         }
 
-        public string Value { get; set; }
-        public List<INode> Children { get; set; }
+        public INode Left { get; set; }
+        public INode Right { get; set; }
+        public INode Destination { get; set; }
 
-        public void Accept(IVisitor v) => v.Visit(this);
+        public string Value { get; set; }
     }
 }

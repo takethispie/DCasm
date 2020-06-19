@@ -203,8 +203,8 @@ public class UTF8Buffer: Buffer {
 public class Scanner {
 	const char EOL = '\n';
 	const int eofSym = 0; /* pdt */
-	const int maxT = 32;
-	const int noSym = 32;
+	const int maxT = 34;
+	const int noSym = 34;
 
 
 	public Buffer buffer; // scanner buffer
@@ -356,18 +356,20 @@ public class Scanner {
 			case "sub": t.kind = 12; break;
 			case "div": t.kind = 13; break;
 			case "mul": t.kind = 14; break;
-			case "mov": t.kind = 15; break;
-			case "out": t.kind = 16; break;
-			case "in": t.kind = 17; break;
-			case "load": t.kind = 18; break;
-			case "store": t.kind = 19; break;
-			case "function": t.kind = 20; break;
-			case "end": t.kind = 21; break;
-			case "call": t.kind = 22; break;
-			case "if": t.kind = 23; break;
-			case "then": t.kind = 24; break;
-			case "else": t.kind = 25; break;
-			case "while": t.kind = 31; break;
+			case "lsh": t.kind = 15; break;
+			case "rsh": t.kind = 16; break;
+			case "mov": t.kind = 17; break;
+			case "out": t.kind = 18; break;
+			case "in": t.kind = 19; break;
+			case "load": t.kind = 20; break;
+			case "store": t.kind = 21; break;
+			case "function": t.kind = 22; break;
+			case "end": t.kind = 23; break;
+			case "call": t.kind = 24; break;
+			case "if": t.kind = 25; break;
+			case "then": t.kind = 26; break;
+			case "else": t.kind = 27; break;
+			case "while": t.kind = 33; break;
 			default: break;
 		}
 	}
@@ -419,19 +421,19 @@ public class Scanner {
 				if (ch == '=') {AddCh(); goto case 9;}
 				else {goto case 0;}
 			case 9:
-				{t.kind = 28; break;}
-			case 10:
-				{t.kind = 29; break;}
-			case 11:
 				{t.kind = 30; break;}
+			case 10:
+				{t.kind = 31; break;}
+			case 11:
+				{t.kind = 32; break;}
 			case 12:
-				recEnd = pos; recKind = 26;
+				recEnd = pos; recKind = 28;
 				if (ch == '=') {AddCh(); goto case 10;}
-				else {t.kind = 26; break;}
+				else {t.kind = 28; break;}
 			case 13:
-				recEnd = pos; recKind = 27;
+				recEnd = pos; recKind = 29;
 				if (ch == '=') {AddCh(); goto case 11;}
-				else {t.kind = 27; break;}
+				else {t.kind = 29; break;}
 
 		}
 		t.val = new String(tval, 0, tlen);

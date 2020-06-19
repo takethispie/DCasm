@@ -7,15 +7,14 @@ namespace DCasm
     {
         public Move(INode source, INode destination)
         {
-            Children = new List<INode>();
             Value = "mov";
-            Children.Add(destination);
-            Children.Add(source);
+            Destination = destination;
+            Source = source;
         }
 
         public string Value { get; set; }
-        public List<INode> Children { get; set; }
+        public INode Destination { get; set; }
+        public INode Source { get; set; }
 
-        public void Accept(IVisitor v) => v.Visit(this);
     }
 }

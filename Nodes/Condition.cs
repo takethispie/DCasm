@@ -6,25 +6,23 @@ namespace DCasm
     public class Condition : INode
     {
         public bool HasElseCall { get; set; }
+        public INode Then, Else;
+        public Comparaison Comparaison;
         public string Value { get; set; }
-        public List<INode> Children { get; set; }
 
         public Condition(Comparaison comp, INode thenInstructions)
         {
-            Children = new List<INode> {comp};
-            Children.Add(thenInstructions);
+            Comparaison = comp;
+            Then = thenInstructions;
             HasElseCall = false;
         }
 
         public Condition(Comparaison comp, INode thenInstructions, INode elseInstructions)
         {
-            Children = new List<INode> {comp, thenInstructions, elseInstructions};
+            Comparaison = comp;
+            Then = thenInstructions;
+            Else = elseInstructions;
             HasElseCall = true;
-        }
-
-        public void Accept(IVisitor v)
-        {
-            v.Visit(this);
         }
     }
 }

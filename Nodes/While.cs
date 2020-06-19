@@ -8,12 +8,14 @@ namespace DCasm
     {
         public string Value { get; set; }
         public List<INode> Children { get; set; }
+        public Comparaison Comparaison { get; set; }
+        public INode Block { get; set; }
 
 
         public While(INode block, Comparaison comp) {
-            Children =  new List<INode> { comp, block};
+            Comparaison = comp;
+            Block = block;
         }
 
-        public void Accept(IVisitor v) => v.Visit(this);
     }
 }

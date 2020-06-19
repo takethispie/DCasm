@@ -35,7 +35,7 @@ DCasm
   "import" moduleName<out string name> 
   (.if(gen.Type == FileTypeEnum.Program) gen.ImportModule(name); else throw new ArgumentException("you cannot import a module into another"); .) 
 }
-Block<out INode node> (. node.Children.ForEach(c => gen.RootNodes.Add(c)); .)
+Block<out Block node> (. node.Children.ForEach(c => gen.RootNodes.Add(c)); .)
 EOF.
 
 BlockUnit<out INode exp>
@@ -58,7 +58,7 @@ BlockUnit<out INode exp>
 )
 .
 
-Block<out INode node> = 
+Block<out Block node> = 
 (. node = new Block(); .)
 "{"
 BlockUnit<out INode exp> (. node.Children.Add(exp); .)
@@ -103,17 +103,19 @@ immediateLoad<out INode exp>
 = 
 (. exp = new Error(); .)
 (
-  "set" (. exp = new ImmediateLoad(false); .)
+  "set"
+  register<out INode dest> constant<out INode val> (. exp = new ImmediateLoad(false) { Destination = dest, DataValue = val }; .)
   |
-  "setupper" (. exp = new ImmediateLoad(true); .)
+  "setupper" 
+  register<out INode dest> constant<out INode val> (. exp = new ImmediateLoad(true) { Destination = dest, DataValue = val }; .)
 )
-register<out INode dest> constant<out INode val> (. exp.Children.Add(dest); exp.Children.Add(val); .)
+
 .
 
 
 arithmOp<out string op>
 = (. op = "";.)
-  ("add" | "sub" | "div" | "mul" ) (. op = t.val; .)
+  ("add" | "sub" | "div" | "mul" | "lsh" | "rsh" ) (. op = t.val; .)
 .
 
 
@@ -139,7 +141,7 @@ data<out INode exp>
 .
 
 
-function<out INode function>
+function<out Function function>
 =
 "function" functionName<out string name>
 (. function = new Function(name); .)
@@ -167,8 +169,8 @@ Call<out INode exp> = "call" functionName<out string name> (. exp = new Call(nam
 Condition<out INode node>
 =
 "if" Comparaison<out INode reg1, out string op, out INode reg2>
-"then" Block<out INode thenblock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock); .)
-["else" Block<out INode elseBlock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); .)]
+"then" Block<out Block thenblock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock); .)
+["else" Block<out Block elseBlock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); .)]
 .
 
 ConditionOp<out string op> = (">" | "<" | "==" | ">=" | "<=") (. op = t.val; .).
@@ -184,7 +186,7 @@ ConditionOp<out op>
 While<out INode Node> 
 =
 "while" Comparaison<out INode reg1, out string op, out INode reg2> 
-Block<out INode exp>
+Block<out Block exp>
 (. Node = new While(exp, new Comparaison(op, reg1, reg2)); .)
 .
 
