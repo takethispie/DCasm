@@ -221,30 +221,30 @@ public CodeGenerator gen;
 		} else SynErr(40);
 	}
 
-	void function(out Function function) {
+	void function(out INode function) {
 		Expect(22);
 		functionName(out string name);
-		function = new Function(name); 
+		var temp = new Function(name);  
 		while (StartOf(2)) {
 			if (StartOf(3)) {
 				arithm(out INode exp);
-				function.Children.Add(exp); 
+				temp.Children.Add(exp); 
 			} else if (la.kind == 9 || la.kind == 10) {
 				immediateLoad(out INode exp);
-				function.Children.Add(exp); 
+				temp.Children.Add(exp); 
 			} else if (StartOf(4)) {
 				data(out INode exp);
-				function.Children.Add(exp); 
+				temp.Children.Add(exp); 
 			} else if (la.kind == 24) {
 				Call(out INode exp);
-				function.Children.Add(exp); 
+				temp.Children.Add(exp); 
 			} else {
 				Condition(out INode exp);
-				function.Children.Add(exp); 
+				temp.Children.Add(exp); 
 			}
 		}
 		Expect(23);
-		function.Value = name; function.Children.Add(new Return(name)); gen.Functions.Add(name, function); 
+		temp.Value = name; temp.Children.Add(new Return(name)); function = temp; gen.Functions.Add(name, temp); 
 	}
 
 	void Call(out INode exp) {
