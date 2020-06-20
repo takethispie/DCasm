@@ -137,7 +137,7 @@ namespace DCasm.Visitors
         }
 
         public void Visit(Read n) {
-            var inst = OpCodes.OpToBinary(n.Value) + "00000" + RegisterConverter.RegisterToBinary(n.Children[0])
+            var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.Children[0])
             + RegisterConverter.RegisterToBinary(n.Children[1]);
             inst = inst.PadRight(32, '0');
             Program.Add(inst);
