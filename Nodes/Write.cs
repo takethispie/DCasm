@@ -3,11 +3,14 @@ using DCasm.Visitors;
 
 namespace DCasm
 {
-    public class Call : INode
+    public class Write : INode
     {
-        public Call(string name)
+        public Write(INode outputSelection, INode value)
         {
-            Value = name;
+            Children = new List<INode>();
+            Children.Add(outputSelection);
+            Children.Add(value);
+            Value = "out";
         }
 
         public string Value { get; set; }

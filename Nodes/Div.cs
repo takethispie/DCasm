@@ -3,11 +3,12 @@ using DCasm.Visitors;
 
 namespace DCasm
 {
-    public class Call : INode
+    public class Div : INode
     {
-        public Call(string name)
+        public Div(string op)
         {
-            Value = name;
+            Children = new List<INode>();
+            Value = op;
         }
 
         public string Value { get; set; }
