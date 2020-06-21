@@ -8,18 +8,27 @@ namespace DCasm.Translator
     {
         public IList<string> Program;
         private Dictionary<string, int> functionsAdress { get; set; }
-        private int pc;
 
         public Compiler(Dictionary<string, Function> functions, bool verbose = false) {
             Program = new List<string>();
-            pc = 2;
+            var adressInst = OpCodes.OpToBinary("set") + "00001" + "00000" + "{0}";
+            Program.Add(adressInst);
+            var inst = OpCodes.OpToBinary("jmp") + "00000" + "00001" + ConstConverter.ConstantToBinary("0");
+            Program.Add(inst);
+            foreach(var (key, value) in functions) {
+                functionsAdress.Add(key, Program.Count);
+                value.Children.ForEach(child => Process(child));
+            }
+            // update init jump to resolved adress
+            var item = Program[0];
+            item = string.Format(item, ConstConverter.ConstantToBinary((Program.Count).ToString()));
+            Program[0] = item;
         }
 
         public void Compile(List<INode> nodes) {
             
             foreach (var node in nodes)
             {
-                var current = pc;
                 Program = Process(node);  
             }
         }
