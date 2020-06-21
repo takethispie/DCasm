@@ -10,6 +10,8 @@ namespace DCasm {
 
         public Comparaison(string op, INode left, INode right) {
             Value = op;
+            Left = left;
+            Right = right;
         }
 
 

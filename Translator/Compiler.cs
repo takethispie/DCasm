@@ -34,6 +34,13 @@ namespace DCasm.Translator
             Load load => Load(load, Program),
             Read read => Read(read, Program),
             Write write => Write(write, Program),
+            Const constant => Program,
+            Function f => Program,
+            Register reg => Program,
+            Block bl => Program,
+            Condition cond => Condition(cond, Program),
+            Comparaison comp => Comparaison(comp, Program),
+            While w => While(w, Program),
             _ => throw new Exception("Unknown Error")
         };
 
@@ -129,6 +136,7 @@ namespace DCasm.Translator
             //if
             var block = n.Then;
             Process(block);
+            var blockOffset = program.Count - tempOffset;
 
             if(n.HasElseCall) {
                 //add jump out of if after if execution
@@ -139,9 +147,9 @@ namespace DCasm.Translator
                 program.Add(jumpOutIfInst);
 
                  //patches the jump to else
-                var jumpOutInst = Program[startAddress + tempOffset + 1];
+                var jumpOutInst = Program[startAddress + tempOffset];
                 jumpOutInst = string.Format(jumpOutInst, ConstConverter.ConstantToBinary(program.Count.ToString()));
-                Program[startAddress + tempOffset + 1] = jumpOutInst;
+                Program[startAddress + tempOffset] = jumpOutInst;
 
                 var thenBlock = n.Then;
                 Process(thenBlock);
@@ -151,24 +159,24 @@ namespace DCasm.Translator
                 program[jmpOutEndIfAddress] = endIfJmp;
             } else {
                 //patches the jump out of if address
-                var jumpOutInst = Program[startAddress + tempOffset + 1];
+                var jumpOutInst = Program[tempOffset - blockOffset];
                 jumpOutInst = string.Format(jumpOutInst, ConstConverter.ConstantToBinary(program.Count.ToString()));
-                Program[startAddress + tempOffset + 1] = jumpOutInst;
+                Program[tempOffset - blockOffset] = jumpOutInst;
             }
             return program;
         }
 
-        public void Visit(Block n) => n.Children.ForEach(child => Process(child));
+        public void Block(Block n) => n.Children.ForEach(child => Process(child));
 
         public IList<string> While(While n, IList<string> program)
         {
             var startAddress = program.Count;
 
-            var comp = n.Children[0];
+            var comp = n.Comparaison;
             Process(comp);           
             
-            var block = n.Children[1];
-            Process(block);
+            var block = n.Block;
+            Block(block);
 
             var setJmpAdress = new ImmediateLoad(false, "$3", startAddress.ToString());
             Process(setJmpAdress);
@@ -178,7 +186,7 @@ namespace DCasm.Translator
             Program.Add(loopInst);
 
             //patches the jump out of while address
-            var jumpOutInst = Program[startAddress + 1];
+            var jumpOutInst = Program[startAddress];
             jumpOutInst = string.Format(jumpOutInst, ConstConverter.ConstantToBinary(program.Count.ToString()));
             Program[startAddress + 1] = jumpOutInst;
             return program;
