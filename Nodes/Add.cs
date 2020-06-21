@@ -4,7 +4,7 @@ using DCasm.Visitors;
 
 namespace DCasm
 {
-    public class Add : INode
+    public class Add : IArithmeticNode
     {
         public Add(string op)
         {

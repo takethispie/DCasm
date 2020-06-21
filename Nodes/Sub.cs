@@ -3,7 +3,7 @@ using DCasm.Visitors;
 
 namespace DCasm
 {
-    public class Sub : INode
+    public class Sub : IArithmeticNode
     {
         public Sub(string op)
         {

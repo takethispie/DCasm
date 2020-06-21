@@ -5,15 +5,16 @@ namespace DCasm
 {
     public class Read : INode
     {
-        public Read(INode inputSelection, INode value)
+        public string Value { get; set; }
+        public INode InputSelection { get; set; }
+        public INode Destination { get; set; }
+
+        public Read(INode inputSelection, INode destination)
         {
             Value = "in";
             InputSelection = inputSelection;
-            DataValue = value;
+            Destination = destination;
         }
 
-        public string Value { get; set; }
-        public INode InputSelection { get; set; }
-        public INode DataValue { get; set; }
     }
 }
