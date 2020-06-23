@@ -1,9 +1,6 @@
-using System.Collections.Generic;
-using DCasm.Visitors;
-
 namespace DCasm
 {
-    public class LeftShift : INode
+    public class LeftShift : IArithmeticNode
     {
 
         public string Value { get; set; }
@@ -12,7 +9,7 @@ namespace DCasm
         public INode Right { get; set; }
 
         public LeftShift(bool imm) {
-            Value = imm ? "lshifti" : "lshift"; 
+            Value = imm ? "lshi" : "lsh"; 
         }
 
     }

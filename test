@@ -1,7 +1,7 @@
 program
 {
     set $10 1
-    lshift $10 $10 
+    lsh $10 $10 6
     
     if $10 > 1 then
     {

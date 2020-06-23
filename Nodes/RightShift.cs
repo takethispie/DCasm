@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using DCasm.Visitors;
-
 namespace DCasm
 {
     public class RightShift : IArithmeticNode
@@ -12,7 +9,7 @@ namespace DCasm
         public INode Right { get; set; }
 
         public RightShift(bool imm) {
-            Value = imm ? "rshifti" : "rshift"; 
+            Value = imm ? "rshi" : "rsh"; 
         }
     }
 }

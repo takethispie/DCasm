@@ -18,8 +18,8 @@ namespace DCasm
                 "sub" => new Sub(isImmediate) { Destination = dest, Left = src1, Right = src2 },
                 "mul" => new Mul(isImmediate) { Destination = dest, Left = src1, Right = src2 },
                 "div" => new Div(isImmediate) { Destination = dest, Left = src1, Right = src2 },
-                "lshift" => new LeftShift(isImmediate) { Destination = dest, Left = src1, Right = src2 },
-                "rshift" => new RightShift(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "lsh" => new LeftShift(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "rsh" => new RightShift(isImmediate) { Destination = dest, Left = src1, Right = src2 },
                 _ => throw new ArgumentException("this arithmetic or logic operation does not exists !")
             };
         }
