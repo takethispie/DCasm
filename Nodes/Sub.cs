@@ -5,9 +5,9 @@ namespace DCasm
 {
     public class Sub : IArithmeticNode
     {
-        public Sub(string op)
+        public Sub(bool isImmediate)
         {
-            Value = op;
+            Value = isImmediate ? "subi" : "sub";
         }
 
         public INode Left { get; set; }

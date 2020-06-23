@@ -50,7 +50,7 @@ namespace DCasm.Translator
             Condition cond => Condition(cond, Program),
             Comparaison comp => Comparaison(comp, Program),
             While w => While(w, Program),
-            _ => throw new Exception("Unknown Error")
+            _ => throw new Exception("Instruction type does not exists")
         };
 
         public IList<string> Store(Store n, IList<string> program) {

@@ -14,11 +14,13 @@ namespace DCasm
         private static INode Create(string op, INode dest, INode src1, INode src2, bool isImmediate)
         {
             return op switch {
-                "add" => new Add(isImmediate ? "addi" : "add") { Destination = dest, Left = src1, Right = src2 },
-                "sub" => new Sub(isImmediate ? "subi" : "sub") { Destination = dest, Left = src1, Right = src2 },
-                "mul" => new Mul(isImmediate ? "muli" : "mul") { Destination = dest, Left = src1, Right = src2 },
-                "div" => new Div(isImmediate ? "divi" : "div") { Destination = dest, Left = src1, Right = src2 },
-                _ => throw new ArgumentException()
+                "add" => new Add(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "sub" => new Sub(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "mul" => new Mul(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "div" => new Div(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "lshift" => new LeftShift(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "rshift" => new RightShift(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                _ => throw new ArgumentException("this arithmetic or logic operation does not exists !")
             };
         }
     }

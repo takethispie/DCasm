@@ -5,9 +5,9 @@ namespace DCasm
 {
     public class Mul : IArithmeticNode
     {
-        public Mul(string op)
+        public Mul(bool isImmediate)
         {
-            Value = op;
+            Value = isImmediate ? "muli" : "mul";
         }
 
         public INode Left { get; set; }

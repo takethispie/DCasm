@@ -11,6 +11,8 @@ namespace DCasm.InstructionSet
             "div" => "000100",
             "lsh" => "000101",
             "rsh" => "000110",
+            "lshi" => "001101",
+            "rshi" => "001110",
             "addi" => "001001",
             "subi" => "001010",
             "muli" => "001011",
