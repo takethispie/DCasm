@@ -15,7 +15,7 @@ namespace DCasm
         {
             Value = upper ? "setu" : "set";
             Destination = new Register { Value = dest};
-            DataValue = new Const(value);
+            DataValue = new Const(value, false);
             Upper = upper;
         }
 

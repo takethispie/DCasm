@@ -7,6 +7,7 @@ CHARACTERS
   letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   digit = "0123456789".
   firstDigit = "12".
+  hexaPrefix = "#".
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
@@ -14,6 +15,7 @@ CHARACTERS
 TOKENS
   ident  = letter {letter | digit}.
   number = digit {digit}.
+  hexa = hexaPrefix ( letter | digit ) { letter | digit }.
   //29 registers are adressable, 30, 31 are reserved
   registerNum = "$" ('0' | firstDigit digit).
 
@@ -78,7 +80,9 @@ register<out INode node>
 constant<out INode val>
 = (. val = null; .)
 (
-    number (.val = new Const(t.val); .)
+    number (.val = new Const(t.val, false); .)
+    |
+    hexa (. val = new Const(t.val, true); .)
 ).
 
 
@@ -177,7 +181,7 @@ ConditionOp<out string op> = (">" | "<" | "==" | ">=" | "<=") (. op = t.val; .).
 
 Comparaison<out INode reg1, out string op, out INode reg2>
 =
-(. reg1 = new Const("-1"); reg2 = new Const("-1"); .)
+(. reg1 = new Const("-1", false); reg2 = new Const("-1", false); .)
 (register<out reg1> | constant<out reg1>)
 ConditionOp<out op> 
 (register<out reg2> | constant<out reg2>)

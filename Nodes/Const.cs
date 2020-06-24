@@ -6,9 +6,9 @@ namespace DCasm
 {
     public class Const : INode
     {
-        public Const(string value)
+        public Const(string value, bool isHexa)
         {
-            Value = value;
+            Value = isHexa ? Convert.ToInt32( value.Remove(0, 1) , 16).ToString() : value;
         }
 
         public string Value { get; set; }

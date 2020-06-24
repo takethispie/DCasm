@@ -1,10 +1,16 @@
 program
 {
-    set $10 1
-    lsh $10 $10 6
-    
-    if $10 > 1 then
-    {
-        add $10 $10 1
-    } 
+
+    set $10 #AAAA
+    set $12 #0444
+    lsh $11 $10 16
+    add $11 $11 $12
+
+    set $14 2
+    set $13 1
+    lsh $13 $13 5
+    add $13 $14 $13
+
+    out $11 $13
+
 }
