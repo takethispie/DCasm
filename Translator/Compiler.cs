@@ -8,9 +8,11 @@ namespace DCasm.Translator
     {
         public IList<string> Program;
         private Dictionary<string, int> functionsAdress { get; set; }
+        private int tempAddress { get; set; }
 
         public Compiler(Dictionary<string, Function> functions, bool verbose = false) {
             Program = new List<string>();
+            functionsAdress = new Dictionary<string, int>();
             var adressInst = OpCodes.OpToBinary("set") + "00001" + "00000" + "{0}";
             Program.Add(adressInst);
             var inst = OpCodes.OpToBinary("jmp") + "00000" + "00001" + ConstConverter.ConstantToBinary("0");
@@ -137,14 +139,14 @@ namespace DCasm.Translator
             int jmpOutEndIfAddress = 0;
 
             var comp = n.Comparaison;
-            Process(comp);
+            program = Process(comp);
             var tempOffset = program.Count - 2;
             
             
             
             //if
             var block = n.Then;
-            Process(block);
+            program = Process(block);
             var blockOffset = program.Count - tempOffset;
 
             if(n.HasElseCall) {
@@ -161,7 +163,7 @@ namespace DCasm.Translator
                 Program[startAddress + tempOffset] = jumpOutInst;
 
                 var thenBlock = n.Then;
-                Process(thenBlock);
+                program = Process(thenBlock);
 
                 var endIfJmp = program[jmpOutEndIfAddress];
                 endIfJmp = string.Format(endIfJmp, ConstConverter.ConstantToBinary(program.Count.ToString()));
@@ -175,29 +177,33 @@ namespace DCasm.Translator
             return program;
         }
 
-        public void Block(Block n) => n.Children.ForEach(child => Process(child));
+        public IList<string> Block(Block n, IList<string> program) {
+
+            n.Children.ForEach(child => program = Process(child));
+            return program;
+        } 
 
         public IList<string> While(While n, IList<string> program)
         {
             var startAddress = program.Count;
 
             var comp = n.Comparaison;
-            Process(comp);           
+            program = Process(comp);           
             
             var block = n.Block;
-            Block(block);
+            program = Block(block, program);
 
             var setJmpAdress = new ImmediateLoad(false, "$3", startAddress.ToString());
-            Process(setJmpAdress);
+            program = Process(setJmpAdress);
             
             var loopInst = OpCodes.OpToBinary("jmp") + "00000" + "00011"
             + ConstConverter.ConstantToBinary("0");
             Program.Add(loopInst);
 
             //patches the jump out of while address
-            var jumpOutInst = Program[startAddress];
+            var jumpOutInst = Program[tempAddress];
             jumpOutInst = string.Format(jumpOutInst, ConstConverter.ConstantToBinary(program.Count.ToString()));
-            Program[startAddress + 1] = jumpOutInst;
+            program[tempAddress] = jumpOutInst;
             return program;
         }
 
@@ -206,7 +212,7 @@ namespace DCasm.Translator
             switch (comparaison.Right) {
                 case Const c:
                     var reg = new ImmediateLoad(false, "$1", c.Value);
-                    Process(reg);
+                    program = Process(reg);
                     comparaison.Right = new Register { Value = "$1"};
                     break;
             }
@@ -214,7 +220,7 @@ namespace DCasm.Translator
             switch (comparaison.Left) {
                 case Const c:
                     var reg = new ImmediateLoad(false, "$2", c.Value);
-                    Process(reg);
+                    program = Process(reg);
                     comparaison.Left = new Register { Value = "$2"};
                     break;
             }
@@ -228,10 +234,11 @@ namespace DCasm.Translator
 
             var setEndJumpAddressInst = OpCodes.OpToBinary("set") 
             + "01001" + "00000" + "{0}";
+            tempAddress = program.Count;
             program.Add(setEndJumpAddressInst);
             
             var initInst = new ImmediateLoad(false, "$8", (program.Count + 3).ToString());
-            Process(initInst);
+            program = Process(initInst);
 
             var op = comparaison.Value switch {
                 ">" => "jgt",

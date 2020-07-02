@@ -16,7 +16,7 @@ TOKENS
   ident  = letter {letter | digit}.
   number = digit {digit}.
   hexa = hexaPrefix ( letter | digit ) { letter | digit }.
-  //29 registers are adressable, 30, 31 are reserved
+  //29 registers are adressable, 1 to 9, 30 and 31 are reserved
   registerNum = "$" ('0' | firstDigit digit).
 
 COMMENTS FROM "/*" TO "*/" NESTED
@@ -165,7 +165,14 @@ function<out INode function>
 "end" (. temp.Value = name; temp.Children.Add(new Return(name)); function = temp; gen.Functions.Add(name, temp); .)
 .
 
-functionName<out string name> = ident (. name = t.val; .).
+functionName<out string name> = 
+ident (. name = t.val; .)
+[
+  "."
+  ident (. name = name + "." + t.val; .)
+]
+
+.
 
 Call<out INode exp> = "call" functionName<out string name> (. exp = new Call(name); .).
 
