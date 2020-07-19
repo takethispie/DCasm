@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using DCasm.InstructionSet;
 
-namespace DCasm.Translator
+namespace DCasm
 {
     public class Compiler
     {

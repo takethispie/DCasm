@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using DCasm.Translator;
 using DCasm.Visitors;
 
 namespace DCasm
