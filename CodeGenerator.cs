@@ -8,7 +8,7 @@ namespace DCasm
     public class CodeGenerator
     {
         private readonly Parser parser;
-        public Dictionary<string, INode> Functions;
+        public Dictionary<string, Function> Functions;
         public List<INode> RootNodes;
         private readonly Scanner scanner;
 
@@ -17,7 +17,7 @@ namespace DCasm
             scanner = new Scanner(fileName);
             parser = new Parser(scanner) {gen = this};
             RootNodes = new List<INode>();
-            Functions = new Dictionary<string, INode>();
+            Functions = new Dictionary<string, Function>();
         }
 
         public CodeGenerator(Stream stream)
@@ -25,15 +25,15 @@ namespace DCasm
             scanner = new Scanner(stream);
             parser = new Parser(scanner) {gen = this};
             RootNodes = new List<INode>();
-            Functions = new Dictionary<string, INode>();
+            Functions = new Dictionary<string, Function>();
         }
 
         public FileTypeEnum Type { get; set; }
         public int ErrorCount => parser.errors.count;
 
         public IEnumerable<string> Compile() {
-            var v = new Compiler(Functions, false, true);
-            RootNodes.ForEach(n => n.Accept(v));
+            var v = new Compiler(Functions, false);
+            v.Compile(RootNodes);
             var hexProgram = new List<string>();
             foreach (var binary in v.Program) {
                 var hex = Utils.BinaryToHex(binary);
@@ -45,8 +45,6 @@ namespace DCasm
         }
 
         public void Interpret() {
-            IVisitor v = new Interpreter(Functions) { verbose = true };
-            RootNodes.ForEach(n => n.Accept(v));
         }
 
 

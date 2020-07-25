@@ -1,3 +1,5 @@
+using System;
+
 namespace DCasm
 {
     public static class ArithmFactory
@@ -11,19 +13,15 @@ namespace DCasm
 
         private static INode Create(string op, INode dest, INode src1, INode src2, bool isImmediate)
         {
-            var node = GetOperand(op, true);
-            node.Children.Add(dest);
-            node.Children.Add(src1);
-            node.Children.Add(src2);
-            return node;
+            return op switch {
+                "add" => new Add(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "sub" => new Sub(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "mul" => new Mul(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "div" => new Div(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "lsh" => new LeftShift(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                "rsh" => new RightShift(isImmediate) { Destination = dest, Left = src1, Right = src2 },
+                _ => throw new ArgumentException("this arithmetic or logic operation does not exists !")
+            };
         }
-
-        public static INode GetOperand(string op, bool immediate) => op switch {
-            "add" => new Add(immediate ? "addi" : "add"),
-            "sub" => new Sub(immediate ? "subi" : "sub"),
-            "mul" => new Mul(immediate ? "muli" : "mul"),
-            "div" => new Div(immediate ? "divi" : "div"),
-            _ => new Error()
-        };
     }
 }

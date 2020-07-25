@@ -11,7 +11,5 @@ namespace DCasm
         public Block() {
             Children = new List<INode>(); 
         }
-
-        public void Accept(IVisitor v) => v.Visit(this);
     }
 }

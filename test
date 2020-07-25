@@ -1,9 +1,19 @@
 program
+import io
 {
-    set $10 1
-    
-    if $10 > 1 then
+
+    set $10 #FFFF
+    set $11 #000F
+    set $12 #00AF
+
+    call io.DrawPixel 
+
+    set $15 0
+
+    while $15 < 25 
     {
-        add $10 $10 1
-    } 
+        add $15 $15 1
+        add $11 $11 1
+        call io.DrawPixel
+    }
 }

@@ -4,25 +4,20 @@ using DCasm.Visitors;
 
 namespace DCasm
 {
-    public class Add : INode
+    public class Add : IArithmeticNode
     {
-        public Add(string op)
-        {
-            Children = new List<INode>();
-            Value = op;
-        }
+        public INode Left { get; set; }
+        public INode Right { get; set; }
+        public INode Destination { get; set; }
 
         public bool Unsigned { get; set; }
         public string Value { get; set; }
-        public List<INode> Children { get; set; }
-
-        public void Accept(IVisitor v) => v.Visit(this);
-
-        public void Reduce()
+        
+        public Add(bool isImmediate)
         {
-            var op = Value;
-            if (Children.Count < 3)
-                throw new Exception("missing args ! only" + Children.Count + " arguments specified");
+            Value = isImmediate ? "addi" : "add";
         }
+
+
     }
 }

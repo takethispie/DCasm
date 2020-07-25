@@ -8,15 +8,14 @@ namespace DCasm
         public Load(INode dest, INode baseReg, INode offset)
         {
             Value = "load";
-            Children = new List<INode>();
-            Children.Add(dest);
-            Children.Add(baseReg);
-            Children.Add(offset);
+            Destination = dest;
+            BaseRegister = baseReg;
+            OffsetRegister = offset;
         }
 
         public string Value { get; set; }
-        public List<INode> Children { get; set; }
-
-        public void Accept(IVisitor v) => v.Visit(this);
+        public INode Destination { get; set; }
+        public INode BaseRegister { get; set; }
+        public INode OffsetRegister { get; set; }
     }
 }

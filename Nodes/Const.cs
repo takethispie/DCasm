@@ -6,17 +6,12 @@ namespace DCasm
 {
     public class Const : INode
     {
-        public Const(string value)
+        public Const(string value, bool isHexa)
         {
-            Value = value;
-            Children = new List<INode>();
+            Value = isHexa ? Convert.ToInt32( value.Remove(0, 1) , 16).ToString() : value;
         }
 
         public string Value { get; set; }
-        public List<INode> Children { get; set; }
-
-        public void Accept(IVisitor v) => v.Visit(this);
-
 
         public int ToInt()
         {

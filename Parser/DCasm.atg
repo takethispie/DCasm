@@ -7,6 +7,7 @@ CHARACTERS
   letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   digit = "0123456789".
   firstDigit = "12".
+  hexaPrefix = "#".
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
@@ -14,7 +15,8 @@ CHARACTERS
 TOKENS
   ident  = letter {letter | digit}.
   number = digit {digit}.
-  //29 registers are adressable, 30, 31 are reserved
+  hexa = hexaPrefix ( letter | digit ) { letter | digit }.
+  //29 registers are adressable, 1 to 9, 30 and 31 are reserved
   registerNum = "$" ('0' | firstDigit digit).
 
 COMMENTS FROM "/*" TO "*/" NESTED
@@ -35,7 +37,7 @@ DCasm
   "import" moduleName<out string name> 
   (.if(gen.Type == FileTypeEnum.Program) gen.ImportModule(name); else throw new ArgumentException("you cannot import a module into another"); .) 
 }
-Block<out INode node> (. node.Children.ForEach(c => gen.RootNodes.Add(c)); .)
+Block<out Block node> (. node.Children.ForEach(c => gen.RootNodes.Add(c)); .)
 EOF.
 
 BlockUnit<out INode exp>
@@ -58,7 +60,7 @@ BlockUnit<out INode exp>
 )
 .
 
-Block<out INode node> = 
+Block<out Block node> = 
 (. node = new Block(); .)
 "{"
 BlockUnit<out INode exp> (. node.Children.Add(exp); .)
@@ -78,7 +80,9 @@ register<out INode node>
 constant<out INode val>
 = (. val = null; .)
 (
-    number (.val = new Const(t.val); .)
+    number (.val = new Const(t.val, false); .)
+    |
+    hexa (. val = new Const(t.val, true); .)
 ).
 
 
@@ -103,17 +107,19 @@ immediateLoad<out INode exp>
 = 
 (. exp = new Error(); .)
 (
-  "set" (. exp = new ImmediateLoad(false); .)
+  "set"
+  register<out INode dest> constant<out INode val> (. exp = new ImmediateLoad(false) { Destination = dest, DataValue = val }; .)
   |
-  "setupper" (. exp = new ImmediateLoad(true); .)
+  "setupper" 
+  register<out INode dest> constant<out INode val> (. exp = new ImmediateLoad(true) { Destination = dest, DataValue = val }; .)
 )
-register<out INode dest> constant<out INode val> (. exp.Children.Add(dest); exp.Children.Add(val); .)
+
 .
 
 
 arithmOp<out string op>
 = (. op = "";.)
-  ("add" | "sub" | "div" | "mul" ) (. op = t.val; .)
+  ("add" | "sub" | "div" | "mul" | "lsh" | "rsh" ) (. op = t.val; .)
 .
 
 
@@ -142,24 +148,31 @@ data<out INode exp>
 function<out INode function>
 =
 "function" functionName<out string name>
-(. function = new Function(name); .)
+(. var temp = new Function(name);  .)
 {
   (
-    arithm<out INode exp> (. function.Children.Add(exp); .)
+    arithm<out INode exp> (. temp.Children.Add(exp); .)
     |
-    immediateLoad<out INode exp>   (. function.Children.Add(exp); .)
+    immediateLoad<out INode exp>   (. temp.Children.Add(exp); .)
     |
-    data<out INode exp>  (. function.Children.Add(exp); .)
+    data<out INode exp>  (. temp.Children.Add(exp); .)
     |
-    Call<out INode exp>  (. function.Children.Add(exp); .)
+    Call<out INode exp>  (. temp.Children.Add(exp); .)
     |
-    Condition<out INode exp>  (. function.Children.Add(exp); .)
+    Condition<out INode exp>  (. temp.Children.Add(exp); .)
   )
 }
-"end" (. function.Value = name; function.Children.Add(new Return(name)); gen.Functions.Add(name, function); .)
+"end" (. temp.Value = name; temp.Children.Add(new Return(name)); function = temp; gen.Functions.Add(name, temp); .)
 .
 
-functionName<out string name> = ident (. name = t.val; .).
+functionName<out string name> = 
+ident (. name = t.val; .)
+[
+  "."
+  ident (. name = name + "." + t.val; .)
+]
+
+.
 
 Call<out INode exp> = "call" functionName<out string name> (. exp = new Call(name); .).
 
@@ -167,15 +180,15 @@ Call<out INode exp> = "call" functionName<out string name> (. exp = new Call(nam
 Condition<out INode node>
 =
 "if" Comparaison<out INode reg1, out string op, out INode reg2>
-"then" Block<out INode thenblock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock); .)
-["else" Block<out INode elseBlock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); .)]
+"then" Block<out Block thenblock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock); .)
+["else" Block<out Block elseBlock> (. node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); .)]
 .
 
 ConditionOp<out string op> = (">" | "<" | "==" | ">=" | "<=") (. op = t.val; .).
 
 Comparaison<out INode reg1, out string op, out INode reg2>
 =
-(. reg1 = new Const("-1"); reg2 = new Const("-1"); .)
+(. reg1 = new Const("-1", false); reg2 = new Const("-1", false); .)
 (register<out reg1> | constant<out reg1>)
 ConditionOp<out op> 
 (register<out reg2> | constant<out reg2>)
@@ -184,7 +197,7 @@ ConditionOp<out op>
 While<out INode Node> 
 =
 "while" Comparaison<out INode reg1, out string op, out INode reg2> 
-Block<out INode exp>
+Block<out Block exp>
 (. Node = new While(exp, new Comparaison(op, reg1, reg2)); .)
 .
 

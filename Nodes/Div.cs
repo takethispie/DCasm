@@ -3,17 +3,17 @@ using DCasm.Visitors;
 
 namespace DCasm
 {
-    public class Div : INode
+    public class Div : IArithmeticNode
     {
-        public Div(string op)
+        public INode Left { get; set; }
+        public INode Right { get; set; }
+        public INode Destination { get; set; }
+        public string Value { get; set; }
+        
+        public Div(bool isImmediate)
         {
-            Children = new List<INode>();
-            Value = op;
+            Value = isImmediate ? "divi" : "div";
         }
 
-        public string Value { get; set; }
-        public List<INode> Children { get; set; }
-
-        public void Accept(IVisitor v) => v.Visit(this);
     }
 }

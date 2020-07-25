@@ -11,8 +11,5 @@ namespace DCasm
         }
 
         public string Value { get; set; }
-        public List<INode> Children { get; set; }
-
-        public void Accept(IVisitor v) => v.Visit(this);
     }
 }

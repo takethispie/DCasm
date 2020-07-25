@@ -7,13 +7,14 @@ namespace DCasm
     public class While : INode
     {
         public string Value { get; set; }
-        public List<INode> Children { get; set; }
+        public Comparaison Comparaison { get; set; }
+        public Block Block { get; set; }
 
 
-        public While(INode block, Comparaison comp) {
-            Children =  new List<INode> { comp, block};
+        public While(Block block, Comparaison comp) {
+            Comparaison = comp;
+            Block = block;
         }
 
-        public void Accept(IVisitor v) => v.Visit(this);
     }
 }
