@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using DCasm.InstructionSet;
 
@@ -7,12 +8,14 @@ namespace DCasm
     public class Compiler
     {
         public IList<string> Program;
-        private Dictionary<string, int> functionsAdress { get; set; }
-        private int tempAddress { get; set; }
+        private Dictionary<string, int> functionsAdress;
+        private Dictionary<int, string> lazyFunctionCall;
+        private int tempAddress;
 
         public Compiler(Dictionary<string, Function> functions, bool verbose = false) {
             Program = new List<string>();
             functionsAdress = new Dictionary<string, int>();
+            lazyFunctionCall = new Dictionary<int, string>();
             var adressInst = OpCodes.OpToBinary("set") + "00001" + "00000" + "{0}";
             Program.Add(adressInst);
             var inst = OpCodes.OpToBinary("jmp") + "00000" + "00001" + ConstConverter.ConstantToBinary("0");
@@ -46,7 +49,7 @@ namespace DCasm
             Read read => Read(read, Program),
             Write write => Write(write, Program),
             Const constant => Program,
-            Function f => Program,
+            Function f => Function(f, Program),
             Register reg => Program,
             Block bl => Program,
             Condition cond => Condition(cond, Program),
@@ -63,12 +66,28 @@ namespace DCasm
             return program;
         }
 
+        public IList<string> Function(Function n, IList<string> program) {
+            var calls = lazyFunctionCall.Where(pair => pair.Value == n.Value).ToList();
+            calls.ForEach(pair => {
+                var inst = program[pair.Key];
+                inst = string.Format(inst, ConstConverter.ConstantToBinary((pair.Value).ToString()));
+                program[pair.Key] = inst;
+                lazyFunctionCall.Remove(pair.Key);
+            });
+            return program;
+        }
+
         public IList<string> Call (Call n, IList<string> program)
         {
-            var address = functionsAdress[n.Value];
-            var setInst = OpCodes.OpToBinary("set") + "00111" + "00000" + ConstConverter.ConstantToBinary(address.ToString());
+            if(functionsAdress.ContainsKey(n.Value)) {
+                var address  = functionsAdress[n.Value];
+                var setInst = OpCodes.OpToBinary("set") + "00111" + "00000" + ConstConverter.ConstantToBinary(address.ToString());
+                program.Add(setInst);
+            } else {
+                program.Add(OpCodes.OpToBinary("set") + "00111" + "00000" + "{0}");
+                lazyFunctionCall.Add(program.Count - 1, n.Value);
+            }
             var inst = OpCodes.OpToBinary("call") + "00000" + "00111" + ConstConverter.ConstantToBinary("0");
-            program.Add(setInst);
             program.Add(inst);
             return program;
         }
