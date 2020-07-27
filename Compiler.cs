@@ -23,13 +23,20 @@ namespace DCasm
 
 
             // update init jump to resolved adress
-            var item = Program[0];
-            item = string.Format(item, ConstConverter.ConstantToBinary((Program.Count).ToString()));
-            Program[0] = item;
         }
 
         public void Compile(List<INode> nodes) {
-            foreach (var node in nodes) {
+            var funcs = nodes.Where(node => node.GetType() == typeof(Function)).ToList();
+            funcs.ForEach(func => {
+                Program = ProcessFunctions(func, Program);
+            });
+
+            var item = Program[0];
+            item = string.Format(item, ConstConverter.ConstantToBinary((Program.Count).ToString()));
+            Program[0] = item;
+
+            var insts = nodes.Except(funcs);
+            foreach (var node in insts) {
                 Program = Process(node, Program);  
             }
         }
@@ -75,14 +82,16 @@ namespace DCasm
 
         private IList<string> Function(Function n, IList<string> program) {
             if(functionsAdress.ContainsKey(n.Value)) throw new Exception("Function already exists");
-            functionsAdress.Add(n.Value, program.Count - 1);
+            functionsAdress.Add(n.Value, program.Count);
+
             var calls = lazyFunctionCall.Where(pair => pair.Value == n.Value).ToList();
             calls.ForEach(pair => {
                 var inst = program[pair.Key];
-                inst = string.Format(inst, ConstConverter.ConstantToBinary((program.Count - 1).ToString()));
+                inst = string.Format(inst, ConstConverter.ConstantToBinary((program.Count).ToString()));
                 program[pair.Key] = inst;
                 lazyFunctionCall.Remove(pair.Key);
             });
+            
             n.Children.ForEach(child => {
                 program = Process(child, program);
             });
