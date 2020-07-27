@@ -63,7 +63,7 @@ namespace DCasm
             Read read => Read(read, program),
             Write write => Write(write, program),
             Const constant => program,
-            Function f => Function(f, program),
+            Function f => program,
             Register reg => program,
             Block bl => program,
             Condition cond => Condition(cond, program),
