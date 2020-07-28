@@ -1,5 +1,9 @@
 module
 {
+    function DrawLine
+        call DrawPixel
+    end
+
     function DrawPixel
         set $13 2
         lsh $14 $13 16

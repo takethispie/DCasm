@@ -35,8 +35,7 @@ namespace DCasm
                 var result = gen.Compile();
                 var resultWithHeader = new List<String> {"v2.0 raw"};
                 resultWithHeader.AddRange(result);
-                File.WriteAllLines(filePath + ".txt", resultWithHeader);
-                //File.WriteAllBytes(filePath + ".h", Utils.HexStringToByte(result));
+                File.WriteAllLines(filePath + ".hex", resultWithHeader);
             }
             else
             {

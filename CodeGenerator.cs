@@ -11,6 +11,8 @@ namespace DCasm
         public Dictionary<string, Function> Functions;
         public List<INode> RootNodes;
         private readonly Scanner scanner;
+        private Compiler compiler;
+    
 
         public CodeGenerator(string fileName)
         {
@@ -18,6 +20,7 @@ namespace DCasm
             parser = new Parser(scanner) {gen = this};
             RootNodes = new List<INode>();
             Functions = new Dictionary<string, Function>();
+            compiler = new Compiler(false);
         }
 
         public CodeGenerator(Stream stream)
@@ -26,16 +29,16 @@ namespace DCasm
             parser = new Parser(scanner) {gen = this};
             RootNodes = new List<INode>();
             Functions = new Dictionary<string, Function>();
+            compiler = new Compiler(false);
         }
 
         public FileTypeEnum Type { get; set; }
         public int ErrorCount => parser.errors.count;
 
         public IEnumerable<string> Compile() {
-            var v = new Compiler(Functions, false);
-            v.Compile(RootNodes);
+            compiler.Compile(RootNodes);
             var hexProgram = new List<string>();
-            foreach (var binary in v.Program) {
+            foreach (var binary in compiler.Program) {
                 var hex = Utils.BinaryToHex(binary);
                 if(true) Console.WriteLine(hex);
                 hexProgram.Add(hex);
@@ -55,8 +58,7 @@ namespace DCasm
             if (!File.Exists(name)) throw new FileNotFoundException(name + " Not found");
             var generator = new CodeGenerator(name);
             generator.Parse();
-            var moduleFunctions = generator.Functions;
-            foreach (var (key, value) in moduleFunctions) Functions.Add(name + "." + key, value);
+            compiler.ImportModule(generator.RootNodes);
             Console.WriteLine("imported " + name);
         }
     }

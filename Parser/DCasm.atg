@@ -167,11 +167,6 @@ function<out INode function>
 
 functionName<out string name> = 
 ident (. name = t.val; .)
-[
-  "."
-  ident (. name = name + "." + t.val; .)
-]
-
 .
 
 Call<out INode exp> = "call" functionName<out string name> (. exp = new Call(name); .).

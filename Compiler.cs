@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using DCasm.InstructionSet;
 
@@ -7,55 +8,71 @@ namespace DCasm
     public class Compiler
     {
         public IList<string> Program;
-        private Dictionary<string, int> functionsAdress { get; set; }
-        private int tempAddress { get; set; }
+        private Dictionary<string, int> functionsAdress;
+        private Dictionary<int, string> lazyFunctionCall;
+        private int tempAddress;
 
-        public Compiler(Dictionary<string, Function> functions, bool verbose = false) {
+        public Compiler(bool verbose = false) {
             Program = new List<string>();
             functionsAdress = new Dictionary<string, int>();
+            lazyFunctionCall = new Dictionary<int, string>();
             var adressInst = OpCodes.OpToBinary("set") + "00001" + "00000" + "{0}";
             Program.Add(adressInst);
             var inst = OpCodes.OpToBinary("jmp") + "00000" + "00001" + ConstConverter.ConstantToBinary("0");
             Program.Add(inst);
-            foreach(var (key, value) in functions) {
-                functionsAdress.Add(key, Program.Count);
-                value.Children.ForEach(child => Process(child));
-            }
+
+
             // update init jump to resolved adress
-            var item = Program[0];
-            item = string.Format(item, ConstConverter.ConstantToBinary((Program.Count).ToString()));
-            Program[0] = item;
         }
 
         public void Compile(List<INode> nodes) {
-            
-            foreach (var node in nodes)
-            {
-                Program = Process(node);  
+            var funcs = nodes.Where(node => node.GetType() == typeof(Function)).ToList();
+            funcs.ForEach(func => {
+                Program = ProcessFunctions(func, Program);
+            });
+
+            var item = Program[0];
+            item = string.Format(item, ConstConverter.ConstantToBinary((Program.Count).ToString()));
+            Program[0] = item;
+
+            var insts = nodes.Except(funcs);
+            foreach (var node in insts) {
+                Program = Process(node, Program);  
             }
         }
 
-        public IList<string> Process(INode node) => node switch
+        public void ImportModule(List<INode> nodes) {
+            foreach(var node in nodes ) {
+                Program = ProcessFunctions(node, Program);
+            }
+        }
+
+        public IList<string> ProcessFunctions(INode node, IList<string> program) => node switch {
+            Function f => Function(f, program),
+            _ => program
+        };
+
+        public IList<string> Process(INode node, IList<string> program) => node switch
         {
-            Store st => Store(st, Program),
-            Call call => Call(call, Program),
-            Return ret => Return(ret, Program),
-            IArithmeticNode n => arithmeticInstructionBuilder(n, Program),
-            ImmediateLoad iLoad => ImmediateLoad(iLoad, Program),
-            Load load => Load(load, Program),
-            Read read => Read(read, Program),
-            Write write => Write(write, Program),
-            Const constant => Program,
-            Function f => Program,
-            Register reg => Program,
-            Block bl => Program,
-            Condition cond => Condition(cond, Program),
-            Comparaison comp => Comparaison(comp, Program),
-            While w => While(w, Program),
+            Store st => Store(st, program),
+            Call call => Call(call, program),
+            Return ret => Return(ret, program),
+            IArithmeticNode n => arithmeticInstructionBuilder(n, program),
+            ImmediateLoad iLoad => ImmediateLoad(iLoad, program),
+            Load load => Load(load, program),
+            Read read => Read(read, program),
+            Write write => Write(write, program),
+            Const constant => program,
+            Function f => program,
+            Register reg => program,
+            Block bl => program,
+            Condition cond => Condition(cond, program),
+            Comparaison comp => Comparaison(comp, program),
+            While w => While(w, program),
             _ => throw new Exception("Instruction type does not exists")
         };
 
-        public IList<string> Store(Store n, IList<string> program) {
+        private IList<string> Store(Store n, IList<string> program) {
             var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.BaseRegister) 
             + RegisterConverter.RegisterToBinary(n.OffsetRegister) + RegisterConverter.RegisterToBinary(n.DataValue)
             + "00000000000";
@@ -63,23 +80,46 @@ namespace DCasm
             return program;
         }
 
-        public IList<string> Call (Call n, IList<string> program)
+        private IList<string> Function(Function n, IList<string> program) {
+            if(functionsAdress.ContainsKey(n.Value)) throw new Exception("Function already exists");
+            functionsAdress.Add(n.Value, program.Count);
+
+            var calls = lazyFunctionCall.Where(pair => pair.Value == n.Value).ToList();
+            calls.ForEach(pair => {
+                var inst = program[pair.Key];
+                inst = string.Format(inst, ConstConverter.ConstantToBinary((program.Count).ToString()));
+                program[pair.Key] = inst;
+                lazyFunctionCall.Remove(pair.Key);
+            });
+            
+            n.Children.ForEach(child => {
+                program = Process(child, program);
+            });
+            return program;
+        }
+
+        private IList<string> Call (Call n, IList<string> program)
         {
-            var address = functionsAdress[n.Value];
-            var setInst = OpCodes.OpToBinary("set") + "00111" + "00000" + ConstConverter.ConstantToBinary(address.ToString());
+            if(functionsAdress.ContainsKey(n.Value)) {
+                var address  = functionsAdress[n.Value];
+                var setInst = OpCodes.OpToBinary("set") + "00111" + "00000" + ConstConverter.ConstantToBinary(address.ToString());
+                program.Add(setInst);
+            } else {
+                program.Add(OpCodes.OpToBinary("set") + "00111" + "00000" + "{0}");
+                lazyFunctionCall.Add(program.Count - 1, n.Value);
+            }
             var inst = OpCodes.OpToBinary("call") + "00000" + "00111" + ConstConverter.ConstantToBinary("0");
-            program.Add(setInst);
             program.Add(inst);
             return program;
         }
 
-        public IList<string> Return (Return ret, IList<string> program) {
+        private IList<string> Return (Return ret, IList<string> program) {
             var inst = OpCodes.OpToBinary("ret").PadRight(32, '0');
             program.Add(inst);
             return program;
         }
 
-        public IList<string> Load(Load n, IList<string> program)
+        private IList<string> Load(Load n, IList<string> program)
         {
             var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.Destination) 
             + RegisterConverter.RegisterToBinary(n.BaseRegister) + RegisterConverter.RegisterToBinary(n.OffsetRegister)
@@ -88,7 +128,7 @@ namespace DCasm
             return program;
         }
 
-        public IList<string> arithmeticInstructionBuilder(IArithmeticNode n, IList<string> program) {
+        private IList<string> arithmeticInstructionBuilder(IArithmeticNode n, IList<string> program) {
             var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.Destination) 
             + RegisterConverter.RegisterToBinary(n.Left) 
             + n.Right switch {
@@ -100,7 +140,7 @@ namespace DCasm
             return program;
         }
 
-        public IList<string> ImmediateLoad(ImmediateLoad n, IList<string> program)
+        private IList<string> ImmediateLoad(ImmediateLoad n, IList<string> program)
         {
             var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.Destination) + "00000" 
             + ConstConverter.ConstantToBinary(n.DataValue.Value);
@@ -108,7 +148,7 @@ namespace DCasm
             return program;
         }
 
-        public IList<string> Read(Read n, IList<string> program) {
+        private IList<string> Read(Read n, IList<string> program) {
             var inst = OpCodes.OpToBinary(n.Value) + RegisterConverter.RegisterToBinary(n.Destination)
             + RegisterConverter.RegisterToBinary(n.InputSelection);
             inst = inst.PadRight(32, '0');
@@ -116,7 +156,7 @@ namespace DCasm
             return program;
         }
 
-        public IList<string> Write(Write n, IList<string> program)
+        private IList<string> Write(Write n, IList<string> program)
         {
             var inst = OpCodes.OpToBinary(n.Value) + "00000" + RegisterConverter.RegisterToBinary(n.OutputSelection)
             + RegisterConverter.RegisterToBinary(n.DataValue);
@@ -125,7 +165,7 @@ namespace DCasm
             return program;
         }
 
-        public IList<string> Move(Move n, IList<string> program) {
+        private IList<string> Move(Move n, IList<string> program) {
             var inst = OpCodes.OpToBinary("mov") + RegisterConverter.RegisterToBinary(n.Destination)
             + RegisterConverter.RegisterToBinary(n.Source);
             inst = inst.PadRight(32, '0');
@@ -133,20 +173,20 @@ namespace DCasm
             return program;
         }
 
-        public IList<string> Condition(Condition n, IList<string> program)
+        private IList<string> Condition(Condition n, IList<string> program)
         {
             int startAddress = program.Count;
             int jmpOutEndIfAddress = 0;
 
             var comp = n.Comparaison;
-            program = Process(comp);
+            program = Process(comp, program);
             var tempOffset = program.Count - 2;
             
             
             
             //if
             var block = n.Then;
-            program = Process(block);
+            program = Process(block, program);
             var blockOffset = program.Count - tempOffset;
 
             if(n.HasElseCall) {
@@ -163,7 +203,7 @@ namespace DCasm
                 Program[startAddress + tempOffset] = jumpOutInst;
 
                 var thenBlock = n.Then;
-                program = Process(thenBlock);
+                program = Process(thenBlock, program);
 
                 var endIfJmp = program[jmpOutEndIfAddress];
                 endIfJmp = string.Format(endIfJmp, ConstConverter.ConstantToBinary(program.Count.ToString()));
@@ -177,24 +217,24 @@ namespace DCasm
             return program;
         }
 
-        public IList<string> Block(Block n, IList<string> program) {
+        private IList<string> Block(Block n, IList<string> program) {
 
-            n.Children.ForEach(child => program = Process(child));
+            n.Children.ForEach(child => program = Process(child, program));
             return program;
         } 
 
-        public IList<string> While(While n, IList<string> program)
+        private IList<string> While(While n, IList<string> program)
         {
             var startAddress = program.Count;
 
             var comp = n.Comparaison;
-            program = Process(comp);           
+            program = Process(comp, program);           
             
             var block = n.Block;
             program = Block(block, program);
 
             var setJmpAdress = new ImmediateLoad(false, "$3", startAddress.ToString());
-            program = Process(setJmpAdress);
+            program = Process(setJmpAdress, program);
             
             var loopInst = OpCodes.OpToBinary("jmp") + "00000" + "00011"
             + ConstConverter.ConstantToBinary("0");
@@ -207,12 +247,12 @@ namespace DCasm
             return program;
         }
 
-        public IList<string> Comparaison(Comparaison comparaison, IList<string> program)
+        private IList<string> Comparaison(Comparaison comparaison, IList<string> program)
         {
             switch (comparaison.Right) {
                 case Const c:
                     var reg = new ImmediateLoad(false, "$1", c.Value);
-                    program = Process(reg);
+                    program = Process(reg, program);
                     comparaison.Right = new Register { Value = "$1"};
                     break;
             }
@@ -220,7 +260,7 @@ namespace DCasm
             switch (comparaison.Left) {
                 case Const c:
                     var reg = new ImmediateLoad(false, "$2", c.Value);
-                    program = Process(reg);
+                    program = Process(reg, program);
                     comparaison.Left = new Register { Value = "$2"};
                     break;
             }
@@ -238,7 +278,7 @@ namespace DCasm
             program.Add(setEndJumpAddressInst);
             
             var initInst = new ImmediateLoad(false, "$8", (program.Count + 3).ToString());
-            program = Process(initInst);
+            program = Process(initInst, program);
 
             var op = comparaison.Value switch {
                 ">" => "jgt",

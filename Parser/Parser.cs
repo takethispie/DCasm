@@ -11,7 +11,7 @@ public class Parser {
 	public const int _number = 2;
 	public const int _hexa = 3;
 	public const int _registerNum = 4;
-	public const int maxT = 36;
+	public const int maxT = 35;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -93,7 +93,7 @@ public CodeGenerator gen;
 		} else if (la.kind == 6) {
 			Get();
 			gen.Type = FileTypeEnum.Module; 
-		} else SynErr(37);
+		} else SynErr(36);
 		while (la.kind == 7) {
 			Get();
 			moduleName(out string name);
@@ -140,19 +140,19 @@ public CodeGenerator gen;
 			function(out exp);
 			break;
 		}
-		case 26: {
+		case 25: {
 			Call(out exp);
 			break;
 		}
-		case 27: {
+		case 26: {
 			Condition(out exp);
 			break;
 		}
-		case 35: {
+		case 34: {
 			While(out exp);
 			break;
 		}
-		default: SynErr(38); break;
+		default: SynErr(37); break;
 		}
 	}
 
@@ -167,7 +167,7 @@ public CodeGenerator gen;
 		} else if (la.kind == 2 || la.kind == 3) {
 			constant(out INode src2);
 			exp = ArithmFactory.Create(op, dest, src1, src2); 
-		} else SynErr(39);
+		} else SynErr(38);
 	}
 
 	void immediateLoad(out INode exp) {
@@ -182,7 +182,7 @@ public CodeGenerator gen;
 			register(out INode dest);
 			constant(out INode val);
 			exp = new ImmediateLoad(true) { Destination = dest, DataValue = val }; 
-		} else SynErr(40);
+		} else SynErr(39);
 	}
 
 	void data(out INode exp) {
@@ -201,7 +201,7 @@ public CodeGenerator gen;
 			} else if (la.kind == 2 || la.kind == 3) {
 				constant(out INode val);
 				exp = new Write(OutputSelection, val); 
-			} else SynErr(41);
+			} else SynErr(40);
 		} else if (la.kind == 20) {
 			Get();
 			register(out INode inputSelection);
@@ -219,7 +219,7 @@ public CodeGenerator gen;
 			register(out INode baseReg);
 			register(out INode offset);
 			exp = new Store(baseReg, offset, value); 
-		} else SynErr(42);
+		} else SynErr(41);
 	}
 
 	void function(out INode function) {
@@ -236,7 +236,7 @@ public CodeGenerator gen;
 			} else if (StartOf(4)) {
 				data(out INode exp);
 				temp.Children.Add(exp); 
-			} else if (la.kind == 26) {
+			} else if (la.kind == 25) {
 				Call(out INode exp);
 				temp.Children.Add(exp); 
 			} else {
@@ -249,18 +249,18 @@ public CodeGenerator gen;
 	}
 
 	void Call(out INode exp) {
-		Expect(26);
+		Expect(25);
 		functionName(out string name);
 		exp = new Call(name); 
 	}
 
 	void Condition(out INode node) {
-		Expect(27);
+		Expect(26);
 		Comparaison(out INode reg1, out string op, out INode reg2);
-		Expect(28);
+		Expect(27);
 		Block(out Block thenblock);
 		node = new Condition(new Comparaison(op, reg1, reg2), thenblock); 
-		if (la.kind == 29) {
+		if (la.kind == 28) {
 			Get();
 			Block(out Block elseBlock);
 			node = new Condition(new Comparaison(op, reg1, reg2), thenblock, elseBlock); 
@@ -268,7 +268,7 @@ public CodeGenerator gen;
 	}
 
 	void While(out INode Node) {
-		Expect(35);
+		Expect(34);
 		Comparaison(out INode reg1, out string op, out INode reg2);
 		Block(out Block exp);
 		Node = new While(exp, new Comparaison(op, reg1, reg2)); 
@@ -287,7 +287,7 @@ public CodeGenerator gen;
 		} else if (la.kind == 3) {
 			Get();
 			val = new Const(t.val, true); 
-		} else SynErr(43);
+		} else SynErr(42);
 	}
 
 	void arithmOp(out string op) {
@@ -317,7 +317,7 @@ public CodeGenerator gen;
 			Get();
 			break;
 		}
-		default: SynErr(44); break;
+		default: SynErr(43); break;
 		}
 		op = t.val; 
 	}
@@ -325,11 +325,6 @@ public CodeGenerator gen;
 	void functionName(out string name) {
 		Expect(1);
 		name = t.val; 
-		if (la.kind == 25) {
-			Get();
-			Expect(1);
-			name = name + "." + t.val; 
-		}
 	}
 
 	void Comparaison(out INode reg1, out string op, out INode reg2) {
@@ -338,17 +333,19 @@ public CodeGenerator gen;
 			register(out reg1);
 		} else if (la.kind == 2 || la.kind == 3) {
 			constant(out reg1);
-		} else SynErr(45);
+		} else SynErr(44);
 		ConditionOp(out op);
 		if (la.kind == 4) {
 			register(out reg2);
 		} else if (la.kind == 2 || la.kind == 3) {
 			constant(out reg2);
-		} else SynErr(46);
+		} else SynErr(45);
 	}
 
 	void ConditionOp(out string op) {
-		if (la.kind == 30) {
+		if (la.kind == 29) {
+			Get();
+		} else if (la.kind == 30) {
 			Get();
 		} else if (la.kind == 31) {
 			Get();
@@ -356,9 +353,7 @@ public CodeGenerator gen;
 			Get();
 		} else if (la.kind == 33) {
 			Get();
-		} else if (la.kind == 34) {
-			Get();
-		} else SynErr(47);
+		} else SynErr(46);
 		op = t.val; 
 	}
 
@@ -374,11 +369,11 @@ public CodeGenerator gen;
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x}
 
 	};
 } // end Parser
@@ -417,29 +412,28 @@ public class Errors {
 			case 22: s = "\"store\" expected"; break;
 			case 23: s = "\"function\" expected"; break;
 			case 24: s = "\"end\" expected"; break;
-			case 25: s = "\".\" expected"; break;
-			case 26: s = "\"call\" expected"; break;
-			case 27: s = "\"if\" expected"; break;
-			case 28: s = "\"then\" expected"; break;
-			case 29: s = "\"else\" expected"; break;
-			case 30: s = "\">\" expected"; break;
-			case 31: s = "\"<\" expected"; break;
-			case 32: s = "\"==\" expected"; break;
-			case 33: s = "\">=\" expected"; break;
-			case 34: s = "\"<=\" expected"; break;
-			case 35: s = "\"while\" expected"; break;
-			case 36: s = "??? expected"; break;
-			case 37: s = "invalid DCasm"; break;
-			case 38: s = "invalid BlockUnit"; break;
-			case 39: s = "invalid arithm"; break;
-			case 40: s = "invalid immediateLoad"; break;
+			case 25: s = "\"call\" expected"; break;
+			case 26: s = "\"if\" expected"; break;
+			case 27: s = "\"then\" expected"; break;
+			case 28: s = "\"else\" expected"; break;
+			case 29: s = "\">\" expected"; break;
+			case 30: s = "\"<\" expected"; break;
+			case 31: s = "\"==\" expected"; break;
+			case 32: s = "\">=\" expected"; break;
+			case 33: s = "\"<=\" expected"; break;
+			case 34: s = "\"while\" expected"; break;
+			case 35: s = "??? expected"; break;
+			case 36: s = "invalid DCasm"; break;
+			case 37: s = "invalid BlockUnit"; break;
+			case 38: s = "invalid arithm"; break;
+			case 39: s = "invalid immediateLoad"; break;
+			case 40: s = "invalid data"; break;
 			case 41: s = "invalid data"; break;
-			case 42: s = "invalid data"; break;
-			case 43: s = "invalid constant"; break;
-			case 44: s = "invalid arithmOp"; break;
+			case 42: s = "invalid constant"; break;
+			case 43: s = "invalid arithmOp"; break;
+			case 44: s = "invalid Comparaison"; break;
 			case 45: s = "invalid Comparaison"; break;
-			case 46: s = "invalid Comparaison"; break;
-			case 47: s = "invalid ConditionOp"; break;
+			case 46: s = "invalid ConditionOp"; break;
 
 			default: s = "error " + n; break;
 		}
