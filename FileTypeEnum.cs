@@ -1,8 +1,7 @@
-namespace DCasm
+namespace DCasm;
+
+public enum FileTypeEnum
 {
-    public enum FileTypeEnum
-    {
-        Module,
-        Program
-    }
+    Module,
+    Program
 }

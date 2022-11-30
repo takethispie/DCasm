@@ -1,9 +1,7 @@
 
 using System;
 
-namespace DCasm {
-
-
+namespace DCasm; 
 
 public class Parser {
 	public const int _EOF = 0;
@@ -25,7 +23,7 @@ public class Parser {
 	int errDist = minErrDist;
 
 public CodeGenerator gen;
-  
+
 /*--------------------------------------------------------------------------*/
 
 
@@ -463,5 +461,4 @@ public class Errors {
 
 public class FatalError: Exception {
 	public FatalError(string m): base(m) {}
-}
 }

@@ -2,22 +2,21 @@ using System;
 using System.Collections.Generic;
 using DCasm.Visitors;
 
-namespace DCasm
+namespace DCasm;
+
+public class Add : IArithmeticNode
 {
-    public class Add : IArithmeticNode
+    public INode Left { get; set; }
+    public INode Right { get; set; }
+    public INode Destination { get; set; }
+
+    public bool Unsigned { get; set; }
+    public string Value { get; set; }
+    
+    public Add(bool isImmediate)
     {
-        public INode Left { get; set; }
-        public INode Right { get; set; }
-        public INode Destination { get; set; }
-
-        public bool Unsigned { get; set; }
-        public string Value { get; set; }
-        
-        public Add(bool isImmediate)
-        {
-            Value = isImmediate ? "addi" : "add";
-        }
-
-
+        Value = isImmediate ? "addi" : "add";
     }
+
+
 }

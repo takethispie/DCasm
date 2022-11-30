@@ -1,15 +1,14 @@
 using System.Collections.Generic;
 using DCasm.Visitors;
 
-namespace DCasm
-{
-    public class Block : INode
-    {
-        public string Value { get; set; }
-        public List<INode> Children { get; set; }
+namespace DCasm;
 
-        public Block() {
-            Children = new List<INode>(); 
-        }
+public class Block : INode
+{
+    public string Value { get; set; }
+    public List<INode> Children { get; set; }
+
+    public Block() {
+        Children = new List<INode>(); 
     }
 }

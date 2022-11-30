@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using DCasm.Visitors;
 
-namespace DCasm
+namespace DCasm;
+
+public interface INode
 {
-    public interface INode
-    {
-        string Value { get; set; }
-    }
+    string Value { get; set; }
 }

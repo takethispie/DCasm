@@ -1,43 +1,42 @@
 module
 {
     function WriteOutPrefix
-    set $18 79
-    set $19 85
-    set $20 84
-    set $21 62
-    out $10 $18
-    out $10 $19
-    out $10 $20
-    out $10 $21
+        set $18 79
+        set $19 85
+        set $20 84
+        set $21 62
+        out $10 $18
+        out $10 $19
+        out $10 $20
+        out $10 $21
     end
 
     //$14 = starting memory adress position
     function ReadChar
-    set $19 0
-    set $20 0
-    //set current position
-    mov $14 $18
-    in $19 $21
-    store $21 $18 $0
-    add $18 $18 1
-    out $20 $21
+        set $19 0
+        set $20 0
+        //set current position
+        mov $14 $18
+        in $19 $21
+        store $21 $18 $0
+        add $18 $18 1
+        out $20 $21
     end
 
 
     //$14 = string adress
     function WriteLine
-    mov $14 $18
-
+        mov $14 $18
     end
 
     //$18 = adress of string cursor
     function EndString
-    store $10 $18 $0
+        store $10 $18 $0
     end
 
     //$18 = adress of string cursor 
     function NewLine
-    set $19 10
-    store $19 $18 $0
+        set $19 10
+        store $19 $18 $0
     end
 }

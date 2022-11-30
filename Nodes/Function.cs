@@ -1,18 +1,17 @@
 using System.Collections.Generic;
 using DCasm.Visitors;
 
-namespace DCasm
+namespace DCasm;
+
+public class Function : INode
 {
-    public class Function : INode
+    public Function(string name)
     {
-        public Function(string name)
-        {
-            Value = name;
-            Children = new List<INode>();
-        }
-
-        public string Value { get; set; }
-        public List<INode> Children { get; set; }
-
+        Value = name;
+        Children = new List<INode>();
     }
+
+    public string Value { get; set; }
+    public List<INode> Children { get; set; }
+
 }

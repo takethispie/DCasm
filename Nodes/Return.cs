@@ -1,14 +1,13 @@
 using System.Collections.Generic;
 using DCasm.Visitors;
 
-namespace DCasm
-{
-    public class Return : INode
-    {
-        public string Value { get; set; }
+namespace DCasm;
 
-        public Return(string functionName) {
-            Value = functionName;
-        }
+public class Return : INode
+{
+    public string Value { get; set; }
+
+    public Return(string functionName) {
+        Value = functionName;
     }
 }

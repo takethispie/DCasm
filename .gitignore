@@ -46,3 +46,6 @@ obj/*
 Parser.cs.old
 Parser.cs.old
 Scanner.cs.old
+
+.fake
+.ionide

@@ -3,8 +3,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-namespace DCasm {
-
+namespace DCasm; 
 public class Token {
 	public int kind;    // token kind
 	public int pos;     // token position in bytes in the source text (starting at 0)
@@ -482,4 +481,3 @@ public class Scanner {
 
 } // end Scanner
 
-}
