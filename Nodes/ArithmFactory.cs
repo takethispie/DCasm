@@ -1,5 +1,3 @@
-using System;
-
 namespace DCasm;
 
 public static class ArithmFactory

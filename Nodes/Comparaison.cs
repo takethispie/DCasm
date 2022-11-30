@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using DCasm.Visitors;
-
-namespace DCasm; 
+﻿namespace DCasm; 
 public class Comparaison : INode {
 
     public string Value { get; set; }

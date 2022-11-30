@@ -1,5 +1,3 @@
-using System;
-
 namespace DCasm.InstructionSet;
 
 public static class RegisterConverter
